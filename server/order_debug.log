@@ -1,0 +1,63 @@
+[2026-03-15T08:24:42.717Z] Incoming order:    week end for cafe: 69b50ed6058af131ec8aaf7d, status: confirmed, orderId: 816137
+[2026-03-15T08:35:19.646Z] Incoming order:    week end for cafe: 69b50ed6058af131ec8aaf7d, status: confirmed, orderId: 275252
+[2026-03-15T08:36:54.073Z] Incoming order:    week end for cafe: 69b50ed6058af131ec8aaf7d, status: confirmed, orderId: 275252
+[2026-03-15T08:47:53.680Z] Incoming order:    week end for cafe: 69b50ed6058af131ec8aaf7d, status: confirmed, orderId: 130981
+[2026-03-15T08:50:48.669Z] Incoming order:    week end for cafe: 69b50ed6058af131ec8aaf7d, status: confirmed, orderId: 356205
+[2026-03-15T09:34:55.815Z] Incoming order:    week end for cafe: 69b5a9d658b2d0f44f1f0f26, status: pending, orderId: 815517
+[2026-03-15T12:53:49.247Z] Incoming order:    week end for cafe: 69b5a9d658b2d0f44f1f0f26, status: pending, orderId: 546817
+[2026-03-15T12:55:34.552Z] Incoming order: mac for cafe: 69b5a9d658b2d0f44f1f0f26, status: pending, orderId: 671419
+[2026-03-15T12:56:29.730Z] Incoming order: mac for cafe: 69b5a9d658b2d0f44f1f0f26, status: pending, orderId: 671419
+[2026-03-15T12:57:01.672Z] Incoming order: mac for cafe: 69b5a9d658b2d0f44f1f0f26, status: pending, orderId: 671419
+[2026-03-15T17:40:48.385Z] Incoming order: bunny for cafe: 69b6dc71a62103ca09058418, status: PENDING, orderId: 417815
+[2026-03-15T18:07:04.190Z] Incoming order: bunny for cafe: 69b6dc71a62103ca09058418, status: PENDING, orderId: 151356
+[2026-03-15T18:36:38.226Z] Incoming order:    week end for cafe: 69b6dc71a62103ca09058418, status: PENDING, orderId: 362283
+[2026-03-15T18:36:38.254Z] ❌ Create Error: MeetupOrder validation failed: members: Cast to embedded failed for value "week end" (type string) at path "members" because of "ObjectParameterError"
+[2026-03-15T18:36:38.264Z] ❌ DB/Socket Error: MeetupOrder validation failed: members: Cast to embedded failed for value "week end" (type string) at path "members" because of "ObjectParameterError"
+[2026-03-15T18:36:38.266Z] ❌ Outer Error: MeetupOrder validation failed: members: Cast to embedded failed for value "week end" (type string) at path "members" because of "ObjectParameterError"
+[2026-03-15T18:45:06.756Z] Incoming order:    week end for cafe: 69b6dc71a62103ca09058418, status: PENDING, orderId: 704438
+[2026-03-15T18:45:06.785Z] ❌ Create Error: MeetupOrder validation failed: members: Cast to embedded failed for value "week end" (type string) at path "members" because of "ObjectParameterError"
+[2026-03-15T18:45:06.792Z] ❌ DB/Socket Error: MeetupOrder validation failed: members: Cast to embedded failed for value "week end" (type string) at path "members" because of "ObjectParameterError"
+[2026-03-15T18:45:06.796Z] ❌ Outer Error: MeetupOrder validation failed: members: Cast to embedded failed for value "week end" (type string) at path "members" because of "ObjectParameterError"
+[2026-03-15T18:47:39.289Z] Incoming order:    week end for cafe: 69b6dc71a62103ca09058418, status: PENDING, orderId: 704438
+[2026-03-15T18:47:39.329Z] ❌ Create Error: MeetupOrder validation failed: members: Cast to embedded failed for value "week end" (type string) at path "members" because of "ObjectParameterError"
+[2026-03-15T18:47:39.337Z] ❌ DB/Socket Error: MeetupOrder validation failed: members: Cast to embedded failed for value "week end" (type string) at path "members" because of "ObjectParameterError"
+[2026-03-15T18:47:39.340Z] ❌ Outer Error: MeetupOrder validation failed: members: Cast to embedded failed for value "week end" (type string) at path "members" because of "ObjectParameterError"
+[2026-03-15T18:53:44.507Z] Incoming order:    week end for cafe: 69b6dc71a62103ca09058418, status: PENDING, orderId: 260728
+[2026-03-15T18:53:44.589Z] ✅ Order saved: 260728
+[2026-03-15T18:54:37.685Z] Incoming order:    week end for cafe: 69b6dc71a62103ca09058418, status: PENDING, orderId: 260728
+[2026-03-15T18:54:37.737Z] ❌ DB/Socket Error: MeetupOrder validation failed: members: Cast to embedded failed for value "week end" (type string) at path "members" because of "ObjectParameterError"
+[2026-03-15T18:54:37.743Z] ❌ Outer Error: MeetupOrder validation failed: members: Cast to embedded failed for value "week end" (type string) at path "members" because of "ObjectParameterError"
+[2026-03-15T19:17:45.127Z] Incoming order:    week end for cafe: 69b6dc71a62103ca09058418, status: PENDING, orderId: 506223
+[2026-03-15T19:17:45.205Z] ✅ Order saved: 506223
+[2026-03-15T19:18:22.204Z] Incoming order:    week end for cafe: 69b6dc71a62103ca09058418, status: PENDING, orderId: 506223
+[2026-03-15T19:50:54.244Z] Incoming order:    week end for cafe: 69b709487b1b202b70caf860, status: PENDING, orderId: 981270
+[2026-03-15T19:50:54.334Z] ✅ Order saved: 981270
+[2026-03-15T19:58:37.384Z] Incoming order:    week end for cafe: 69b709487b1b202b70caf860, status: PENDING, orderId: 981270
+[2026-03-15T20:16:08.955Z] Incoming order:    week end for cafe: 69b709487b1b202b70caf860, status: PENDING, orderId: 959469
+[2026-03-15T20:16:09.029Z] ✅ Order saved: 959469
+[2026-03-15T20:16:49.019Z] Incoming order:    week end for cafe: 69b709487b1b202b70caf860, status: PENDING, orderId: 959469
+[2026-03-15T20:17:47.610Z] Incoming order: bunny for cafe: 69b709487b1b202b70caf860, status: PENDING, orderId: 244459
+[2026-03-15T20:17:47.682Z] ✅ Order saved: 244459
+[2026-03-15T20:18:14.844Z] Incoming order: bunny for cafe: 69b709487b1b202b70caf860, status: PENDING, orderId: 244459
+[2026-03-16T16:46:44.043Z] Incoming order:    week end for cafe: 69b82dcd2ac608e884586f5c, status: PENDING, orderId: 450491
+[2026-03-16T16:46:44.115Z] ✅ Order saved: 450491
+[2026-03-17T04:33:43.924Z] Incoming order:    week end for cafe: 69b8d80e8f16d29523aaa516, status: PENDING, orderId: 924105
+[2026-03-17T04:33:43.972Z] ✅ Order saved: 924105
+[2026-03-17T04:39:46.650Z] Incoming order:    week end for cafe: 69b8d80e8f16d29523aaa516, status: PENDING, orderId: 450224
+[2026-03-17T04:39:46.692Z] ✅ Order saved: 450224
+[2026-03-17T06:18:10.707Z] Incoming order: mac for cafe: 69b8d80e8f16d29523aaa516, status: PENDING, orderId: 199134
+[2026-03-17T06:18:10.847Z] ✅ Order saved: 199134
+[2026-03-17T06:26:57.855Z] Incoming order:    week end for cafe: 69b8d80e8f16d29523aaa516, status: PENDING, orderId: 591957
+[2026-03-17T06:26:57.905Z] ✅ Order saved: 591957
+[2026-03-17T06:27:14.740Z] Incoming order:    week end for cafe: 69b8d80e8f16d29523aaa516, status: PENDING, orderId: 591957
+[2026-03-17T06:33:33.083Z] Incoming order:    week end for cafe: 69b8d80e8f16d29523aaa516, status: PENDING, orderId: 726901
+[2026-03-17T06:33:33.130Z] ✅ Order saved: 726901
+[2026-03-17T06:33:44.067Z] Incoming order: mac for cafe: 69b8d80e8f16d29523aaa516, status: PENDING, orderId: 205116
+[2026-03-17T06:33:44.188Z] ✅ Order saved: 205116
+[2026-03-17T08:34:59.056Z] Incoming order: mac for cafe: 69b90a3135cbf6bab4eeabc5, status: PENDING, orderId: 432075
+[2026-03-17T08:34:59.138Z] ✅ Order saved: 432075
+[2026-03-17T08:36:27.968Z] Incoming order: mac for cafe: 69b90a3135cbf6bab4eeabc5, status: PENDING, orderId: 432075
+[2026-03-17T17:16:02.066Z] Incoming order: bunny vardhan for cafe: 69b90a3135cbf6bab4eeabc5, status: PENDING, orderId: 425626
+[2026-03-17T17:16:02.128Z] ✅ Order saved: 425626
+[2026-03-17T17:25:57.877Z] Incoming order: bunny vardhan for cafe: 69b90a3135cbf6bab4eeabc5, status: PENDING, orderId: 494545
+[2026-03-17T17:25:58.059Z] ✅ Order saved: 494545

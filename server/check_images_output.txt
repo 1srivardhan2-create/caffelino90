@@ -1,0 +1,18 @@
+Connected to MongoDB
+Found 3 approved cafes.
+---
+ID: 69b6dc71a62103ca09058418
+Name: concu
+Profile Picture exists: true
+Profile Picture Start: data:image/avif;base64,AAAAHGZ0eXBhdmlmAAAAAG1pZjF
+Cafe Photos Count: 0
+---
+ID: 69b709487b1b202b70caf860
+Name: havali
+Profile Picture exists: false
+Cafe Photos Count: 0
+---
+ID: 69b82dcd2ac608e884586f5c
+Name: prizmo
+Profile Picture exists: false
+Cafe Photos Count: 0

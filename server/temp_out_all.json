@@ -1,0 +1,68 @@
+[
+  {
+    "_id": "69b4763200423aa3416dd93f",
+    "meetupCode": "J84ZEY",
+    "title": "raju's Meetup",
+    "organizerId": "69af3148d0ffba77e94bd1d6"
+  },
+  {
+    "_id": "69b473d2d627cc4d42bd4ea4",
+    "meetupCode": "DUR67K",
+    "title": "sunny's Meetup",
+    "organizerId": "google_sunny944051_gmail_com"
+  },
+  {
+    "_id": "69b47140d627cc4d42bd4e35",
+    "meetupCode": "1F269G",
+    "title": "rajuTester's Meetup",
+    "organizerId": "69af3148d0ffba77e94bd1d6"
+  },
+  {
+    "_id": "69b46a1c766e06a0ee57f925",
+    "meetupCode": "61018T",
+    "title": "sunny's Meetup",
+    "organizerId": "google_sunny944051_gmail_com"
+  },
+  {
+    "_id": "69b45f931b494ea85d62a089",
+    "meetupCode": "78PU1H",
+    "title": "sunny's Meetup",
+    "organizerId": "google_sunny944051_gmail_com"
+  },
+  {
+    "_id": "69b457cd1b494ea85d62a021",
+    "meetupCode": "BQNQEO",
+    "title": "sunny's Meetup",
+    "organizerId": "google_sunny944051_gmail_com"
+  },
+  {
+    "_id": "69b1b152a5bcd1fa3e028877",
+    "meetupCode": "75WAIV",
+    "title": "Vardhan's Meetup",
+    "organizerId": "69af3148d0ffba77e94bd1d6"
+  },
+  {
+    "_id": "69b1af97a5bcd1fa3e02886d",
+    "meetupCode": "RSML1U",
+    "title": "raju's Meetup",
+    "organizerId": "69af3148d0ffba77e94bd1d6"
+  },
+  {
+    "_id": "69b1aec3a5bcd1fa3e028858",
+    "meetupCode": "KZSOIQ",
+    "title": "raju's Meetup",
+    "organizerId": "69af3148d0ffba77e94bd1d6"
+  },
+  {
+    "_id": "69b1a0cea5bcd1fa3e0287e1",
+    "meetupCode": "VPRDQB",
+    "title": "sunny23's Meetup",
+    "organizerId": "69ac59f05c4ba0752aa5de78"
+  },
+  {
+    "_id": "69af3051d0ffba77e94bd1c4",
+    "meetupCode": "HE8JIW",
+    "title": "Test",
+    "organizerId": "x1"
+  }
+]

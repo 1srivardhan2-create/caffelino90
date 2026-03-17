@@ -1,0 +1,52 @@
+[
+  {
+    "id": "69b6dc71a62103ca09058418",
+    "name": "concu",
+    "status": true,
+    "hasProfilePicture": true,
+    "profilePictureType": "base64",
+    "profilePictureLength": 87759,
+    "photoCount": 0,
+    "photos": []
+  },
+  {
+    "id": "69b709487b1b202b70caf860",
+    "name": "havali",
+    "status": true,
+    "hasProfilePicture": false,
+    "profilePictureType": "none",
+    "profilePictureLength": 0,
+    "photoCount": 0,
+    "photos": []
+  },
+  {
+    "id": "69b82dcd2ac608e884586f5c",
+    "name": "prizmo",
+    "status": true,
+    "hasProfilePicture": false,
+    "profilePictureType": "none",
+    "profilePictureLength": 0,
+    "photoCount": 0,
+    "photos": []
+  },
+  {
+    "id": "69b8478f25316513c38a5cfe",
+    "name": "lavintage",
+    "status": true,
+    "hasProfilePicture": false,
+    "profilePictureType": "none",
+    "profilePictureLength": 0,
+    "photoCount": 0,
+    "photos": []
+  },
+  {
+    "id": "69b84ff325316513c38a5e0d",
+    "name": "bunny",
+    "status": true,
+    "hasProfilePicture": false,
+    "profilePictureType": "none",
+    "profilePictureLength": 0,
+    "photoCount": 0,
+    "photos": []
+  }
+]

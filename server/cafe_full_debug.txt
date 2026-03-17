@@ -1,0 +1,81 @@
+=== concu ===
+All keys: _id, ownerId, Name, Cafe_Address, cafe_location, latitude, longitude, establishmentType, Average_Cost, AboutCafe, managerName, Phonenumber, email_address_manager, status, role, tables, opening_hours, paymentMethods, upiIDs, Cafe_photos, profilePicture, createdAt, updatedAt, __v
+_id: "69b6dc71a62103ca09058418"
+ownerId: "69b6d5b7e1d102cf2896df33"
+Name: "concu"
+Cafe_Address: "Feel Good Homes, Gandhamguda, Gandipet mandal, Ranga Reddy, Telangana, 500091, India"
+cafe_location: "Feel Good Homes, Gandhamguda, Gandipet mandal, Ranga Reddy, Telangana, 500091, India"
+latitude: 17.36478
+longitude: 78.385231
+establishmentType: "Cafe"
+Average_Cost: "700"
+AboutCafe: ""
+managerName: "vardhan"
+Phonenumber: "2323232323"
+email_address_manager: "caffelino.9@gmail.com"
+status: true
+role: "cafe"
+tables: 0
+opening_hours: {"monday":{"closed":false},"tuesday":{"closed":false},"wednesday":{"closed":false},"thursday":{"closed":false},"friday":{"closed":false},"saturday":{"closed":false},"sunday":{"closed":false}}
+paymentMethods: [array len=0]
+upiIDs: [array len=0]
+Cafe_photos: [array len=0]
+profilePicture: [string len=87759 starts=data:image/avif;base64,AAAAHGZ0eXBhdmlmAAAAAG1pZjF]
+createdAt: "2026-03-15T16:21:05.595Z"
+updatedAt: "2026-03-15T16:21:05.595Z"
+__v: 0
+
+=== havali ===
+All keys: _id, ownerId, Name, Cafe_Address, cafe_location, latitude, longitude, establishmentType, Average_Cost, AboutCafe, managerName, Phonenumber, email_address_manager, status, role, tables, opening_hours, paymentMethods, upiIDs, Cafe_photos, profilePicture, createdAt, updatedAt, __v
+_id: "69b709487b1b202b70caf860"
+ownerId: "69b709117b1b202b70caf84c"
+Name: "havali"
+Cafe_Address: "Feel Good Homes, Gandhamguda, Gandipet mandal, Ranga Reddy, Telangana, 500091, India"
+cafe_location: "Feel Good Homes, Gandhamguda, Gandipet mandal, Ranga Reddy, Telangana, 500091, India"
+latitude: 17.364826469775554
+longitude: 78.38551954488541
+establishmentType: "Restaurant"
+Average_Cost: "800"
+AboutCafe: ""
+managerName: "ssohan"
+Phonenumber: "8438909305"
+email_address_manager: "maxbunny9440@gmail.com"
+status: true
+role: "cafe"
+tables: 0
+opening_hours: {"monday":{"closed":false},"tuesday":{"closed":false},"wednesday":{"closed":false},"thursday":{"closed":false},"friday":{"closed":false},"saturday":{"closed":false},"sunday":{"closed":false}}
+paymentMethods: [array len=0]
+upiIDs: [array len=0]
+Cafe_photos: [array len=0]
+profilePicture: ""
+createdAt: "2026-03-15T19:32:24.999Z"
+updatedAt: "2026-03-15T19:32:24.999Z"
+__v: 0
+
+=== prizmo ===
+All keys: _id, ownerId, Name, Cafe_Address, cafe_location, latitude, longitude, establishmentType, Average_Cost, AboutCafe, managerName, Phonenumber, email_address_manager, status, role, tables, opening_hours, paymentMethods, upiIDs, Cafe_photos, profilePicture, createdAt, updatedAt, __v
+_id: "69b82dcd2ac608e884586f5c"
+ownerId: "69b82ccc2ac608e884586f58"
+Name: "prizmo"
+Cafe_Address: [string len=108 starts=Banjarahills, Gajwel Pragnapur Road, Bhongir, Bhon]
+cafe_location: [string len=108 starts=Banjarahills, Gajwel Pragnapur Road, Bhongir, Bhon]
+latitude: 17.5193072
+longitude: 78.882709
+establishmentType: "Restaurant"
+Average_Cost: "400"
+AboutCafe: ""
+managerName: "atish"
+Phonenumber: "9440516961"
+email_address_manager: "ravulakollaraju9@gmail.com"
+status: true
+role: "cafe"
+tables: 0
+opening_hours: {"monday":{"closed":false},"tuesday":{"closed":false},"wednesday":{"closed":false},"thursday":{"closed":false},"friday":{"closed":false},"saturday":{"closed":false},"sunday":{"closed":false}}
+paymentMethods: [array len=0]
+upiIDs: [array len=0]
+Cafe_photos: [array len=0]
+profilePicture: ""
+createdAt: "2026-03-16T16:20:29.274Z"
+updatedAt: "2026-03-16T16:20:29.274Z"
+__v: 0
+

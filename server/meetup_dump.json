@@ -1,0 +1,30 @@
+{
+  "_id": "69b713d476e8158ad54702a1",
+  "meetupCode": "KVZQUY",
+  "title": "bunny's Meetup",
+  "organizerId": "69b6d5b7e1d102cf2896df33",
+  "organizerName": "bunny",
+  "date": "2026-03-19",
+  "time": "04:47",
+  "members": [
+    {
+      "userId": "69b6d5b7e1d102cf2896df33",
+      "name": "bunny",
+      "joinedAt": "2026-03-15T20:17:24.168Z",
+      "_id": "69b713d476e8158ad54702a2"
+    }
+  ],
+  "cafesForVoting": [],
+  "votes": [],
+  "selectedCafe": {
+    "cafeId": "69b709487b1b202b70caf860",
+    "cafeName": "havali",
+    "name": "havali",
+    "image": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400",
+    "location": "Feel Good Homes, Gandhamguda, Gandipet mandal, Ranga Reddy, Telangana, 500091, India"
+  },
+  "status": "ordering",
+  "createdAt": "2026-03-15T20:17:24.169Z",
+  "updatedAt": "2026-03-15T20:17:29.621Z",
+  "__v": 0
+}
