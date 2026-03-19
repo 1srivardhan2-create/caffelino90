@@ -5,7 +5,7 @@ import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface BillApprovalAdminProps {
   billData: any;
