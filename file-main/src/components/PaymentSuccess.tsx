@@ -5,7 +5,7 @@ import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { toast } from 'sonner';
 import { copyToClipboard } from '../utils/clipboard';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { PAYMENT_STATUS } from './PaymentStatusTracker';
 import { notifyPaymentSuccess } from '../utils/notificationManager';
 

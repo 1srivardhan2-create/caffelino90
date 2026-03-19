@@ -40,7 +40,7 @@ export default function AllCafesPage({ onNavigate, onBack }: AllCafesPageProps) 
   // Helper to resolve image URLs (prepend server base for /uploads/ paths)
   const resolveImageUrl = (url: string) => {
     if (!url) return '';
-    if (url.startsWith('/uploads/')) return `http://localhost:5000${url}`;
+    if (url.startsWith('/uploads/')) return `https://caffelino90-9v4a.onrender.com${url}`;
     return url;
   };
 
@@ -52,7 +52,7 @@ export default function AllCafesPage({ onNavigate, onBack }: AllCafesPageProps) 
 
     const resolveImg = (imgStr: string | null) => {
       if (!imgStr) return DEFAULT_CAFE_IMAGE;
-      if (imgStr.startsWith('/uploads/')) return `http://localhost:5000${imgStr}`;
+      if (imgStr.startsWith('/uploads/')) return `https://caffelino90-9v4a.onrender.com${imgStr}`;
       return imgStr; // Handles data: image/... and http://... natively
     };
 

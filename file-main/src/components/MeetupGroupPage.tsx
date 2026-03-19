@@ -8,7 +8,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-const imgLogo = "/logo.png";
+import imgLogo from '../assets/logo.svg';
 import { getAvatarById } from '../utils/avatarData';
 import GenderAvatar from './GenderAvatar';
 import ChatPaymentMessage from './ChatPaymentMessage';

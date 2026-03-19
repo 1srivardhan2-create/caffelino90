@@ -106,7 +106,7 @@ export default function CafeSelectionAdmin({ user, meetupData, onNavigate, onBac
 
       try {
         // Save to backend
-        const res = await fetch('http://localhost:5000/api/meetups/add-cafes', {
+        const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/add-cafes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

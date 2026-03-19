@@ -1,4 +1,4 @@
-const imgImageLogo = "/logo.png";
+import imgImageLogo from '../assets/logo.svg';
 const imgOner1 = "/oner1.png";
 import { ArrowLeft } from "lucide-react";
 

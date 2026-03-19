@@ -93,7 +93,7 @@ export default function JoinVoting({ user, meetupData, onNavigate, onBack }: Joi
     setMyVote(cafeId);
 
     try {
-      const res = await fetch('http://localhost:5000/api/meetups/vote', {
+      const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/vote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

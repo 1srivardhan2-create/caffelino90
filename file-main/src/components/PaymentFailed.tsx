@@ -2,7 +2,7 @@ import { XCircle, RotateCcw, Home, AlertCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 interface PaymentFailedProps {
   paymentData: any;

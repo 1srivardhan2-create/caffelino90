@@ -145,7 +145,7 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
     // Try to fetch meetup orders from the new endpoint
     if (resolvedCafeId) {
       try {
-        const res = await fetch(`http://localhost:5000/api/cafe/meetup-orders/${resolvedCafeId}`);
+        const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/cafe/meetup-orders/${resolvedCafeId}`);
         const data = await res.json();
         if (data.success && data.orders && data.orders.length > 0) {
           const activeOrders = data.orders
@@ -200,7 +200,7 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
     if (!resolvedCafeId) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/meetup-orders/deleted/${resolvedCafeId}`);
+      const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/meetup-orders/deleted/${resolvedCafeId}`);
       const data = await res.json();
       if (data.success && data.orders) {
         setDeletedOrders(data.orders);
@@ -223,7 +223,7 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
     if (!confirm(`Delete order ${order.orderNumber}?\n\nThis order will be moved to Deleted Orders.`)) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/meetup-orders/${order.orderId || order.orderNumber}`, {
+      const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/meetup-orders/${order.orderId || order.orderNumber}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason: 'manual delete' })
@@ -252,7 +252,7 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
   // ─── ACTIVE ORDER ACTIONS ─────────────────────────────────────────────────────
   const handleAccept = async (order: Order) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/meetup-orders/${order.orderId || order.orderNumber}/accept`, {
+      const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/meetup-orders/${order.orderId || order.orderNumber}/accept`, {
         method: 'PATCH',
       });
       const data = await res.json();
@@ -290,7 +290,7 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/meetup-orders/${selectedOrder.orderId || selectedOrder.orderNumber}/cash-collected`, {
+      const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/meetup-orders/${selectedOrder.orderId || selectedOrder.orderNumber}/cash-collected`, {
         method: 'PATCH',
       });
       const data = await res.json();

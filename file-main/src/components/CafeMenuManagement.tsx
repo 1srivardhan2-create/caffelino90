@@ -22,7 +22,7 @@ export interface MenuItem {
   imageFile?: File; // For frontend uploading
 }
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://caffelino90-9v4a.onrender.com/api';
 
 export default function CafeMenuManagement() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -491,7 +491,7 @@ function MenuItemCard({
 
   const getDisplayImage = () => {
     if (imageError || !item.image_url) return getDefaultImage(item.Category);
-    if (item.image_url.startsWith('/uploads/')) return `http://localhost:5000${item.image_url}`;
+    if (item.image_url.startsWith('/uploads/')) return `https://caffelino90-9v4a.onrender.com${item.image_url}`;
     return item.image_url;
   };
 

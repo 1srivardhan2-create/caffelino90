@@ -44,8 +44,8 @@ import { clearAllGroupData } from './utils/groupStateManager';
 import { getAvatarById } from './utils/avatarData';
 import { getCafeById } from './utils/cafesData';
 import { safeStorage, safeWindow, safeDocument } from './utils/safeStorage';
-const imgLogo = "/logo.png";
-const imgCaffelinoLogo = "/caffelinoLogo.png";
+import imgLogo from './assets/logo.svg';
+import imgCaffelinoLogo from './assets/caffelinoLogo.svg';
 type Page =
   | "landing"
   | "home"
@@ -491,7 +491,7 @@ function AppContent() {
       };
 
       try {
-        const response = await fetch(`http://localhost:5000/api/user/profile/${user.id}`, {
+        const response = await fetch(`https://caffelino90-9v4a.onrender.com/api/user/profile/${user.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

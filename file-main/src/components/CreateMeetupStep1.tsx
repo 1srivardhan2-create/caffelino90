@@ -119,7 +119,7 @@ export default function CreateMeetupStep1({ user, onNavigate, onBack }: CreateMe
     try {
       const meetupTitle = `${adminName}'s Meetup`;
 
-      const createRes = await fetch('http://localhost:5000/api/meetups/create', {
+      const createRes = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

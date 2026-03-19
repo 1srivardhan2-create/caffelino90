@@ -183,7 +183,7 @@ export default function CafeVoting({ user, meetupData, onNavigate, onBack }: Caf
 
   const handleEndVotingApi = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/meetups/${meetupData._id || meetupData.id}/end-voting`, {
+      const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/meetups/${meetupData._id || meetupData.id}/end-voting`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id || user._id })

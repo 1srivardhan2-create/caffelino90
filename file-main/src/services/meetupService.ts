@@ -1,6 +1,6 @@
 // Meetup Service - Handles meetup-related API calls
 
-const API_BASE_URL = "http://localhost:5000/api/meetups";
+const API_BASE_URL = "https://caffelino90-9v4a.onrender.com/api/meetups";
 
 /**
  * Get all active meetups for a specific user from the backend

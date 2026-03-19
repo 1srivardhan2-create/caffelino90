@@ -145,13 +145,13 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
     const fetchMenu = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/meetups/${meetupData._id}/cafe-menu`);
+        const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/meetups/${meetupData._id}/cafe-menu`);
         const data = await res.json();
         if (data.success && data.menuItems) {
           const mappedMenu = data.menuItems.map((item: any) => {
             let finalImage = item.image || item.image_url;
             if (finalImage && finalImage.startsWith('/uploads/')) {
-              finalImage = `http://localhost:5000${finalImage}`;
+              finalImage = `https://caffelino90-9v4a.onrender.com${finalImage}`;
             }
 
             return {
@@ -186,7 +186,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
     const fetchMembers = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/meetups/${meetupData._id}`);
+        const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/meetups/${meetupData._id}`);
         const data = await res.json();
         if (data.success) {
           const fetchedMembers = data.members || (data.meetup && data.meetup.members) || [];
@@ -221,7 +221,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
     // Fetch initial chat history
     const fetchChatHistory = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/meetups/messages/${meetupData._id}`);
+        const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/meetups/messages/${meetupData._id}`);
         const data = await res.json();
         if (data.success && data.messages) {
           const apiMsgs = data.messages.map((m: any) => ({
@@ -359,7 +359,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
       // Call Token API here to persist standard order token payment
       if (orderId) {
-        fetch(`http://localhost:5000/api/meetup-orders/${orderId}/token-paid`, {
+        fetch(`https://caffelino90-9v4a.onrender.com/api/meetup-orders/${orderId}/token-paid`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tokenAmount: 20 })
@@ -459,7 +459,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
     setInputText('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/meetups/message', {
+      const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -568,7 +568,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
     });
 
     try {
-      const res = await fetch('http://localhost:5000/api/meetups/message', {
+      const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -633,7 +633,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
     // Save order to the backend
     try {
-      await fetch('http://localhost:5000/api/meetups/order', {
+      await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -727,7 +727,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
     // Broadcast bill message
     try {
-      const res = await fetch('http://localhost:5000/api/meetups/message', {
+      const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -768,7 +768,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       }]);
 
       try {
-        const res2 = await fetch('http://localhost:5000/api/meetups/message', {
+        const res2 = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/message', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -819,7 +819,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       toast.success('Payment marked as Cash Done! ✅');
 
       try {
-        const res = await fetch('http://localhost:5000/api/meetups/message', {
+        const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/message', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

@@ -1,6 +1,6 @@
 // Auth Service - Handles Google OAuth API calls
 
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "https://caffelino90-9v4a.onrender.com/api";
 
 /**
  * Send Google credential to backend for verification and JWT generation

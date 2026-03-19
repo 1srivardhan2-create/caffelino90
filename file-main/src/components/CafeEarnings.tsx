@@ -55,7 +55,7 @@ export default function CafeEarnings() {
   const fetchEarnings = async () => {
     if (!resolvedCafeId) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/meetup-orders/earnings/${resolvedCafeId}`);
+      const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/meetup-orders/earnings/${resolvedCafeId}`);
       const data = await res.json();
       if (data.success) {
         setSummary(data.summary);

@@ -6,7 +6,7 @@ import POSMenuInterface from './POSMenuInterface';
 // Helper to resolve image URLs (prepend server base for /uploads/ paths)
 const resolveImageUrl = (url: string) => {
   if (!url) return '';
-  if (url.startsWith('/uploads/')) return `http://localhost:5000${url}`;
+  if (url.startsWith('/uploads/')) return `https://caffelino90-9v4a.onrender.com${url}`;
   return url;
 };
 
@@ -36,9 +36,9 @@ export default function CafeDetailsPage({ cafe, user, onBack, onNavigate }: Cafe
   const cafeName = isDbCafe ? (cafe.Name || 'Unnamed Cafe') : cafe?.name;
   const cafeImage = isDbCafe
     ? (cafe.profilePicture 
-        ? (cafe.profilePicture.startsWith('/uploads/') ? `http://localhost:5000${cafe.profilePicture}` : cafe.profilePicture)
+        ? (cafe.profilePicture.startsWith('/uploads/') ? `https://caffelino90-9v4a.onrender.com${cafe.profilePicture}` : cafe.profilePicture)
         : ((cafe.Cafe_photos && cafe.Cafe_photos.length > 0) 
-            ? (cafe.Cafe_photos[0].startsWith('/uploads/') ? `http://localhost:5000${cafe.Cafe_photos[0]}` : cafe.Cafe_photos[0]) 
+            ? (cafe.Cafe_photos[0].startsWith('/uploads/') ? `https://caffelino90-9v4a.onrender.com${cafe.Cafe_photos[0]}` : cafe.Cafe_photos[0]) 
             : DEFAULT_CAFE_IMAGE))
     : cafe?.image;
   const cafePhotos = isDbCafe ? (cafe.Cafe_photos || []).map((p: string) => resolveImageUrl(p)) : (cafe?.photos || []);
@@ -285,7 +285,7 @@ export default function CafeDetailsPage({ cafe, user, onBack, onNavigate }: Cafe
                         >
                           {item.image_url ? (
                             <img
-                              src={item.image_url?.startsWith('/uploads/') ? `http://localhost:5000${item.image_url}` : item.image_url}
+                              src={item.image_url?.startsWith('/uploads/') ? `https://caffelino90-9v4a.onrender.com${item.image_url}` : item.image_url}
                               alt={item.item_name}
                               className="w-full h-full object-cover"
                               onError={(e: any) => {

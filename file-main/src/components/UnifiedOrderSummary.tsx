@@ -254,7 +254,7 @@ export default function UnifiedOrderSummary({
                   {/* Item Image */}
                   <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                     <img
-                      src={item.image?.startsWith('/uploads/') ? `http://localhost:5000${item.image}` : item.image}
+                      src={item.image?.startsWith('/uploads/') ? `https://caffelino90-9v4a.onrender.com${item.image}` : item.image}
                       alt={item.name}
                       className="w-full h-full object-cover"
                     />

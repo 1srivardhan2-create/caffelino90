@@ -116,7 +116,7 @@ export default function CafeSelectionCreate({ user, meetupData, onNavigate, onBa
     } else {
       try {
         // Direct Selection: Save to backend immediately so late joiners see it
-        const res = await fetch('http://localhost:5000/api/meetups/select-cafe', {
+        const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/select-cafe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

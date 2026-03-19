@@ -100,7 +100,7 @@ export default function POSMenuInterface({
   const mappedMenuItems: MenuItem[] = (menuItems || []).map((item: any, index: number) => {
     let finalImage = item.image_url || item.image;
     if (finalImage && finalImage.startsWith('/uploads/')) {
-      finalImage = `http://localhost:5000${finalImage}`;
+      finalImage = `https://caffelino90-9v4a.onrender.com${finalImage}`;
     }
 
     return {

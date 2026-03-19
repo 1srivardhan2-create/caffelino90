@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://caffelino90-9v4a.onrender.com/api';
 
 interface JoinWithCodeProps {
   user: any;

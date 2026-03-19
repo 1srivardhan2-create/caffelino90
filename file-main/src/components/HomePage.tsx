@@ -306,7 +306,7 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
                     // Helper to resolve an image string correctly
                     const resolveImg = (imgStr: string) => {
                       if (!imgStr) return null;
-                      if (imgStr.startsWith('/uploads/')) return `http://localhost:5000${imgStr}`;
+                      if (imgStr.startsWith('/uploads/')) return `https://caffelino90-9v4a.onrender.com${imgStr}`;
                       return imgStr; // Handles data: image/... and http://... natively
                     };
 
