@@ -1,7 +1,7 @@
 import svgPaths from "./svg-j9evwrknpl";
 import clsx from "clsx";
-import imgImageProfileAvatar from "figma:asset/849709757a691f0e0782bc36044166439bcbd6db.png";
-import imgMylogo1 from "figma:asset/ea8edc7a5e80446726722176201d332f9359a7a2.png";
+const imgImageProfileAvatar = "/profileAvatar.png";
+const imgMylogo1 = "/mylogo1.png";
 type ContainerBackgroundImage2Props = {
   additionalClassNames?: string;
 };

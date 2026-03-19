@@ -1,11 +1,10 @@
 import svgPaths from "./svg-f4u93hmk9g";
-import imgImageCafeMocha from "figma:asset/a5b6d9e26488894c07b58e2a055a3a130a345cf5.png";
-import imgImageTheCoffeeBean from "figma:asset/b4f2f423b3c301ca9189b4c18c7bb06b363f7583.png";
-import imgImageBrewBites from "figma:asset/75472a56891d782a6aebdf5671d3e38f8d2afea2.png";
-import imgImageUrbanGrind from "figma:asset/17cd23f12fb1885b006cb3fd1bdda399c967f02c.png";
-import imgImageEspressoHouse from "figma:asset/c4806e9637d84069edccb37d86ec78c7334aeb44.png";
-import imgImageChaiChatter from "figma:asset/b88a8ef1e96c6bec8532bc45e1965770c3c90b00.png";
-
+const imgImageCafeMocha = "/cafeMocha.png";
+const imgImageTheCoffeeBean = "/theCoffeeBean.png";
+const imgImageBrewBites = "/brewBites.png";
+const imgImageUrbanGrind = "/urbanGrind.png";
+const imgImageEspressoHouse = "/espressoHouse.png";
+const imgImageChaiChatter = "/chaiChatter.png";
 function Button() {
   return (
     <div className="h-[24px] relative shrink-0 w-[56.025px]" data-name="Button">

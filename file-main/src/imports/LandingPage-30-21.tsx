@@ -1,6 +1,5 @@
-import imgImageLogo from "figma:asset/6acfd9d6c8ee7fd0ee085b43918ec67ad605c2de.png";
-import imgOner1 from "figma:asset/ade7c17ca7134b9a9ed8c5fc98a2a5fcb317ebe3.png";
-
+const imgImageLogo = "/logo.png";
+const imgOner1 = "/oner1.png";
 function ImageLogo() {
   return (
     <div className="absolute h-[80px] left-[202.66px] top-0 w-[266.663px]" data-name="Image (Logo)">

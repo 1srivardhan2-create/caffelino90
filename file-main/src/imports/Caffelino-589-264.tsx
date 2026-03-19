@@ -1,6 +1,6 @@
 import svgPaths from "./svg-0aujtn2rnu";
 import clsx from "clsx";
-import imgImageProfileAvatar from "figma:asset/849709757a691f0e0782bc36044166439bcbd6db.png";
+const imgImageProfileAvatar = "/profileAvatar.png";
 type ContainerBackgroundImage1Props = {
   additionalClassNames?: string;
   text: string;

@@ -1,6 +1,5 @@
 import svgPaths from "./svg-37gcrxhilf";
-import imgImageCaffelino from "figma:asset/ea8edc7a5e80446726722176201d332f9359a7a2.png";
-
+const imgImageCaffelino = "/caffelino.png";
 function Icon() {
   return (
     <div className="relative shrink-0 size-[20px]" data-name="Icon">

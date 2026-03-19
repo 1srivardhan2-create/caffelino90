@@ -1,14 +1,13 @@
 import svgPaths from "./svg-6z1aazpv24";
-import imgLogo from "figma:asset/6acfd9d6c8ee7fd0ee085b43918ec67ad605c2de.png";
-import imgCoffee11 from "figma:asset/c70ff4b507874d64c60a2a2a803b94f4a81262ab.png";
-import imgMusic1 from "figma:asset/3d26e5f5c5bf70cbc455ccbea5e89ad8f9725cdb.png";
-import imgFood11 from "figma:asset/99bab43317c91e9339d8206aed7bfe8c1e9d7ff6.png";
-import imgBook11 from "figma:asset/059ef2f82d9a724ad4291ec5fe0e7a6f1bdd7782.png";
-import imgGame11 from "figma:asset/0fa55507ab7f40d20bc4c57ed2605cdd88245c9a.png";
-import imgImageFridayCoffeeChat from "figma:asset/7d0528e8a39187bd5c82dc5af4c22d4ed96c2f09.png";
-import imgImageWeekendGamingNight from "figma:asset/fad44129806a88be5d99e884e96319be206cdba9.png";
-import imgImageStudyTechTalk from "figma:asset/15d5ccb4b8b2ff1e32155ef83c9c9535a383bfea.png";
-
+const imgLogo = "/logo.png";
+const imgCoffee11 = "/coffee11.png";
+const imgMusic1 = "/music1.png";
+const imgFood11 = "/food11.png";
+const imgBook11 = "/book11.png";
+const imgGame11 = "/game11.png";
+const imgImageFridayCoffeeChat = "/fridayCoffeeChat.png";
+const imgImageWeekendGamingNight = "/weekendGamingNight.png";
+const imgImageStudyTechTalk = "/studyTechTalk.png";
 function TextInput() {
   return (
     <div className="absolute bg-slate-100 box-border content-stretch flex h-[36px] items-center left-0 overflow-clip pl-[40px] pr-[16px] py-[8px] rounded-[2.68435e+07px] top-0 w-[448px]" data-name="Text Input">

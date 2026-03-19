@@ -1,6 +1,5 @@
 import svgPaths from "./svg-gacskslj4l";
-import imgImageLogo from "figma:asset/6acfd9d6c8ee7fd0ee085b43918ec67ad605c2de.png";
-
+const imgImageLogo = "/logo.png";
 function Heading() {
   return (
     <div className="h-[30px] relative shrink-0 w-full" data-name="Heading 1">

@@ -44,9 +44,8 @@ import { clearAllGroupData } from './utils/groupStateManager';
 import { getAvatarById } from './utils/avatarData';
 import { getCafeById } from './utils/cafesData';
 import { safeStorage, safeWindow, safeDocument } from './utils/safeStorage';
-import imgLogo from 'figma:asset/c3ec3feac5c0ab68f4c09d5c8a9e7f9f7f0c40c4.png';
-import imgCaffelinoLogo from 'figma:asset/ea8edc7a5e80446726722176201d332f9359a7a2.png';
-
+const imgLogo = "/logo.png";
+const imgCaffelinoLogo = "/caffelinoLogo.png";
 type Page =
   | "landing"
   | "home"
