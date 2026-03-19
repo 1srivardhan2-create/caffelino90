@@ -66,7 +66,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
   const [sgstAmount, setSgstAmount] = useState(0);
   const [couponCode, setCouponCode] = useState('');
   const [couponDiscount, setCouponDiscount] = useState(0);
-  const [numberOfPeople, setNumberOfPeople] = useState(meetupData?.members.length || 1);
+  const [numberOfPeople, setNumberOfPeople] = useState(meetupData?.members?.length || 1);
   const [membersList, setMembersList] = useState<any[]>(meetupData?.members || []);
   const [tokenPaid, setTokenPaid] = useState(false);
   const [splitMembers, setSplitMembers] = useState<string[]>([]);
@@ -74,13 +74,33 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
   const chatEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  const currentUserId = user?.id || user?._id || meetupData?.user?.id || meetupData?.user?._id;
-  const meetupAdminId = meetupData?.organizerId || meetupData?.adminId;
-  // If meetupData explicitly says isAdmin is false (set by JoinMeetup when joining via code),
-  // always treat as non-admin. Also, joinedViaCode users are NEVER admin.
-  const isAdmin = meetupData?.isAdmin === false || meetupData?.joinedViaCode === true
+  const currentUserId = user?.id || user?._id || (meetupData as any)?.user?.id || (meetupData as any)?.user?._id || null;
+  const meetupAdminId = meetupData?.organizerId || meetupData?.adminId || null;
+
+  // Add safety check for meetupData
+  if (!meetupData) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-20 h-20 bg-[#be9d80]/20 rounded-full flex items-center justify-center mb-4">
+          <Coffee className="w-10 h-10 text-[#be9d80]" />
+        </div>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Meetup session loading...</h2>
+        <p className="text-gray-600 mb-6 max-w-xs">We're getting your chat ready. If it doesn't load soon, try going back and opening it again.</p>
+        <Button 
+          onClick={() => onNavigate('home')}
+          className="bg-[#be9d80] text-white hover:bg-[#a88968]"
+        >
+          Go Back Home
+        </Button>
+      </div>
+    );
+  }
+
+  // Ensure _id exists if meetupId was passed instead
+  const meetupId = meetupData._id || (meetupData as any).meetupId;
+  const isAdmin = meetupData?.isAdmin === false || (meetupData as any)?.joinedViaCode === true
     ? false
-    : (currentUserId === meetupAdminId || meetupData?.isAdmin === true);
+    : !!((currentUserId && meetupAdminId && currentUserId === meetupAdminId) || meetupData?.isAdmin === true);
   const selectedCafe = meetupData?.selectedCafe || meetupData?.selectedCafes?.[0];
 
   // Get storage key for this meetup
@@ -108,7 +128,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         setCommissionAmount(parsed.commissionAmount || 0);
         setCgstAmount(parsed.cgstAmount || 0);
         setSgstAmount(parsed.sgstAmount || 0);
-        setNumberOfPeople(parsed.numberOfPeople || meetupData?.members.length || 1);
+        setNumberOfPeople(parsed.numberOfPeople || meetupData?.members?.length || 1);
         setTokenPaid(parsed.tokenPaid || false);
         setSplitMembers(parsed.splitMembers || []);
         setPerPersonAmount(parsed.perPersonAmount || 0);
@@ -410,7 +430,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       userRole: isAdmin ? 'creator' : 'member',
       lastActive: new Date().toISOString(),
       isApproved: true,
-      memberCount: meetupData.members.length,
+      memberCount: meetupData.members?.length || 0,
       cafeImage: selectedCafe?.image,
       lastNavigationPage: 'meetup-chat-billing',
       navigationData: meetupData,
@@ -1193,7 +1213,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
                       <div className="border-t border-gray-200 pt-2 space-y-1">
                         <p className="text-xs font-bold text-gray-600 mb-1">Item List:</p>
-                        {(message.billData?.items || []).map((item: any) => (
+                        {Array.isArray(message.billData?.items) && message.billData.items.map((item: any) => (
                           <div key={item.id} className="flex justify-between text-sm">
                             <span>{item.name} x {item.quantity}</span>
                             <span>₹{Number((item.price || 0) * (item.quantity || 0)).toFixed(2)}</span>
@@ -1235,7 +1255,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                               👥 Split among {message.billData.members.length} people — ₹{Number(message.billData?.perPersonAmount || 0).toFixed(2)} each
                             </p>
                             <div className="mt-1 space-y-0.5">
-                              {(message.billData.members || []).map((name: string, idx: number) => (
+                              {Array.isArray(message.billData?.members) && message.billData.members.map((name: string, idx: number) => (
                                 <p key={idx} className="text-xs text-indigo-600 text-center">
                                   {name} → ₹{Number(message.billData?.perPersonAmount || 0).toFixed(2)}
                                 </p>

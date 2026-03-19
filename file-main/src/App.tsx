@@ -617,20 +617,13 @@ function AppContent() {
     if (page === "group-chat" && data) {
       setSelectedGroup(data);
     }
-    if (page === "meetup-flow-controller" && data) {
-      setSelectedGroup(data);
+    if (["meetup-flow-controller", "meetup-dashboard", "cafe-selection-page", "cafe-voting-page"].includes(page as string)) {
+      if (data) setSelectedGroup(data);
+      else if (!selectedGroup) return navigateTo('home');
     }
-    if (page === "meetup-dashboard" && data) {
-      setSelectedGroup(data);
-    }
-    if (page === "cafe-selection-page" && data) {
-      setSelectedGroup(data);
-    }
-    if (page === "cafe-voting-page" && data) {
-      setSelectedGroup(data);
-    }
-    if (page === "meetup-chat-billing" && data) {
-      setSelectedGroup(data);
+    if (page === "meetup-chat-billing") {
+      if (data) setSelectedGroup(data);
+      else if (!selectedGroup) return navigateTo('home');
     }
     if (page === "meetup-chat-billing-completed" && data) {
       setSelectedGroup(data);

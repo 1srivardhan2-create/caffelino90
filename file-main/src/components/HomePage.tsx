@@ -115,16 +115,32 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
   const joinedGroups = userGroups.filter((g: GroupState) => g.userRole === 'member' && g.isApproved);
 
   const handleResumeGroup = (group: any) => {
-    // Force navigate to chat regardless of stage
-    const page = 'meetup-chat-billing';
-    const data = group.navigationData || {
-      meetupId: group.groupId,
-      meetupName: group.groupName,
-      cafeName: group.cafeName,
-      isAdmin: group.userRole === 'creator',
-      groupCode: group.groupCode,
-    };
-    onNavigate(page, data);
+    // If we have full navigation data saved, use it. Otherwise fallback to basic.
+    let data = group.navigationData;
+    
+    if (!data) {
+      data = {
+        _id: group.groupId, // Critical for API calls
+        meetupId: group.groupId,
+        meetupName: group.groupName,
+        title: group.groupName,
+        cafeName: group.cafeName,
+        isAdmin: group.userRole === 'creator',
+        joinCode: group.groupCode,
+        meetupCode: group.groupCode,
+        members: [], // Initialize as empty array to avoid crashes
+        date: group.meetupDate || '',
+        time: group.meetupTime || '',
+        organizerName: group.userRole === 'creator' ? (user?.firstName || user?.name) : 'Admin',
+      };
+    } else {
+      // Ensure _id is present even in existing navigationData if it was missing
+      if (!data._id && group.groupId) data._id = group.groupId;
+      if (!data.joinCode && group.groupCode) data.joinCode = group.groupCode;
+      if (!data.members) data.members = [];
+    }
+    
+    onNavigate('meetup-chat-billing', data);
   };
 
   const handleDeleteGroup = async (groupId: string) => {
