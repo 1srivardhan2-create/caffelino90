@@ -12,19 +12,28 @@ require("dotenv").config();
 
 // Helper: upload a base64 data URI string directly to Cloudinary
 async function uploadBase64ToCloudinary(base64String, folder) {
-    if (!base64String || typeof base64String !== 'string') return '';
+    if (!base64String || typeof base64String !== 'string') {
+        console.warn('[uploadBase64] Skipped: no valid string provided');
+        return '';
+    }
     // If it's already a URL (http/https), return as-is
     if (base64String.startsWith('http://') || base64String.startsWith('https://')) return base64String;
     // Only process data: URIs
-    if (!base64String.startsWith('data:')) return '';
+    if (!base64String.startsWith('data:')) {
+        console.warn('[uploadBase64] Skipped: string does not start with data: or http');
+        return '';
+    }
     try {
+        console.log(`[uploadBase64] Uploading to Cloudinary folder: ${folder}, data length: ${base64String.length}`);
         const result = await cloudinary.uploader.upload(base64String, {
             folder,
             resource_type: 'image',
         });
+        console.log(`[uploadBase64] SUCCESS: ${result.secure_url}`);
         return result.secure_url;
     } catch (err) {
-        console.error('Cloudinary base64 upload error:', err.message);
+        console.error(`[uploadBase64] FAILED for folder ${folder}:`, err.message);
+        console.error('[uploadBase64] Check CLOUDINARY_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET in .env');
         return '';
     }
 }
@@ -870,6 +879,14 @@ const getApprovedCafes = async (req, res) => {
             menuMap[ownerId].push(item);
         });
 
+        // Helper: sanitize image URLs — remove empty, /uploads/ paths
+        const sanitizeImageUrl = (url) => {
+            if (!url || typeof url !== 'string') return '';
+            if (url.startsWith('/uploads/')) return ''; // Local paths won't work on Render
+            if (url.startsWith('data:')) return ''; // Don't send raw base64 to client
+            return url; // http/https Cloudinary URLs are fine
+        };
+
         // Attach menu items to each cafe
         const cafesWithMenu = cafes.map(cafe => {
             const idKey = cafe._id.toString();
@@ -884,9 +901,21 @@ const getApprovedCafes = async (req, res) => {
                 combinedMenus.push(...menuFromOwnerId);
             }
 
+            // Sanitize image URLs for all menu items
+            const sanitizedMenuItems = combinedMenus.map(item => ({
+                ...item,
+                image_url: sanitizeImageUrl(item.image_url),
+            }));
+
+            // Sanitize cafe photos and profile picture
+            const sanitizedCafePhotos = (cafe.Cafe_photos || []).map(p => sanitizeImageUrl(p)).filter(Boolean);
+            const sanitizedProfilePic = sanitizeImageUrl(cafe.profilePicture);
+
             return {
                 ...cafe,
-                menuItems: combinedMenus,
+                menuItems: sanitizedMenuItems,
+                Cafe_photos: sanitizedCafePhotos,
+                profilePicture: sanitizedProfilePic,
             };
         });
 

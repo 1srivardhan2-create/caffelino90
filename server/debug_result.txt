@@ -1,0 +1,126 @@
+CAFES: 4
+CAFE: havali | _id: 69b8d80e8f16d29523aaa516 | ownerId: 69b84fc525316513c38a5e09 | profilePic: URL | photos: 8
+  photo[0]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773721606/cafes/photos/yoz0j
+  photo[1]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773721607/cafes/photos/i1o99
+  photo[2]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773721608/cafes/photos/ilarz
+  photo[3]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773721609/cafes/photos/mecnv
+  photo[4]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773721610/cafes/photos/bxg2t
+  photo[5]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773721611/cafes/photos/lgafk
+  photo[6]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773721612/cafes/photos/ztx0i
+  photo[7]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773721613/cafes/photos/au2w2
+CAFE: concu | _id: 69b90a3135cbf6bab4eeabc5 | ownerId: 69b6d5b7e1d102cf2896df33 | profilePic: URL | photos: 7
+  photo[0]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773734444/cafes/photos/mf1zj
+  photo[1]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773734445/cafes/photos/h3mex
+  photo[2]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773734446/cafes/photos/rvjya
+  photo[3]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773734447/cafes/photos/xzaaa
+  photo[4]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773734448/cafes/photos/ex3ex
+  photo[5]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773734449/cafes/photos/hl4mi
+  photo[6]: URL https://res.cloudinary.com/dbbp6ybef/image/upload/v1773734449/cafes/photos/hndob
+CAFE: Echosa | _id: 69bc5c8fd7b51d11f6566c38 | ownerId: google_sunny944051_gmail_com | profilePic: EMPTY | photos: 0
+CAFE: dwaraka | _id: 69bd6bb87c1ac0e2573db526 | ownerId: google_ravulakollabunny_gmail_com | profilePic: EMPTY | photos: 0
+
+MENU ITEMS: 51
+ITEM: capichino | owner: 69ad05ed71c0a90b3bdaebe2 | avail: true | img: LOCAL 
+ITEM: chicken | owner: 69ad05ed71c0a90b3bdaebe2 | avail: true | img: LOCAL 
+ITEM: majito | owner: 69ad05ed71c0a90b3bdaebe2 | avail: true | img: LOCAL 
+ITEM: margita | owner: 69adb283bde4fba1281df9f9 | avail: true | img: LOCAL 
+ITEM: majito | owner: 69adb283bde4fba1281df9f9 | avail: true | img: LOCAL 
+ITEM: captichino | owner: 69adb283bde4fba1281df9f9 | avail: true | img: LOCAL 
+ITEM: majito | owner: 69aeba9555c90d1b655804be | avail: true | img: LOCAL 
+ITEM: paneer pizza | owner: 69aeba9555c90d1b655804be | avail: true | img: LOCAL 
+ITEM: captichino | owner: 69aeba9555c90d1b655804be | avail: true | img: LOCAL 
+ITEM: mutton | owner: 69aeba9555c90d1b655804be | avail: true | img: LOCAL 
+ITEM: chicken pizza | owner: 69aec42c55c90d1b655804f2 | avail: true | img: LOCAL 
+ITEM: chicken pizza | owner: 69afe9ba8d7e48ab282e749d | avail: true | img: LOCAL 
+ITEM: chicken pizza | owner: 69afe9ba8d7e48ab282e749d | avail: true | img: LOCAL 
+ITEM: chicken | owner: 69b19ff0a5bcd1fa3e0287b9 | avail: true | img: LOCAL 
+ITEM: chicken | owner: 69b19ff0a5bcd1fa3e0287b9 | avail: true | img: LOCAL 
+ITEM: chicken | owner: 69b25f4bdee502872b0c5e89 | avail: true | img: LOCAL 
+ITEM: chicken | owner: 69b25f4bdee502872b0c5e89 | avail: true | img: LOCAL 
+ITEM: chicken | owner: 69b25f4bdee502872b0c5e89 | avail: true | img: LOCAL 
+ITEM: muttton | owner: 69b25f4bdee502872b0c5e89 | avail: true | img: LOCAL 
+ITEM: chicken | owner: 69b2e58a2184e4dc2763746d | avail: true | img: LOCAL 
+ITEM: majito | owner: 69b365ac76fea7f813759aba | avail: true | img: LOCAL 
+ITEM: sandwich chicken | owner: 69b365ac76fea7f813759aba | avail: true | img: LOCAL 
+ITEM: chicken | owner: 69b44e113f8ac6ecc7d8b527 | avail: true | img: LOCAL 
+ITEM: lemon rice | owner: 69b44e113f8ac6ecc7d8b527 | avail: true | img: LOCAL 
+ITEM: egg rice | owner: 69b44e113f8ac6ecc7d8b527 | avail: true | img: LOCAL 
+ITEM: allu burger | owner: 69b44e113f8ac6ecc7d8b527 | avail: true | img: LOCAL 
+ITEM: chicken birayani | owner: 69b50ed6058af131ec8aaf7d | avail: true | img: LOCAL 
+ITEM: alferado | owner: 69b50ed6058af131ec8aaf7d | avail: true | img: LOCAL 
+ITEM: paneer butter masala | owner: 69b50ed6058af131ec8aaf7d | avail: true | img: LOCAL 
+ITEM: margita | owner: 69b50ed6058af131ec8aaf7d | avail: true | img: LOCAL 
+ITEM: capichano | owner: 69b50ed6058af131ec8aaf7d | avail: true | img: LOCAL 
+ITEM: mutton | owner: 69b5a9d658b2d0f44f1f0f26 | avail: true | img: LOCAL 
+ITEM: majito | owner: 69b5a9d658b2d0f44f1f0f26 | avail: true | img: LOCAL 
+ITEM: majito | owner: 69b50ed6058af131ec8aaf7d | avail: true | img: EMPTY 
+ITEM: chicken | owner: 69b6dc71a62103ca09058418 | avail: true | img: LOCAL 
+ITEM: chicken | owner: 69b6dc71a62103ca09058418 | avail: true | img: LOCAL 
+ITEM: chicken | owner: 69b6dc71a62103ca09058418 | avail: true | img: LOCAL 
+ITEM: capichino | owner: 69b6dc71a62103ca09058418 | avail: true | img: LOCAL 
+ITEM: bb | owner: 69b709487b1b202b70caf860 | avail: true | img: LOCAL 
+ITEM: alferado | owner: 69b709487b1b202b70caf860 | avail: true | img: LOCAL 
+ITEM: paneer bbq pizza | owner: 69b709487b1b202b70caf860 | avail: true | img: LOCAL 
+ITEM: ocean majito | owner: 69b709487b1b202b70caf860 | avail: true | img: LOCAL 
+ITEM: capichano | owner: 69b82dcd2ac608e884586f5c | avail: true | img: LOCAL 
+ITEM: chicken birayani | owner: 69b8d80e8f16d29523aaa516 | avail: true | img: LOCAL 
+ITEM: chicken bbq | owner: 69b8d80e8f16d29523aaa516 | avail: true | img: LOCAL 
+ITEM: caramel coffe | owner: 69b8d80e8f16d29523aaa516 | avail: true | img: LOCAL 
+ITEM: ocean majito | owner: 69b8d80e8f16d29523aaa516 | avail: true | img: LOCAL 
+ITEM: chicken biriyani | owner: 69b90a3135cbf6bab4eeabc5 | avail: true | img: LOCAL 
+ITEM: panner pixzza | owner: 69b90a3135cbf6bab4eeabc5 | avail: true | img: LOCAL 
+ITEM: paneer pizza | owner: 69b90a3135cbf6bab4eeabc5 | avail: true | img: LOCAL 
+ITEM: majito | owner: 69b90a3135cbf6bab4eeabc5 | avail: true | img: BASE64 
+
+MATCHING:
+  capichino: owner=69ad05ed71c0a90b3bdaebe2 match=false
+  chicken: owner=69ad05ed71c0a90b3bdaebe2 match=false
+  majito: owner=69ad05ed71c0a90b3bdaebe2 match=false
+  margita: owner=69adb283bde4fba1281df9f9 match=false
+  majito: owner=69adb283bde4fba1281df9f9 match=false
+  captichino: owner=69adb283bde4fba1281df9f9 match=false
+  majito: owner=69aeba9555c90d1b655804be match=false
+  paneer pizza: owner=69aeba9555c90d1b655804be match=false
+  captichino: owner=69aeba9555c90d1b655804be match=false
+  mutton: owner=69aeba9555c90d1b655804be match=false
+  chicken pizza: owner=69aec42c55c90d1b655804f2 match=false
+  chicken pizza: owner=69afe9ba8d7e48ab282e749d match=false
+  chicken pizza: owner=69afe9ba8d7e48ab282e749d match=false
+  chicken: owner=69b19ff0a5bcd1fa3e0287b9 match=false
+  chicken: owner=69b19ff0a5bcd1fa3e0287b9 match=false
+  chicken: owner=69b25f4bdee502872b0c5e89 match=false
+  chicken: owner=69b25f4bdee502872b0c5e89 match=false
+  chicken: owner=69b25f4bdee502872b0c5e89 match=false
+  muttton: owner=69b25f4bdee502872b0c5e89 match=false
+  chicken: owner=69b2e58a2184e4dc2763746d match=false
+  majito: owner=69b365ac76fea7f813759aba match=false
+  sandwich chicken: owner=69b365ac76fea7f813759aba match=false
+  chicken: owner=69b44e113f8ac6ecc7d8b527 match=false
+  lemon rice: owner=69b44e113f8ac6ecc7d8b527 match=false
+  egg rice: owner=69b44e113f8ac6ecc7d8b527 match=false
+  allu burger: owner=69b44e113f8ac6ecc7d8b527 match=false
+  chicken birayani: owner=69b50ed6058af131ec8aaf7d match=false
+  alferado: owner=69b50ed6058af131ec8aaf7d match=false
+  paneer butter masala: owner=69b50ed6058af131ec8aaf7d match=false
+  margita: owner=69b50ed6058af131ec8aaf7d match=false
+  capichano: owner=69b50ed6058af131ec8aaf7d match=false
+  mutton: owner=69b5a9d658b2d0f44f1f0f26 match=false
+  majito: owner=69b5a9d658b2d0f44f1f0f26 match=false
+  majito: owner=69b50ed6058af131ec8aaf7d match=false
+  chicken: owner=69b6dc71a62103ca09058418 match=false
+  chicken: owner=69b6dc71a62103ca09058418 match=false
+  chicken: owner=69b6dc71a62103ca09058418 match=false
+  capichino: owner=69b6dc71a62103ca09058418 match=false
+  bb: owner=69b709487b1b202b70caf860 match=false
+  alferado: owner=69b709487b1b202b70caf860 match=false
+  paneer bbq pizza: owner=69b709487b1b202b70caf860 match=false
+  ocean majito: owner=69b709487b1b202b70caf860 match=false
+  capichano: owner=69b82dcd2ac608e884586f5c match=false
+  chicken birayani: owner=69b8d80e8f16d29523aaa516 match=true
+  chicken bbq: owner=69b8d80e8f16d29523aaa516 match=true
+  caramel coffe: owner=69b8d80e8f16d29523aaa516 match=true
+  ocean majito: owner=69b8d80e8f16d29523aaa516 match=true
+  chicken biriyani: owner=69b90a3135cbf6bab4eeabc5 match=true
+  panner pixzza: owner=69b90a3135cbf6bab4eeabc5 match=true
+  paneer pizza: owner=69b90a3135cbf6bab4eeabc5 match=true
+  majito: owner=69b90a3135cbf6bab4eeabc5 match=true
