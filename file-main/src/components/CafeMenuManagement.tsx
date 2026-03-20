@@ -76,28 +76,33 @@ export default function CafeMenuManagement() {
 
     try {
       setIsSaving(true);
-      const formData = new FormData();
-      formData.append('item_name', newItem.item_name);
-      formData.append('Category', newItem.Category || 'Beverages');
-      formData.append('food_type', newItem.food_type || 'Veg');
-      formData.append('price', String(newItem.price || 0));
-      formData.append('description_food', newItem.description_food || '');
-      formData.append('available', 'true');
 
-      if (newItem.image_url && newItem.image_url.trim()) {
-        formData.append('image_url', newItem.image_url.trim());
-      }
+      // Convert imageFile to base64 if present
+      let imageUrlToSend = newItem.image_url?.trim() || '';
       if (newItem.imageFile) {
-        formData.append('image', newItem.imageFile);
+        imageUrlToSend = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(newItem.imageFile!);
+        });
       }
 
       const token = safeStorage.getItem('cafeToken') || safeStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}/cafe/menuItem/cafe`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: formData,
+        body: JSON.stringify({
+          item_name: newItem.item_name,
+          Category: newItem.Category || 'Beverages',
+          food_type: newItem.food_type || 'Veg',
+          price: String(newItem.price || 0),
+          description_food: newItem.description_food || '',
+          available: true,
+          image_url: imageUrlToSend,
+        }),
         credentials: 'omit'
       });
 
@@ -142,27 +147,32 @@ export default function CafeMenuManagement() {
 
     try {
       setIsSaving(true);
-      const formData = new FormData();
-      formData.append('item_name', newItem.item_name);
-      formData.append('Category', newItem.Category || 'Beverages');
-      formData.append('food_type', newItem.food_type || 'Veg');
-      formData.append('price', String(newItem.price || 0));
-      formData.append('description_food', newItem.description_food || '');
 
-      if (newItem.image_url && newItem.image_url.trim()) {
-        formData.append('image_url', newItem.image_url.trim());
-      }
+      // Convert imageFile to base64 if present
+      let imageUrlToSend = newItem.image_url?.trim() || '';
       if (newItem.imageFile) {
-        formData.append('image', newItem.imageFile);
+        imageUrlToSend = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(newItem.imageFile!);
+        });
       }
 
       const token = safeStorage.getItem('cafeToken') || safeStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}/cafe/menuItem/edit/${selectedItem._id}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: formData,
+        body: JSON.stringify({
+          item_name: newItem.item_name,
+          Category: newItem.Category || 'Beverages',
+          food_type: newItem.food_type || 'Veg',
+          price: String(newItem.price || 0),
+          description_food: newItem.description_food || '',
+          image_url: imageUrlToSend,
+        }),
         credentials: 'omit'
       });
 

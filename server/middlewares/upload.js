@@ -1,22 +1,9 @@
 const multer = require("multer");
 const path = require("path");
-const fs = require("fs");
 
-// Ensure uploads directory exists
-const uploadDir = path.join(__dirname, "..", "uploads");
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Disk storage: saves files to /uploads with a timestamped filename
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname);
-    },
-});
+// Memory storage: keeps files in memory as Buffer objects
+// This allows uploading to Cloudinary via file.buffer
+const storage = multer.memoryStorage();
 
 const upload = multer({
     storage,
@@ -34,3 +21,4 @@ const upload = multer({
 });
 
 module.exports = upload;
+

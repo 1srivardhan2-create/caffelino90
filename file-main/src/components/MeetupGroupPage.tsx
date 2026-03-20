@@ -8,7 +8,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import imgLogo from '../assets/logo.svg';
+const CAFFELINO_LOGO_URL = 'https://i.postimg.cc/g0S6yjSj/caffelino-removebg-preview.png';
 import { getAvatarById } from '../utils/avatarData';
 import GenderAvatar from './GenderAvatar';
 import ChatPaymentMessage from './ChatPaymentMessage';
@@ -106,8 +106,8 @@ export default function MeetupGroupPage({ user, meetupData, onNavigate }: Meetup
               onClick={() => onNavigate('home')}
             >
               <img
-                src={imgLogo}
-                alt="Logo"
+                src={CAFFELINO_LOGO_URL}
+                alt="Caffelino Logo"
                 className="h-[32px] md:h-[40px] w-auto object-contain"
               />
             </div>

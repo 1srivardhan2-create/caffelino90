@@ -316,10 +316,16 @@ const MenuItem = async (req, res) => {
             });
         }
 
-        // Use uploaded file from disk storage, or fallback to provided image_url
-        let finalImageUrl = image_url || "";
-        if (req.files && req.files.image && req.files.image[0]) {
-            finalImageUrl = "/uploads/" + req.files.image[0].filename;
+        // Upload file to Cloudinary, or use provided image_url
+        let finalImageUrl = "";
+        if (req.files && req.files.image && req.files.image[0] && req.files.image[0].buffer) {
+            finalImageUrl = await uploadBuffer(req.files.image[0].buffer, "cafes/menu");
+        } else if (image_url && typeof image_url === 'string') {
+            if (image_url.startsWith('data:')) {
+                finalImageUrl = await uploadBase64ToCloudinary(image_url, 'cafes/menu');
+            } else if (image_url.startsWith('http')) {
+                finalImageUrl = image_url;
+            }
         }
 
         const menuItem = await CafeMenu.create({
@@ -361,9 +367,11 @@ const EditMenuItem = async (req, res) => {
         if (req.body.image_url !== undefined)
             menuItem.image_url = req.body.image_url;
 
-        // Use uploaded file from disk storage
-        if (req.files && req.files.image && req.files.image[0]) {
-            menuItem.image_url = "/uploads/" + req.files.image[0].filename;
+        // Upload file to Cloudinary
+        if (req.files && req.files.image && req.files.image[0] && req.files.image[0].buffer) {
+            menuItem.image_url = await uploadBuffer(req.files.image[0].buffer, "cafes/menu");
+        } else if (req.body.image_url && typeof req.body.image_url === 'string' && req.body.image_url.startsWith('data:')) {
+            menuItem.image_url = await uploadBase64ToCloudinary(req.body.image_url, 'cafes/menu');
         }
 
         await menuItem.save();

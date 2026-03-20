@@ -274,7 +274,7 @@ export default function PartnerRegistration({ onNavigate }: PartnerRegistrationP
       {/* Back Button - Positioned on Left Side */}
       <button
         onClick={() => onNavigate('partner-login-choice')}
-        className="fixed top-24 left-8 md:left-12 flex items-center gap-2 bg-[#8b5943] text-white px-4 py-2 rounded-2xl shadow-lg hover:scale-105 transition-all z-40"
+        className="fixed top-20 left-3 sm:left-8 md:left-12 flex items-center gap-1.5 sm:gap-2 bg-[#8b5943] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl shadow-lg hover:scale-105 transition-all z-40"
       >
         <svg className="size-4" fill="none" viewBox="0 0 11 11">
           <g>
@@ -282,20 +282,20 @@ export default function PartnerRegistration({ onNavigate }: PartnerRegistrationP
             <path d="M5.33333 10L0.666666 5.33333L5.33333 0.666664" stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
           </g>
         </svg>
-        <span className="text-[14px]">Back</span>
+        <span className="text-[13px] sm:text-[14px]">Back</span>
       </button>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Page Header */}
-        <div className="mb-10 text-center">
-          <h1 className="text-[42px] text-[#3b1f0e] mb-3" style={{ fontFamily: 'Arial, sans-serif' }}>
+        <div className="mb-6 sm:mb-10 text-center">
+          <h1 className="text-[28px] sm:text-[36px] md:text-[42px] text-[#3b1f0e] mb-3" style={{ fontFamily: 'Arial, sans-serif' }}>
             ☕ Partner with Caffélino
           </h1>
-          <p className="text-[18px] text-[#6b4423]">
+          <p className="text-[15px] sm:text-[18px] text-[#6b4423]">
             Join our network of cafés and connect with amazing communities
           </p>
-          <div className="mt-4 inline-block bg-[#fff8f0] border-2 border-[#be9d80] rounded-lg px-6 py-3">
-            <p className="text-[14px] text-[#3b1f0e]">
+          <div className="mt-4 inline-block bg-[#fff8f0] border-2 border-[#be9d80] rounded-lg px-4 sm:px-6 py-3">
+            <p className="text-[13px] sm:text-[14px] text-[#3b1f0e]">
               <span className="text-red-500">*</span> indicates mandatory fields
             </p>
           </div>
@@ -303,7 +303,7 @@ export default function PartnerRegistration({ onNavigate }: PartnerRegistrationP
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* 1. CAFÉ INFORMATION */}
-          <Card className="bg-white p-8 rounded-2xl shadow-lg border-2 border-[#e8d5c4]">
+          <Card className="bg-white p-4 sm:p-8 rounded-2xl shadow-lg border-2 border-[#e8d5c4]">
             <div className="mb-6 pb-4 border-b-2 border-[#be9d80]/30">
               <h2 className="text-[26px] text-[#3b1f0e] flex items-center gap-3">
                 <Store className="w-7 h-7 text-[#be9d80]" />
@@ -439,7 +439,7 @@ export default function PartnerRegistration({ onNavigate }: PartnerRegistrationP
 
 
           {/* 2. OPERATING HOURS */}
-          <Card className="bg-white p-8 rounded-2xl shadow-lg border-2 border-[#e8d5c4]">
+          <Card className="bg-white p-4 sm:p-8 rounded-2xl shadow-lg border-2 border-[#e8d5c4]">
             <div className="mb-6 pb-4 border-b-2 border-[#be9d80]/30">
               <h2 className="text-[26px] text-[#3b1f0e] flex items-center gap-3">
                 <Clock className="w-7 h-7 text-[#be9d80]" />
@@ -450,11 +450,11 @@ export default function PartnerRegistration({ onNavigate }: PartnerRegistrationP
 
             <div className="space-y-4">
               {daysOfWeek.map((day) => (
-                <div key={day} className="flex items-center gap-4 p-4 bg-[#faf8f5] rounded-xl">
-                  <div className="w-32">
-                    <span className="text-[15px] text-[#3b1f0e]">{day}</span>
+                <div key={day} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-[#faf8f5] rounded-xl">
+                  <div className="w-full sm:w-28">
+                    <span className="text-[14px] sm:text-[15px] text-[#3b1f0e] font-medium">{day}</span>
                   </div>
-                  <div className="flex items-center gap-3 flex-1">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-1">
                     <Input
                       type="time"
                       value={openingHours[day].open}
@@ -495,7 +495,7 @@ export default function PartnerRegistration({ onNavigate }: PartnerRegistrationP
           </Card>
 
           {/* 3. MANAGER / CONTACT INFORMATION */}
-          <Card className="bg-white p-8 rounded-2xl shadow-lg border-2 border-[#e8d5c4]">
+          <Card className="bg-white p-4 sm:p-8 rounded-2xl shadow-lg border-2 border-[#e8d5c4]">
             <div className="mb-6 pb-4 border-b-2 border-[#be9d80]/30">
               <h2 className="text-[26px] text-[#3b1f0e] flex items-center gap-3">
                 <User className="w-7 h-7 text-[#be9d80]" />
@@ -659,7 +659,7 @@ export default function PartnerRegistration({ onNavigate }: PartnerRegistrationP
           </Card>
 
           {/* 4. CAFÉ PHOTOS */}
-          <Card className="bg-white p-8 rounded-2xl shadow-lg border-2 border-[#e8d5c4]">
+          <Card className="bg-white p-4 sm:p-8 rounded-2xl shadow-lg border-2 border-[#e8d5c4]">
             <div className="mb-6 pb-4 border-b-2 border-[#be9d80]/30">
               <h2 className="text-[26px] text-[#3b1f0e] flex items-center gap-3">
                 <Camera className="w-7 h-7 text-[#be9d80]" />
@@ -731,7 +731,7 @@ export default function PartnerRegistration({ onNavigate }: PartnerRegistrationP
           </Card>
 
           {/* 5. CONFIRMATION & SUBMIT */}
-          <Card className="bg-white p-8 rounded-2xl shadow-lg border-2 border-[#e8d5c4]">
+          <Card className="bg-white p-4 sm:p-8 rounded-2xl shadow-lg border-2 border-[#e8d5c4]">
             <div className="mb-6 pb-4 border-b-2 border-[#be9d80]/30">
               <h2 className="text-[26px] text-[#3b1f0e]">
                 5. Confirmation & Submit

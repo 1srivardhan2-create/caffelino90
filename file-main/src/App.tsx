@@ -44,8 +44,7 @@ import { clearAllGroupData } from './utils/groupStateManager';
 import { getAvatarById } from './utils/avatarData';
 import { getCafeById } from './utils/cafesData';
 import { safeStorage, safeWindow, safeDocument } from './utils/safeStorage';
-import imgLogo from './assets/logo.svg';
-import imgCaffelinoLogo from './assets/caffelinoLogo.svg';
+const CAFFELINO_LOGO_URL = 'https://i.postimg.cc/g0S6yjSj/caffelino-removebg-preview.png';
 type Page =
   | "landing"
   | "home"
@@ -626,30 +625,27 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-slate-50" {...swipeHandlers}>
       {showHeader && (
-        <header className="fixed top-0 left-0 right-0 h-14 bg-[#be9d80] border-b border-[#a88968] z-50 shadow-sm">
-          <div className="max-w-7xl mx-auto h-full px-3 md:px-4 flex items-center justify-between">
-            <div className="flex items-center gap-2 md:gap-3">
-              <div className="cursor-pointer" onClick={() => navigateTo("landing")}>
-                <img src={imgCaffelinoLogo} alt="Caffélino" className="h-[128px] md:h-[160px] w-auto object-contain" />
-              </div>
+        <header className="fixed top-0 left-0 right-0 h-[72px] md:h-[80px] bg-[#be9d80] border-b border-[#a88968] z-50 shadow-md">
+          <div className="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3 md:gap-4">
             </div>
-            <div className="flex items-center gap-3 relative h-9">
+            <div className="flex items-center gap-4 relative">
               {user ? (
                 <>
                   <div className="flex items-center">
-                    <p className="text-black text-[16px] md:text-[18px] font-['Arial:Bold',_sans-serif] font-bold tracking-wide">
+                    <p className="text-black text-[18px] md:text-[20px] font-['Arial:Bold',_sans-serif] font-bold tracking-wide">
                       {user.firstName || user.name}
                     </p>
                   </div>
-                  <div className="relative h-9 w-[84px]">
+                  <div className="flex items-center gap-3">
                     <button
-                      className="absolute left-0 top-0 p-2 rounded-full hover:bg-[#a88968] transition-colors w-9 h-9 flex items-center justify-center"
+                      className="p-2.5 rounded-full hover:bg-[#a88968] transition-colors w-11 h-11 flex items-center justify-center relative"
                       aria-label="Notifications"
                       onClick={() => navigateTo("notifications")}
                     >
-                      <Bell className="w-5 h-5 text-white" />
+                      <Bell className="w-6 h-6 text-white" />
                       {unreadNotifications > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center text-[10px]">
+                        <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center text-[10px]">
                           {unreadNotifications}
                         </span>
                       )}
@@ -657,12 +653,12 @@ function AppContent() {
                     <button
                       onClick={() => navigateTo("profile")}
                       aria-label="Profile"
-                      className="absolute left-12 top-0 w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-[#e8d5c4] to-[#d9bf9d] border-[1.6px] border-white/60 hover:opacity-80 transition-opacity"
+                      className="w-11 h-11 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-[#e8d5c4] to-[#d9bf9d] border-2 border-white/60 hover:opacity-80 transition-opacity shadow-sm"
                     >
                       {user.avatarId && (user.gender === 'male' || user.gender === 'female') ? (
                         <span className="text-2xl">{getAvatarById(user.avatarId)?.emoji}</span>
                       ) : (
-                        <span className="text-lg text-[#8b5943]">
+                        <span className="text-xl text-[#8b5943] font-semibold">
                           {user.firstName?.charAt(0)?.toUpperCase() || user.name?.charAt(0)?.toUpperCase() || '?'}
                         </span>
                       )}
@@ -672,15 +668,15 @@ function AppContent() {
               ) : (
                 <>
                   <button
-                    className="p-2 rounded-full hover:bg-[#a88968] transition-colors"
+                    className="p-2.5 rounded-full hover:bg-[#a88968] transition-colors"
                     aria-label="Notifications"
                     onClick={() => setShowAuthModal(true)}
                   >
-                    <Bell className="w-5 h-5 text-white" />
+                    <Bell className="w-6 h-6 text-white" />
                   </button>
                   <Button
                     onClick={() => setShowAuthModal(true)}
-                    className="bg-white text-slate-900 hover:bg-slate-100 rounded-md px-3 md:px-6 text-sm"
+                    className="bg-white text-slate-900 hover:bg-slate-100 rounded-lg px-4 md:px-7 text-base font-medium py-2"
                   >
                     Login
                   </Button>
@@ -691,7 +687,7 @@ function AppContent() {
         </header>
       )}
 
-      <main className={showHeader ? "pt-14" : ""}>
+      <main className={showHeader ? "pt-[72px] md:pt-[80px]" : ""}>
         {renderPage()}
       </main>
 
