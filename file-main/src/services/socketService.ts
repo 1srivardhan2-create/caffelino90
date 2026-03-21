@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 
-const API_BASE_URL = 'https://caffelino90-9v4a.onrender.com';
+const API_BASE_URL = window.location.hostname === 'localhost' ? "http://localhost:5000" : 'https://caffelino90-9v4a.onrender.com';
 
 class SocketService {
   public socket: Socket | null = null;

@@ -64,7 +64,8 @@ export default function AdminDetails({ user, onNavigate, onBack }: AdminDetailsP
       const meetupTitle = `${adminName.trim()}'s Meetup`;
       const userId = user?.id || user?._id || `admin-${Date.now()}`;
 
-      const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/create', {
+      const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://caffelino90-9v4a.onrender.com';
+      const res = await fetch(`${API_BASE}/api/meetups/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

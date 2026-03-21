@@ -1,7 +1,7 @@
 // LOCAL STORAGE IMPLEMENTATION - NO BACKEND
 // All data stored in browser localStorage
 
-const BASE_URL = 'https://caffelino90-9v4a.onrender.com';
+const BASE_URL = window.location.hostname === 'localhost' ? "http://localhost:5000" : 'https://caffelino90-9v4a.onrender.com';
 
 // Helper function to get data from localStorage
 function getLocalData(key: string) {

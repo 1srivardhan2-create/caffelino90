@@ -115,18 +115,20 @@ export default function LoginSignup({ onClose, onLogin }: LoginSignupProps) {
                 </div>
               )}
 
-              {isProcessing ? (
-                <div className="w-full bg-white py-3.5 px-4 rounded-lg flex items-center justify-center gap-3 shadow-sm">
-                  <div className="w-5 h-5 border-2 border-neutral-300 border-t-neutral-600 rounded-full animate-spin"></div>
-                  <span className="text-sm text-neutral-600">Authenticating...</span>
-                </div>
-              ) : (
+              <div className={isProcessing ? "opacity-0 h-0 w-0 overflow-hidden pointer-events-none" : "block"}>
                 <GoogleLoginButton
                   loginRole="user"
                   onLoginSuccess={handleGoogleLoginSuccess}
                   onLoginError={handleGoogleLoginError}
                   onProcessing={setIsProcessing}
                 />
+              </div>
+              
+              {isProcessing && (
+                <div className="w-full bg-white py-3.5 px-4 rounded-lg flex items-center justify-center gap-3 shadow-sm">
+                  <div className="w-5 h-5 border-2 border-neutral-300 border-t-neutral-600 rounded-full animate-spin"></div>
+                  <span className="text-sm text-neutral-600">Authenticating...</span>
+                </div>
               )}
             </div>
 
