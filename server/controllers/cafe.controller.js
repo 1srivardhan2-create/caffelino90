@@ -865,12 +865,22 @@ const verifyCafe = async (req, res) => {
 // Get all approved/verified cafes (public — for user-facing page)
 const getApprovedCafes = async (req, res) => {
     try {
+        const limit = parseInt(req.query.limit) || 0;
         console.log("[DEBUG] getApprovedCafes: Fetching approved cafes...");
-        const cafes = await Cafe.find({ status: true })
+        
+        let cafesQuery = Cafe.find({ status: true })
             .select('Name Cafe_Address cafe_location latitude longitude Average_Cost AboutCafe Cafe_photos profilePicture establishmentType opening_hours managerName Phonenumber tables ownerId createdAt')
-            .sort({ createdAt: -1 })
-            .lean();
-        console.log(`[DEBUG] getApprovedCafes: Found ${cafes.length} approved cafes.`);
+            .sort({ createdAt: -1 });
+            
+        if (limit > 0) {
+            cafesQuery = cafesQuery.limit(limit);
+        }
+            
+        const [cafes, totalCount] = await Promise.all([
+            cafesQuery.lean(),
+            Cafe.countDocuments({ status: true })
+        ]);
+        console.log(`[DEBUG] getApprovedCafes: Found ${cafes.length} approved cafes out of ${totalCount} total.`);
 
         // Build list of valid ObjectId identifiers for menu lookup
         const objectIdIdentifiers = [];
@@ -939,7 +949,7 @@ const getApprovedCafes = async (req, res) => {
             };
         });
 
-        res.json({ success: true, cafes: cafesWithMenu });
+        res.json({ success: true, cafes: cafesWithMenu, totalCount });
     } catch (error) {
         console.error("getApprovedCafes error:", error.message);
         console.error("getApprovedCafes stack:", error.stack);

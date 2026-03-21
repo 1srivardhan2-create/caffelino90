@@ -7,6 +7,7 @@ import { saveGroupState } from '../utils/groupStateManager';
 import { notifyPaymentSuccess, getUnreadCount } from '../utils/notificationManager';
 import { socketService } from '../services/socketService';
 import { getAvatarById } from '../utils/avatarData';
+import { BASE_URL } from '../utils/api';
 
 interface MeetupChatBillingProps {
   user: any;
@@ -145,13 +146,13 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
     const fetchMenu = async () => {
       try {
-        const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/meetups/${meetupData._id}/cafe-menu`);
+        const res = await fetch(`${BASE_URL}/api/meetups/${meetupData._id}/cafe-menu`);
         const data = await res.json();
         if (data.success && data.menuItems) {
           const mappedMenu = data.menuItems.map((item: any) => {
             let finalImage = item.image || item.image_url;
             if (finalImage && finalImage.startsWith('/uploads/')) {
-              finalImage = `https://caffelino90-9v4a.onrender.com${finalImage}`;
+              finalImage = `${BASE_URL}${finalImage}`;
             }
 
             return {
@@ -186,7 +187,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
     const fetchMembers = async () => {
       try {
-        const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/meetups/${meetupData._id}`);
+        const res = await fetch(`${BASE_URL}/api/meetups/${meetupData._id}`);
         const data = await res.json();
         if (data.success) {
           const fetchedMembers = data.members || (data.meetup && data.meetup.members) || [];
@@ -221,7 +222,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
     // Fetch initial chat history
     const fetchChatHistory = async () => {
       try {
-        const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/meetups/messages/${meetupData._id}`);
+        const res = await fetch(`${BASE_URL}/api/meetups/messages/${meetupData._id}`);
         const data = await res.json();
         if (data.success && data.messages) {
           const apiMsgs = data.messages.map((m: any) => ({
@@ -359,7 +360,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
       // Call Token API here to persist standard order token payment
       if (orderId) {
-        fetch(`https://caffelino90-9v4a.onrender.com/api/meetup-orders/${orderId}/token-paid`, {
+        fetch(`${BASE_URL}/api/meetup-orders/${orderId}/token-paid`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tokenAmount: 20 })
@@ -459,7 +460,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
     setInputText('');
 
     try {
-      const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/message', {
+      const res = await fetch(`${BASE_URL}/api/meetups/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -568,7 +569,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
     });
 
     try {
-      const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/message', {
+      const res = await fetch(`${BASE_URL}/api/meetups/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -633,7 +634,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
     // Save order to the backend
     try {
-      await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/order', {
+      await fetch(`${BASE_URL}/api/meetups/order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -727,7 +728,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
     // Broadcast bill message
     try {
-      const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/message', {
+      const res = await fetch(`${BASE_URL}/api/meetups/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -768,7 +769,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       }]);
 
       try {
-        const res2 = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/message', {
+        const res2 = await fetch(`${BASE_URL}/api/meetups/message`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -819,7 +820,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       toast.success('Payment marked as Cash Done! ✅');
 
       try {
-        const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/message', {
+        const res = await fetch(`${BASE_URL}/api/meetups/message`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -910,7 +911,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
   const handleTokenPayment = async () => {
     try {
-      const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/razorpay-order', {
+      const res = await fetch(`${BASE_URL}/api/meetups/razorpay-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -918,11 +919,20 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
           userId: currentUserId || 'guest'
         })
       });
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (parseErr) {
+        throw new Error(`Server returned invalid response (Status: ${res.status}). Verify your backend is running.`);
+      }
+
+      if (!res.ok) {
+        throw new Error(data.message || data.error || `Server error (${res.status})`);
+      }
       
       if (data.success && data.orderId) {
         const options = {
-          key: 'rzp_live_STpiE9q5HlDcz1',
+          key: 'rzp_live_STzO1DnRlqY3vN',
           amount: data.amount,
           currency: data.currency,
           name: 'Caffélino',
@@ -930,7 +940,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
           order_id: data.orderId,
           handler: async function (response: any) {
             try {
-              const verifyRes = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/verify-payment', {
+              const verifyRes = await fetch(`${BASE_URL}/api/meetups/verify-payment`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -956,7 +966,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                   timestamp: new Date()
                 }]);
                 
-                await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/message', {
+                await fetch(`${BASE_URL}/api/meetups/message`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
@@ -991,11 +1001,11 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         });
         rzp.open();
       } else {
-         toast.error('Could not initiate payment. Please try again.');
+         toast.error(data?.message || 'Could not initiate payment. Missing order details.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Razorpay init error:', err);
-      toast.error('Error creating payment order.');
+      toast.error(err.message || 'Error creating payment order.');
     }
   };
 

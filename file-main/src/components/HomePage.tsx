@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Users, Calendar, Receipt, Coffee, Sparkles, MapPin, Store, BadgeCheck, Loader2, ArrowRight, DollarSign } from 'lucide-react';
 import { getApprovedCafes } from '../services/cafeService';
 import { getActiveMeetups, getMyMeetups } from '../services/meetupService';
@@ -7,6 +7,7 @@ import Footer from './Footer';
 import MyGroupCard from './MyGroupCard';
 import { getUserGroups, clearOldTestGroups, removeGroup, removeAllUserGroups, saveGroupState, getNavigationPageFromStage, GroupState } from '../utils/groupStateManager';
 import { getActiveGroupId } from '../utils/sessionManager';
+import { BASE_URL } from '../utils/api';
 
 
 interface HomePageProps {
@@ -18,22 +19,40 @@ interface HomePageProps {
 export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [approvedCafes, setApprovedCafes] = useState<any[]>([]);
+  const [totalCafes, setTotalCafes] = useState<number>(0);
   const [cafesLoading, setCafesLoading] = useState(true);
+  const [showWakeup, setShowWakeup] = useState(false);
   const [myMeetups, setMyMeetups] = useState<GroupState[]>([]);
 
   // Fetch approved cafes and active meetups from backend
   useEffect(() => {
+    let wakeTimer: NodeJS.Timeout;
+    if (cafesLoading) {
+      wakeTimer = setTimeout(() => setShowWakeup(true), 3000);
+    } else {
+      setShowWakeup(false);
+    }
+    return () => clearTimeout(wakeTimer);
+  }, [cafesLoading]);
+
+  const hasFetched = useRef(false);
+
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const fetchInitialData = async () => {
       setCafesLoading(true);
       try {
         // Parallel fetch for speed
         const [cafesResult, meetupsResult] = await Promise.all([
-          getApprovedCafes(),
+          getApprovedCafes(4),
           user ? getMyMeetups(user.id) : Promise.resolve({ success: false, meetups: [] })
         ]);
 
         if (cafesResult.success && cafesResult.cafes) {
           setApprovedCafes(cafesResult.cafes);
+          setTotalCafes(cafesResult.totalCount || cafesResult.cafes.length);
         }
 
         // Sync backend meetups with local state
@@ -270,7 +289,7 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
                       Popular Cafes Near You
                     </p>
                     <p className="font-['Arial:Regular',_sans-serif] leading-[18px] text-[13px] text-neutral-500">
-                      {cafesLoading ? 'Loading...' : `${approvedCafes.length} verified partner${approvedCafes.length !== 1 ? 's' : ''}`}
+                      {cafesLoading ? 'Loading...' : `${totalCafes} verified partner${totalCafes !== 1 ? 's' : ''}`}
                     </p>
                   </div>
                 </div>
@@ -285,8 +304,21 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
 
               {/* Loading state */}
               {cafesLoading && (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-7 h-7 animate-spin text-[#8b5943]" />
+                <div className="w-full">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 px-1">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="animate-pulse bg-white rounded-[16px] shadow-sm border border-gray-100 p-4">
+                        <div className="bg-gray-200 h-[170px] rounded-[12px] mb-3"></div>
+                        <div className="bg-gray-200 h-5 w-3/4 rounded mb-2"></div>
+                        <div className="bg-gray-200 h-4 w-1/2 rounded"></div>
+                      </div>
+                    ))}
+                  </div>
+                  {showWakeup && (
+                    <p className="text-center text-orange-500 font-medium mt-6 animate-pulse">
+                      Server is waking up, please wait...
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -307,7 +339,7 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
                     // Helper to resolve an image string correctly
                     const resolveImg = (imgStr: string) => {
                       if (!imgStr) return null;
-                      if (imgStr.startsWith('/uploads/')) return `https://caffelino90-9v4a.onrender.com${imgStr}`;
+                      if (imgStr.startsWith('/uploads/')) return `${BASE_URL}${imgStr}`;
                       return imgStr; // Handles data: image/... and http://... natively
                     };
 
@@ -369,13 +401,13 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
                   })}
                   </div>
                   
-                  {approvedCafes.length > 4 && (
+                  {totalCafes > 4 && (
                     <div className="flex justify-center mt-8 w-full">
                       <button
                         onClick={() => onNavigate('all-cafes')}
                         className="bg-[#fcf9f5] hover:bg-[#f5ebd9] border-2 border-[#e8d5c4] text-[#8b5943] font-bold py-3 px-8 rounded-[12px] shadow-sm hover:shadow-md transition-all flex items-center gap-2"
                       >
-                        View all {approvedCafes.length} cafes
+                        View all {totalCafes} cafes
                         <ArrowRight className="w-5 h-5" />
                       </button>
                     </div>

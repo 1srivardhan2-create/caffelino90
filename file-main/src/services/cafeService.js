@@ -83,11 +83,16 @@ export async function verifyCafe(cafeId) {
 
 /**
  * Get all approved cafes (public, for user-facing pages)
- * @returns {Promise<{success: boolean, cafes: object[]}>}
+ * @param {number|null} limit - Optional limit for the number of cafes to fetch
+ * @returns {Promise<{success: boolean, cafes: object[], totalCount?: number}>}
  */
-export async function getApprovedCafes() {
+export async function getApprovedCafes(limit = null) {
     try {
-        const response = await fetch(`${API_BASE_URL}/cafe/approved`, {
+        let url = `${API_BASE_URL}/cafe/approved`;
+        if (limit) {
+            url += `?limit=${limit}`;
+        }
+        const response = await fetch(url, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

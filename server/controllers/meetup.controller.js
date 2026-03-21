@@ -952,8 +952,8 @@ const createRazorpayOrder = async (req, res) => {
         }
 
         const razorpayInstance = new Razorpay({
-            key_id: process.env.RAZORPAY_KEY_ID || 'rzp_live_STpiE9q5HlDcz1',
-            key_secret: process.env.RAZORPAY_KEY_SECRET || 'g0XeY6LdBVbske7S4LKTLv98',
+            key_id: process.env.RAZORPAY_KEY_ID || 'rzp_live_STzO1DnRlqY3vN',
+            key_secret: process.env.RAZORPAY_KEY_SECRET || '9sLZEDjBN9jEmraAsRC8fmOL',
         });
 
         // 20 INR token amount in paise
@@ -987,7 +987,7 @@ const verifyRazorpayPayment = async (req, res) => {
             return res.status(400).json({ success: false, message: "Payment details missing" });
         }
 
-        const secret = process.env.RAZORPAY_KEY_SECRET || 'g0XeY6LdBVbske7S4LKTLv98';
+        const secret = process.env.RAZORPAY_KEY_SECRET || '9sLZEDjBN9jEmraAsRC8fmOL';
         const generated_signature = crypto.createHmac("sha256", secret)
             .update(razorpay_order_id + "|" + razorpay_payment_id)
             .digest("hex");
