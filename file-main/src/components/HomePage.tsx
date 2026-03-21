@@ -194,7 +194,7 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
               </button>
               <button
                 className="bg-[#0a0a0a] border-2 border-[#be9d80] h-[52px] md:h-[56px] rounded-[16px] px-8 md:px-10 cursor-pointer hover:bg-[#1a1a1a] transition-all shadow-sm w-full md:w-auto font-bold text-[15px] md:text-[16px] text-white hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
-                onClick={() => onNavigate('join-meetup')}
+                onClick={() => user ? onNavigate('join-meetup') : onShowAuth()}
               >
                 <Users className="w-5 h-5" />
                 Join Meetup
