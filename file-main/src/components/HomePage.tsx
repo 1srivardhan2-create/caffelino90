@@ -301,8 +301,9 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
 
               {/* Cafe Cards */}
               {!cafesLoading && approvedCafes.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 px-1">
-                  {approvedCafes.map((cafe: any, idx: number) => {
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 px-1">
+                    {approvedCafes.slice(0, 4).map((cafe: any, idx: number) => {
                     // Helper to resolve an image string correctly
                     const resolveImg = (imgStr: string) => {
                       if (!imgStr) return null;
@@ -366,7 +367,20 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
                       </div>
                     );
                   })}
-                </div>
+                  </div>
+                  
+                  {approvedCafes.length > 4 && (
+                    <div className="flex justify-center mt-8 w-full">
+                      <button
+                        onClick={() => onNavigate('all-cafes')}
+                        className="bg-[#fcf9f5] hover:bg-[#f5ebd9] border-2 border-[#e8d5c4] text-[#8b5943] font-bold py-3 px-8 rounded-[12px] shadow-sm hover:shadow-md transition-all flex items-center gap-2"
+                      >
+                        View all {approvedCafes.length} cafes
+                        <ArrowRight className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
