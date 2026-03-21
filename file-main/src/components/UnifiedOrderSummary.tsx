@@ -76,12 +76,36 @@ export default function UnifiedOrderSummary({
     setIsConfirming(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
       const bill = calculateBill();
       const orderNumber = `ORD${Math.floor(100000 + Math.random() * 900000)}`;
       const now = new Date();
+
+      // Send to real backend
+      try {
+        await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            meetupId: meetupData?._id || meetupData?.id,
+            userId: user?.id || 'guest',
+            userName: user?.name || user?.firstName || 'Guest',
+            cafeId: meetupData?.winnerCafe?.cafeId || meetupData?.winnerCafe?.id || meetupData?.cafe?.id || meetupData?.cafe?._id || '',
+            items: orderItems.map((i: any) => ({ menuItemId: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+            subtotal: bill.subtotal,
+            cgst: bill.cgst,
+            sgst: bill.sgst,
+            commission: parseFloat((bill.total * 0.06).toFixed(2)),
+            total: bill.total,
+            splitEnabled: false,
+            members: meetupData?.members || [],
+            perPersonAmount: bill.total,
+            status: 'PENDING',
+            orderId: orderNumber,
+          })
+        });
+      } catch (err) {
+        console.error('Failed to save order to backend:', err);
+      }
 
       // Create bill data
       const billData = {

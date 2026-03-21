@@ -42,9 +42,13 @@ export default function CafeMenuManagement() {
   const fetchMenuItems = async () => {
     try {
       const token = safeStorage.getItem('cafeToken') || safeStorage.getItem('token');
+      const cafeId = safeStorage.getItem('myCafeId') || '';
       const res = await fetch(`${API_BASE_URL}/cafe/cafe/items`, {
         credentials: 'omit',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'x-cafe-id': cafeId
+        }
       });
       if (!res.ok) throw new Error('Failed to fetch menu items');
       const data = await res.json();
@@ -88,11 +92,13 @@ export default function CafeMenuManagement() {
       }
 
       const token = safeStorage.getItem('cafeToken') || safeStorage.getItem('token');
+      const cafeId = safeStorage.getItem('myCafeId') || '';
       const res = await fetch(`${API_BASE_URL}/cafe/menuItem/cafe`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
+          'x-cafe-id': cafeId,
         },
         body: JSON.stringify({
           item_name: newItem.item_name,
@@ -159,11 +165,13 @@ export default function CafeMenuManagement() {
       }
 
       const token = safeStorage.getItem('cafeToken') || safeStorage.getItem('token');
+      const cafeId = safeStorage.getItem('myCafeId') || '';
       const res = await fetch(`${API_BASE_URL}/cafe/menuItem/edit/${selectedItem._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
+          'x-cafe-id': cafeId,
         },
         body: JSON.stringify({
           item_name: newItem.item_name,
@@ -195,10 +203,12 @@ export default function CafeMenuManagement() {
     if (confirm(`Are you sure you want to delete "${name}"?`)) {
       try {
         const token = safeStorage.getItem('cafeToken') || safeStorage.getItem('token');
+        const cafeId = safeStorage.getItem('myCafeId') || '';
         const res = await fetch(`${API_BASE_URL}/cafe/delete/item/${id}`, {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'x-cafe-id': cafeId
           },
           credentials: 'omit'
         });
@@ -217,10 +227,12 @@ export default function CafeMenuManagement() {
   const handleToggleAvailability = async (id: string) => {
     try {
       const token = safeStorage.getItem('cafeToken') || safeStorage.getItem('token');
+      const cafeId = safeStorage.getItem('myCafeId') || '';
       const res = await fetch(`${API_BASE_URL}/cafe/menuItem/availability/${id}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'x-cafe-id': cafeId
         },
         credentials: 'omit'
       });
