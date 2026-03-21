@@ -5,6 +5,8 @@ const CafeMenu = require("../models/Cafe/cafe_menu");
 const Order = require("../models/Cafe/Cafe_orders");
 const Cafe = require("../models/Cafe/Cafe_login");
 const mongoose = require("mongoose");
+const Razorpay = require("razorpay");
+const crypto = require("crypto");
 
 // ─── Helper: Generate random meetup code ─────────────────────────
 function generateMeetupCode() {
@@ -940,6 +942,99 @@ const getMyMeetups = async (req, res) => {
     }
 };
 
+// ─── RAZORPAY: CREATE 20 PKR/INR TOKEN ORDER ─────────────────────
+const createRazorpayOrder = async (req, res) => {
+    try {
+        const { meetupId, userId } = req.body;
+
+        if (!meetupId || !userId) {
+            return res.status(400).json({ message: "meetupId and userId are required" });
+        }
+
+        const razorpayInstance = new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID || 'rzp_live_STpiE9q5HlDcz1',
+            key_secret: process.env.RAZORPAY_KEY_SECRET || 'g0XeY6LdBVbske7S4LKTLv98',
+        });
+
+        // 20 INR token amount in paise
+        const options = {
+            amount: 2000, 
+            currency: "INR",
+            receipt: `receipt_${meetupId}_${Date.now()}`.substring(0, 40)
+        };
+
+        const order = await razorpayInstance.orders.create(options);
+
+        res.json({
+            success: true,
+            orderId: order.id,
+            amount: order.amount,
+            currency: order.currency
+        });
+
+    } catch (error) {
+        console.error("Razorpay Create Order Error:", error);
+        res.status(500).json({ success: false, message: "Failed to create Razorpay order", error: error.message });
+    }
+};
+
+// ─── RAZORPAY: VERIFY PAYMENT ────────────────────────────────────
+const verifyRazorpayPayment = async (req, res) => {
+    try {
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, meetupId, userId } = req.body;
+
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+            return res.status(400).json({ success: false, message: "Payment details missing" });
+        }
+
+        const secret = process.env.RAZORPAY_KEY_SECRET || 'g0XeY6LdBVbske7S4LKTLv98';
+        const generated_signature = crypto.createHmac("sha256", secret)
+            .update(razorpay_order_id + "|" + razorpay_payment_id)
+            .digest("hex");
+
+        if (generated_signature !== razorpay_signature) {
+            return res.status(400).json({ success: false, message: "Payment verification failed" });
+        }
+
+        // Emit socket event saying payment token is received if meetup is provided
+        if (meetupId && req.io) {
+            
+            // Mark orders as confirmed in DB
+            const orders = await MeetupOrder.find({ meetupId });
+            for (let o of orders) {
+                o.status = "CONFIRMED";
+                await o.save();
+            }
+
+            // Also mark meetup as completed or at least advance it
+            const meetup = await Meetup.findById(meetupId);
+            if (meetup) {
+                meetup.status = "completed";
+                await meetup.save();
+                
+                // Get totals to share with users
+                const grandTotal = orders.reduce((sum, o) => sum + o.total, 0);
+                const memberCount = meetup.members.length || 1;
+                const perPersonSplit = Math.ceil(grandTotal / memberCount);
+
+                req.io.to(meetupId).emit("bill_confirmed", {
+                    meetupId,
+                    grandTotal,
+                    perPersonSplit,
+                    memberCount,
+                    orders,
+                    isTokenPayment: true
+                });
+            }
+        }
+
+        res.json({ success: true, message: "Payment verified successfully" });
+    } catch (error) {
+        console.error("Razorpay Verify Error:", error);
+        res.status(500).json({ success: false, message: "Payment verification error", error: error.message });
+    }
+};
+
 module.exports = {
     createMeetup,
     joinMeetup,
@@ -962,4 +1057,6 @@ module.exports = {
     applyCoupon,
     getActiveMeetups,
     getMyMeetups,
+    createRazorpayOrder,
+    verifyRazorpayPayment,
 };

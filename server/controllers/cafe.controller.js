@@ -317,7 +317,19 @@ const getCafeById = async (req, res) => {
 // Add a new menu item
 const MenuItem = async (req, res) => {
     try {
-        const { item_name, Category, food_type, price, description_food, image_url } = req.body;
+        const { item_name, description_food, price, food_type, popular, Category, image_url } = req.body;
+
+        // Determine the actual cafe ID, prioritizing x-cafe-id header for flexibility
+        let actualCafeId = req.headers['x-cafe-id'] || req.cafe.id;
+        try {
+            // If the ID from header/token doesn't directly match a cafe _id,
+            // check if it's an ownerId and find the associated cafe _id.
+            const cafeCheck = await Cafe.findById(actualCafeId);
+            if (!cafeCheck) {
+                const cafeByOwner = await Cafe.findOne({ ownerId: actualCafeId });
+                if (cafeByOwner) actualCafeId = cafeByOwner._id.toString();
+            }
+        } catch (e) { /* ignore */ } // Ignore if actualCafeId is not a valid ObjectId
 
         if (!item_name || !price || !Category || !food_type) {
             return res.status(400).json({
@@ -325,26 +337,31 @@ const MenuItem = async (req, res) => {
             });
         }
 
-        // Upload file to Cloudinary, or use provided image_url
         let finalImageUrl = "";
+        // Handle image upload from multipart form data (req.files)
         if (req.files && req.files.image && req.files.image[0] && req.files.image[0].buffer) {
             finalImageUrl = await uploadBuffer(req.files.image[0].buffer, "cafes/menu");
-        } else if (image_url && typeof image_url === 'string') {
+        }
+        // Handle image upload from base64 string in body
+        else if (image_url && typeof image_url === 'string') {
             if (image_url.startsWith('data:')) {
                 finalImageUrl = await uploadBase64ToCloudinary(image_url, 'cafes/menu');
-            } else if (image_url.startsWith('http')) {
+            }
+            // Preserve existing http/https URLs
+            else if (image_url.startsWith('http')) {
                 finalImageUrl = image_url;
             }
         }
 
         const menuItem = await CafeMenu.create({
-            cafe_owner: req.cafe.id,
+            cafe_owner: actualCafeId,
             item_name,
             Category,
             food_type,
             price: Number(price),
             description_food: description_food || "",
-            image_url: finalImageUrl
+            image_url: finalImageUrl,
+            popular: popular || false, // Default to false if not provided
         });
 
         res.status(201).json({ message: "Menu item added", menuItem });
@@ -439,7 +456,16 @@ const deleteItem = async (req, res) => {
 // Get all menu items for the logged-in cafe
 const getItems = async (req, res) => {
     try {
-        const items = await CafeMenu.find({ cafe_owner: req.cafe.id });
+        let actualCafeId = req.headers['x-cafe-id'] || req.cafe.id;
+        try {
+            const cafeCheck = await Cafe.findById(actualCafeId);
+            if (!cafeCheck) {
+                const cafeByOwner = await Cafe.findOne({ ownerId: actualCafeId });
+                if (cafeByOwner) actualCafeId = cafeByOwner._id.toString();
+            }
+        } catch (e) { /* ignore */ }
+
+        const items = await CafeMenu.find({ cafe_owner: actualCafeId });
         res.json(items);
     } catch (error) {
         console.error("Get Items Error:", error);
@@ -850,8 +876,8 @@ const getApprovedCafes = async (req, res) => {
         const objectIdIdentifiers = [];
         cafes.forEach(c => {
             objectIdIdentifiers.push(c._id);
-            // Only include ownerId if it's a valid ObjectId
-            if (c.ownerId && mongoose.Types.ObjectId.isValid(c.ownerId)) {
+            // Only include ownerId if it's a valid ObjectId and different from _id
+            if (c.ownerId && mongoose.Types.ObjectId.isValid(c.ownerId) && c.ownerId.toString() !== c._id.toString()) {
                 objectIdIdentifiers.push(new mongoose.Types.ObjectId(c.ownerId));
             }
         });
@@ -882,27 +908,21 @@ const getApprovedCafes = async (req, res) => {
         // Helper: sanitize image URLs — remove empty, /uploads/ paths
         const sanitizeImageUrl = (url) => {
             if (!url || typeof url !== 'string') return '';
-            if (url.startsWith('/uploads/')) return ''; // Local paths won't work on Render
-            if (url.startsWith('data:')) return ''; // Don't send raw base64 to client
-            return url; // http/https Cloudinary URLs are fine
+            // Preserve local, base64, and http/https images so they exist on the frontend
+            return url; 
         };
 
         // Attach menu items to each cafe
         const cafesWithMenu = cafes.map(cafe => {
             const idKey = cafe._id.toString();
-            const ownerIdKey = cafe.ownerId ? cafe.ownerId.toString() : null;
 
             const menuFromId = menuMap[idKey] || [];
-            const menuFromOwnerId = ownerIdKey ? (menuMap[ownerIdKey] || []) : [];
 
-            // Avoid duplicates if _id === ownerId somehow
-            const combinedMenus = [...menuFromId];
-            if (idKey !== ownerIdKey && menuFromOwnerId.length > 0) {
-                combinedMenus.push(...menuFromOwnerId);
-            }
+            // Strict isolation: Only use menus mapped directly to the cafe's _id
+            const uniqueMenus = Array.from(new Map(menuFromId.map(item => [item._id.toString(), item])).values());
 
             // Sanitize image URLs for all menu items
-            const sanitizedMenuItems = combinedMenus.map(item => ({
+            const sanitizedMenuItems = uniqueMenus.map(item => ({
                 ...item,
                 image_url: sanitizeImageUrl(item.image_url),
             }));

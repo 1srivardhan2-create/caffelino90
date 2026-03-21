@@ -908,25 +908,95 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
   // Split bill is now managed in POS — no separate dialog needed
 
-  const handleTokenPayment = () => {
-    // Navigate to payment page for ₹20 token
-    const bill = calculateBill();
-
-    onNavigate('payment-online', {
-      ...meetupData,
-      orderId,
-      amount: 20, // Only ₹20 token payment
-      splitBill,
-      numberOfPeople,
-      billData: bill,
-      isTokenPayment: true,
-      remainingAmount: bill.total - 20,
-      orderItems: orderItems.map(item => ({
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price * item.quantity
-      })),
-    });
+  const handleTokenPayment = async () => {
+    try {
+      const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/razorpay-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          meetupId: meetupData?._id || meetupData?.id,
+          userId: currentUserId || 'guest'
+        })
+      });
+      const data = await res.json();
+      
+      if (data.success && data.orderId) {
+        const options = {
+          key: 'rzp_live_STpiE9q5HlDcz1',
+          amount: data.amount,
+          currency: data.currency,
+          name: 'Caffélino',
+          description: '₹20 Token Confirmation',
+          order_id: data.orderId,
+          handler: async function (response: any) {
+            try {
+              const verifyRes = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/verify-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  meetupId: meetupData?._id || meetupData?.id,
+                  userId: currentUserId || 'guest'
+                })
+              });
+              const verifyData = await verifyRes.json();
+              
+              if (verifyData.success) {
+                setTokenPaid(true);
+                setOrderConfirmed(true);
+                toast.success('Order Confirmed. ₹20 token received.');
+                
+                const msgText = `Order Confirmed.\n₹20 token received.\nPlease pay remaining amount at the café counter.`;
+                setMessages((prev: Message[]) => [...prev, {
+                  id: `token-${Date.now()}`,
+                  type: 'system',
+                  text: msgText,
+                  timestamp: new Date()
+                }]);
+                
+                await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/message', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    meetupId: meetupData?._id || meetupData?.id,
+                    userId: currentUserId || 'system',
+                    userName: 'System',
+                    type: 'system',
+                    message: msgText
+                  })
+                });
+              } else {
+                toast.error('Payment verification failed.');
+              }
+            } catch (err) {
+               console.error('Verify error:', err);
+               toast.error('Error verifying payment.');
+            }
+          },
+          prefill: {
+            name: user?.firstName || user?.name || 'Guest',
+            email: user?.email || '',
+            contact: user?.phone || ''
+          },
+          theme: {
+            color: '#be9d80'
+          }
+        };
+        
+        const rzp = new (window as any).Razorpay(options);
+        rzp.on('payment.failed', function (response: any) {
+          toast.error(`Payment failed: ${response.error.description}. Please try again.`);
+        });
+        rzp.open();
+      } else {
+         toast.error('Could not initiate payment. Please try again.');
+      }
+    } catch (err) {
+      console.error('Razorpay init error:', err);
+      toast.error('Error creating payment order.');
+    }
   };
 
   const bill = orderConfirmed ? calculateBill() : null;
