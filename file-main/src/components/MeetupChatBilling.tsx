@@ -911,7 +911,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
   const handleTokenPayment = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/api/meetups/razorpay-order`, {
+      const res = await fetch('https://caffelino90-9v4a.onrender.com/api/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -940,7 +940,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
           order_id: data.orderId,
           handler: async function (response: any) {
             try {
-              const verifyRes = await fetch(`${BASE_URL}/api/meetups/verify-payment`, {
+              const verifyRes = await fetch('https://caffelino90-9v4a.onrender.com/api/verify-payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

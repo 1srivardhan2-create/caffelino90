@@ -60,6 +60,11 @@ app.use("/api/meetups", meetupRoutes);
 const meetupOrderRoutes = require("./routes/MeetupOrder.routes");
 app.use("/api/meetup-orders", meetupOrderRoutes);
 
+// Razorpay explicit routes as requested
+const { createRazorpayOrder, verifyRazorpayPayment } = require("./controllers/meetup.controller");
+app.post("/api/create-order", createRazorpayOrder);
+app.post("/api/verify-payment", verifyRazorpayPayment);
+
 // Serve static uploaded files
 app.use("/uploads", express.static("uploads"));
 
