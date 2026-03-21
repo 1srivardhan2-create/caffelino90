@@ -945,7 +945,7 @@ const getMyMeetups = async (req, res) => {
 // ─── RAZORPAY: CREATE 20 PKR/INR TOKEN ORDER ─────────────────────
 const createRazorpayOrder = async (req, res) => {
     try {
-        console.log("Received POST /api/create-order", req.body);
+        console.log("API HIT ✅", req.body);
         const { meetupId, userId } = req.body;
 
         if (!meetupId || !userId) {
