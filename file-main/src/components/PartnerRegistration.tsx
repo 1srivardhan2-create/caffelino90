@@ -274,7 +274,7 @@ export default function PartnerRegistration({ onNavigate }: PartnerRegistrationP
       {/* Back Button - Positioned on Left Side */}
       <button
         onClick={() => onNavigate('partner-login-choice')}
-        className="fixed top-20 left-3 sm:left-8 md:left-12 flex items-center gap-1.5 sm:gap-2 bg-[#8b5943] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl shadow-lg hover:scale-105 transition-all z-40"
+        className="fixed top-20 left-4 flex items-center gap-2 bg-[#8b5943] text-white px-4 py-2 rounded-2xl shadow-lg hover:scale-105 transition-all z-[60] sm:left-8 md:left-12"
       >
         <svg className="size-4" fill="none" viewBox="0 0 11 11">
           <g>
@@ -282,7 +282,7 @@ export default function PartnerRegistration({ onNavigate }: PartnerRegistrationP
             <path d="M5.33333 10L0.666666 5.33333L5.33333 0.666664" stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.33333" />
           </g>
         </svg>
-        <span className="text-[13px] sm:text-[14px]">Back</span>
+        <span className="text-[14px]">Back</span>
       </button>
 
       <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -313,47 +313,47 @@ export default function PartnerRegistration({ onNavigate }: PartnerRegistrationP
             </div>
 
             <div className="space-y-6">
-              {/* Establishment Type (Cafe / Restaurant) */}
-              <div>
-                <Label className="text-[#3b1f0e] mb-3 block flex items-center gap-2 text-[16px] font-semibold">
+              <div className="space-y-4">
+                <Label className="text-[#3b1f0e] mb-2 block">
                   Establishment Type <span className="text-red-500">*</span>
                 </Label>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, establishmentType: 'Cafe' })}
-                    className={`py-4 px-6 rounded-xl border-2 text-left flex items-center gap-4 transition-all ${formData.establishmentType === 'Cafe'
+                    className={`py-3 px-4 sm:py-4 sm:px-6 rounded-xl border-2 text-left flex items-center gap-3 sm:gap-4 transition-all ${formData.establishmentType === 'Cafe'
                       ? 'border-[#8b5943] bg-[#be9d80]/10 ring-2 ring-[#8b5943]/20 shadow-md'
                       : 'border-[#e8d5c4] bg-white hover:border-[#be9d80]/50'
                       }`}
                   >
-                    <div className={`p-3 rounded-full ${formData.establishmentType === 'Cafe' ? 'bg-[#8b5943] text-white' : 'bg-[#faf8f5] text-[#be9d80]'}`}>
-                      <Store className="w-6 h-6" />
+                    <div className={`p-2 sm:p-3 rounded-full ${formData.establishmentType === 'Cafe' ? 'bg-[#8b5943] text-white' : 'bg-[#faf8f5] text-[#be9d80]'}`}>
+                      <Store className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                      <h3 className={`font-semibold text-[17px] ${formData.establishmentType === 'Cafe' ? 'text-[#3b1f0e]' : 'text-[#6b4423]'}`}>Café</h3>
-                      <p className="text-[13px] text-[#8b5943] mt-1 line-clamp-1">Coffee shop, bakery, etc.</p>
+                      <h3 className={`font-semibold text-[15px] sm:text-[17px] ${formData.establishmentType === 'Cafe' ? 'text-[#3b1f0e]' : 'text-[#6b4423]'}`}>Café</h3>
+                      <p className="text-[11px] sm:text-[13px] text-[#8b5943] mt-1 line-clamp-1">Coffee shop, bakery, etc.</p>
                     </div>
                   </button>
-
+ 
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, establishmentType: 'Restaurant' })}
-                    className={`py-4 px-6 rounded-xl border-2 text-left flex items-center gap-4 transition-all ${formData.establishmentType === 'Restaurant'
+                    className={`py-3 px-4 sm:py-4 sm:px-6 rounded-xl border-2 text-left flex items-center gap-3 sm:gap-4 transition-all ${formData.establishmentType === 'Restaurant'
                       ? 'border-[#8b5943] bg-[#be9d80]/10 ring-2 ring-[#8b5943]/20 shadow-md'
                       : 'border-[#e8d5c4] bg-white hover:border-[#be9d80]/50'
                       }`}
                   >
-                    <div className={`p-3 rounded-full ${formData.establishmentType === 'Restaurant' ? 'bg-[#8b5943] text-white' : 'bg-[#faf8f5] text-[#be9d80]'}`}>
-                      <Store className="w-6 h-6" />
+                    <div className={`p-2 sm:p-3 rounded-full ${formData.establishmentType === 'Restaurant' ? 'bg-[#8b5943] text-white' : 'bg-[#faf8f5] text-[#be9d80]'}`}>
+                      <Store className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                      <h3 className={`font-semibold text-[17px] ${formData.establishmentType === 'Restaurant' ? 'text-[#3b1f0e]' : 'text-[#6b4423]'}`}>Restaurant</h3>
-                      <p className="text-[13px] text-[#8b5943] mt-1 line-clamp-1">Fine dining, casual, etc.</p>
+                      <h3 className={`font-semibold text-[15px] sm:text-[17px] ${formData.establishmentType === 'Restaurant' ? 'text-[#3b1f0e]' : 'text-[#6b4423]'}`}>Restaurant</h3>
+                      <p className="text-[11px] sm:text-[13px] text-[#8b5943] mt-1 line-clamp-1">Fine dining, casual, etc.</p>
                     </div>
                   </button>
                 </div>
               </div>
+
 
               {/* Café Name */}
               <div>
@@ -510,11 +510,11 @@ export default function PartnerRegistration({ onNavigate }: PartnerRegistrationP
                 <Camera className="inline w-5 h-5 mr-2" />
                 Profile Picture <span className="text-red-500">*</span>
               </Label>
-              <div className="flex items-center gap-6">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
                 <div className="relative">
                   {profilePic ? (
                     <div className="relative group">
-                      <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[#be9d80] shadow-lg">
+                      <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-[#be9d80] shadow-lg">
                         <img
                           src={URL.createObjectURL(profilePic)}
                           alt="Profile"
@@ -532,10 +532,10 @@ export default function PartnerRegistration({ onNavigate }: PartnerRegistrationP
                   ) : (
                     <label
                       htmlFor="profilePic"
-                      className="w-32 h-32 rounded-full border-4 border-dashed border-[#be9d80] flex flex-col items-center justify-center cursor-pointer hover:border-[#8b5943] hover:bg-[#faf8f5] transition-colors"
+                      className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-dashed border-[#be9d80] flex flex-col items-center justify-center cursor-pointer hover:border-[#8b5943] hover:bg-[#faf8f5] transition-colors"
                     >
-                      <Camera className="w-10 h-10 text-[#be9d80] mb-1" />
-                      <span className="text-[11px] text-[#6b4423] text-center px-2">Upload Photo</span>
+                      <Camera className="w-6 h-6 sm:w-8 sm:h-8 text-[#be9d80] mb-1" />
+                      <span className="text-[10px] sm:text-[11px] text-[#6b4423] text-center px-2">Upload Photo</span>
                       <input
                         type="file"
                         id="profilePic"
@@ -549,12 +549,12 @@ export default function PartnerRegistration({ onNavigate }: PartnerRegistrationP
                     </label>
                   )}
                 </div>
-                <div className="flex-1">
-                  <div className="bg-[#fff8f0] border-2 border-[#be9d80]/40 rounded-xl p-4">
-                    <p className="text-[13px] text-[#3b1f0e] mb-2">
+                <div className="w-full sm:flex-1">
+                  <div className="bg-[#fff8f0] border-2 border-[#be9d80]/40 rounded-xl p-3 sm:p-4">
+                    <p className="text-[12px] sm:text-[13px] text-[#3b1f0e] mb-1 sm:mb-2">
                       <strong>📷 Photo Requirements:</strong>
                     </p>
-                    <ul className="text-[12px] text-[#6b4423] space-y-1 ml-4 list-disc">
+                    <ul className="text-[11px] sm:text-[12px] text-[#6b4423] space-y-1 ml-4 list-disc">
                       <li>Upload a clear, professional headshot</li>
                       <li>Face should be clearly visible</li>
                       <li>This photo will appear on your dashboard and profile</li>

@@ -44,6 +44,7 @@ import { clearAllGroupData } from './utils/groupStateManager';
 import { getAvatarById } from './utils/avatarData';
 import { getCafeById } from './utils/cafesData';
 import { safeStorage, safeWindow, safeDocument } from './utils/safeStorage';
+import { BASE_URL } from './utils/api';
 const CAFFELINO_LOGO_URL = 'https://i.postimg.cc/g0S6yjSj/caffelino-removebg-preview.png';
 type Page =
   | "landing"
@@ -490,7 +491,7 @@ function AppContent() {
       };
 
       try {
-        const response = await fetch(`https://caffelino90-9v4a.onrender.com/api/user/profile/${user.id}`, {
+        const response = await fetch(`${BASE_URL}/api/user/profile/${user.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

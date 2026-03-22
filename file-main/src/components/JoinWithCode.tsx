@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { BASE_URL } from '../utils/api';
 
-const API_BASE = 'https://caffelino90-9v4a.onrender.com/api';
+const API_BASE = `${BASE_URL}/api`;
 
 interface JoinWithCodeProps {
   user: any;

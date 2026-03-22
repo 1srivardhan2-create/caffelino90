@@ -5,6 +5,7 @@ import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { toast } from 'sonner';
+import { BASE_URL } from '../utils/api';
 
 interface UnifiedCafeMenuProps {
   meetupData: any;
@@ -441,7 +442,7 @@ export default function UnifiedCafeMenu({
                 {/* Item Image */}
                 <div className="relative h-48 overflow-hidden">
                   <img
-                    src={item.image?.startsWith('/uploads/') ? `https://caffelino90-9v4a.onrender.com${item.image}` : item.image}
+                    src={item.image?.startsWith('/uploads/') ? `${BASE_URL}${item.image}` : item.image}
                     alt={item.name}
                     className="w-full h-full object-cover"
                   />

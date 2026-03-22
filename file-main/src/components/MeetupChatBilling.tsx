@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Users, Coffee, Send, ShoppingCart, Plus, Minus, Receipt, CreditCard, Banknote, Check, Edit2, MapPin } from 'lucide-react';
+import { ArrowLeft, Users, Coffee, Send, ShoppingCart, Plus, Minus, Receipt, CreditCard, Banknote, Check, Edit2, MapPin, CheckCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { toast } from 'sonner';
 import POSMenuInterface, { POSConfirmData } from './POSMenuInterface';
@@ -24,6 +24,8 @@ interface MeetupChatBillingProps {
     selectedCafe?: any;
     selectedCafes?: any[];
     members: any[];
+    isAdmin?: boolean;
+    joinedViaCode?: boolean;
   } | null;
   onNavigate: (page: string, data?: any) => void;
   onBack: () => void;
@@ -52,10 +54,10 @@ interface OrderItem {
 // Real menu is now fetched from API
 
 export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack, onNotificationUpdate }: MeetupChatBillingProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
   const [menuItems, setMenuItems] = useState<any[]>([]);
   const [inputText, setInputText] = useState('');
-  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [orderItems, setOrderItems] = useState<any[]>([]);
   const [showOrderSection, setShowOrderSection] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [orderId, setOrderId] = useState('');
@@ -375,7 +377,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         timestamp: new Date(),
       };
 
-      setMessages(prev => [...prev, confirmationMessage]);
+      setMessages((prev: any[]) => [...prev, confirmationMessage]);
     }
   }, [meetupData]);
 
@@ -494,8 +496,8 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
   const handleQuantityChange = (itemId: string, change: number) => {
     setOrderItems((prev: OrderItem[]) => {
-      const existingItem = prev.find(i => i.id === itemId);
-      const menuItem = menuItems.find(i => i.id === itemId);
+      const existingItem = prev.find((i: any) => i.id === itemId);
+      const menuItem = menuItems.find((i: any) => i.id === itemId);
 
       if (!menuItem) return prev;
 
@@ -515,11 +517,11 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
   };
 
   const getItemQuantity = (itemId: string) => {
-    return orderItems.find(i => i.id === itemId)?.quantity || 0;
+    return orderItems.find((i: any) => i.id === itemId)?.quantity || 0;
   };
 
   const calculateBill = () => {
-    const itemTotal = orderItems.reduce((sum: number, item: OrderItem) => sum + (Number(item.price || 0) * Number(item.quantity || 0)), 0);
+    const itemTotal = orderItems.reduce((sum: number, item: any) => sum + (Number(item.price || 0) * Number(item.quantity || 0)), 0);
     const discount = Number(couponDiscount || 0);
     const subtotalAfterCoupon = itemTotal - discount;
     const cgst = Number(cgstAmount || 0) || parseFloat((subtotalAfterCoupon * 0.025).toFixed(2));
@@ -558,8 +560,8 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
     // Add local first for instant UI response
     const tempId = `bill-${Date.now()}`;
-    setMessages(prev => {
-      const filtered = prev.filter(m => !(m.billData && m.billData.orderId === currentOrderId && m.type === 'bill'));
+    setMessages((prevItems: any[]) => {
+      const filtered = prevItems.filter((m: any) => !(m.billData && m.billData.orderId === currentOrderId && m.type === 'bill'));
       return [...filtered, {
         id: tempId,
         type: 'bill' as const,
@@ -584,7 +586,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       if (data.success && data.message) {
         socketService.sendMessage({
           _id: data.message._id,
-          meetupId: meetupData?._id,
+          meetupId: meetupData?._id || '',
           userId: user?.id || '',
           userName: user?.firstName || user?.name || '',
           message: '',
@@ -598,6 +600,58 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
     }
 
     toast.success('Order confirmed! Review bill below.');
+  };
+
+  const emitOrderToCafe = (currentOrderId: string, billData: any) => {
+    const cafeIdToEmit = selectedCafe?.cafeId || selectedCafe?.id || selectedCafe?._id || '';
+    if (!cafeIdToEmit) return;
+
+    socketService.emitOrderCreated({
+      orderNumber: currentOrderId,
+      orderId: currentOrderId,
+      meetupName: `Meetup ${meetupData?.meetupCode || meetupData?.joinCode || ''}`,
+      groupName: user?.firstName || user?.name || 'Group',
+      meetupId: meetupData?._id || meetupData?.id,
+      cafeId: cafeIdToEmit,
+      memberCount: meetupData?.members?.length || 1,
+      items: orderItems.map((i: any) => ({ name: i.name, quantity: i.quantity, price: i.price })),
+      totalAmount: billData.total,
+      subtotal: billData.itemTotal,
+      cgst: billData.cgst,
+      sgst: billData.sgst,
+      orderDate: new Date().toLocaleDateString('en-IN'),
+      orderTime: new Date().toLocaleTimeString('en-IN'),
+      status: 'pending',
+      adminName: user?.firstName || user?.name || '',
+      adminPhone: '',
+      createdAt: new Date().toISOString(),
+      splitEnabled: billData.splitEnabled,
+      perPersonAmount: billData.perPersonAmount,
+      members: billData.members,
+    });
+    console.log('📦 Order-created emitted for cafe:', cafeIdToEmit);
+
+    // Save to localStorage for cafe dashboard fallback (polling)
+    try {
+      const existingOrders = JSON.parse(localStorage.getItem('cafeOrders') || '[]');
+      const newOrder = {
+        orderNumber: currentOrderId,
+        meetupName: `Meetup ${meetupData?.meetupCode || meetupData?.joinCode || ''}`,
+        groupName: user?.firstName || user?.name || 'Group',
+        meetupId: meetupData?._id || meetupData?.id,
+        memberCount: meetupData?.members?.length || 1,
+        items: orderItems.map((i: any) => ({ name: i.name, quantity: i.quantity, price: i.price })),
+        totalAmount: billData.total,
+        orderDate: new Date().toLocaleDateString('en-IN'),
+        orderTime: new Date().toLocaleTimeString('en-IN'),
+        status: 'pending',
+        adminName: user?.firstName || user?.name || '',
+        adminPhone: '',
+        createdAt: new Date().toISOString(),
+      };
+      existingOrders.unshift(newOrder);
+      localStorage.setItem('cafeOrders', JSON.stringify(existingOrders));
+    } catch (e) { /* ignore */ }
   };
 
   const handlePOSConfirmOrder = async (posData: POSConfirmData) => {
@@ -663,56 +717,10 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       console.error('Failed to save order:', err);
     }
 
-    // Also emit order-created via socket for cafe dashboard (redundant path — backend also emits)
-    const cafeIdToEmit = selectedCafe?.cafeId || selectedCafe?.id || selectedCafe?._id || '';
-    if (cafeIdToEmit) {
-      socketService.emitOrderCreated({
-        orderNumber: currentOrderId,
-        orderId: currentOrderId,
-        meetupName: `Meetup ${meetupData?.meetupCode || meetupData?.joinCode || ''}`,
-        groupName: user?.firstName || user?.name || 'Group',
-        meetupId: meetupData?._id || meetupData?.id,
-        cafeId: cafeIdToEmit,
-        memberCount: meetupData?.members?.length || 1,
-        items: posData.items.map((i: any) => ({ name: i.name, quantity: i.quantity, price: i.price })),
-        totalAmount: posData.total,
-        subtotal: posData.subtotal,
-        cgst: posData.cgst,
-        sgst: posData.sgst,
-        orderDate: new Date().toLocaleDateString('en-IN'),
-        orderTime: new Date().toLocaleTimeString('en-IN'),
-        status: 'pending',
-        adminName: user?.firstName || user?.name || '',
-        adminPhone: '',
-        createdAt: new Date().toISOString(),
-        splitEnabled: posData.splitEnabled,
-        perPersonAmount: posData.perPersonAmount,
-        members: posData.members,
-      });
-      console.log('📦 Order-created emitted for cafe:', cafeIdToEmit);
+    // If token is already paid (e.g. editing an order), emit to cafe immediately
+    if (tokenPaid) {
+      emitOrderToCafe(currentOrderId, billData);
     }
-
-    // Save to localStorage for cafe dashboard fallback (polling)
-    try {
-      const existingOrders = JSON.parse(localStorage.getItem('cafeOrders') || '[]');
-      const newOrder = {
-        orderNumber: currentOrderId,
-        meetupName: `Meetup ${meetupData?.meetupCode || meetupData?.joinCode || ''}`,
-        groupName: user?.firstName || user?.name || 'Group',
-        meetupId: meetupData?._id || meetupData?.id,
-        memberCount: meetupData?.members?.length || 1,
-        items: posData.items.map((i: any) => ({ name: i.name, quantity: i.quantity, price: i.price })),
-        totalAmount: posData.total,
-        orderDate: new Date().toLocaleDateString('en-IN'),
-        orderTime: new Date().toLocaleTimeString('en-IN'),
-        status: 'pending',
-        adminName: user?.firstName || user?.name || '',
-        adminPhone: '',
-        createdAt: new Date().toISOString(),
-      };
-      existingOrders.unshift(newOrder);
-      localStorage.setItem('cafeOrders', JSON.stringify(existingOrders));
-    } catch (e) { /* ignore */ }
 
     // Add bill message locally for instant UI
     const tempId = `bill-${Date.now()}`;
@@ -835,13 +843,13 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         if (data.success && data.message) {
           socketService.sendMessage({
             _id: data.message._id,
-            meetupId: meetupData?._id,
+            meetupId: meetupData?._id || '',
             userId: user?.id || '',
             userName: user?.firstName || user?.name || '',
             message: '',
             type: 'payment',
             paymentData,
-            createdAt: data.message.createdAt
+            createdAt: data.message.createdAt || new Date().toISOString()
           });
         }
       } catch (err) {
@@ -853,7 +861,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       const amountPaid = splitBill ? bill.total / (numberOfPeople > 0 ? numberOfPeople : 1) : bill.total;
 
       // Prepare order items for notification
-      const orderItemsForNotification = orderItems.map(item => ({
+      const orderItemsForNotification = orderItems.map((item: any) => ({
         name: item.name,
         quantity: item.quantity,
         price: item.price * item.quantity
@@ -879,7 +887,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       const amountPerPerson = splitBill ? bill.total / (numberOfPeople > 0 ? numberOfPeople : 1) : bill.total;
 
       // Prepare order items for payment page
-      const orderItemsForNotification = orderItems.map(item => ({
+      const orderItemsForNotification = orderItems.map((item: any) => ({
         name: item.name,
         quantity: item.quantity,
         price: item.price * item.quantity
@@ -911,12 +919,13 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
   const handleTokenPayment = async () => {
     try {
-      const res = await fetch('https://caffelino90-9v4a.onrender.com/api/create-order', {
+      const res = await fetch(`${BASE_URL}/api/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           meetupId: meetupData?._id || meetupData?.id,
-          userId: currentUserId || 'guest'
+          userId: currentUserId || 'guest',
+          orderId: orderId // Link it to the current order if available
         })
       });
       let data;
@@ -940,7 +949,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
           order_id: data.orderId,
           handler: async function (response: any) {
             try {
-              const verifyRes = await fetch('https://caffelino90-9v4a.onrender.com/api/verify-payment', {
+              const verifyRes = await fetch(`${BASE_URL}/api/verify-payment`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -954,12 +963,30 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
               const verifyData = await verifyRes.json();
               
               if (verifyData.success) {
+                // IMPORTANT: Update the meetup order status to 'token_paid' in our DB
+                if (orderId) {
+                  try {
+                    await fetch(`${BASE_URL}/api/meetup-orders/${orderId}/token-paid`, {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ tokenAmount: 20 })
+                    });
+                  } catch (orderUpdateErr) {
+                    console.error('Failed to update order status on backend:', orderUpdateErr);
+                  }
+                }
+
                 setTokenPaid(true);
                 setOrderConfirmed(true);
+                
+                // Emit order to cafe now that token is paid
+                const billData = calculateBill();
+                emitOrderToCafe(orderId, billData);
+
                 toast.success('Order Confirmed. ₹20 token received.');
                 
                 const msgText = `Order Confirmed.\n₹20 token received.\nPlease pay remaining amount at the café counter.`;
-                setMessages((prev: Message[]) => [...prev, {
+                setMessages((prev: any[]) => [...prev, {
                   id: `token-${Date.now()}`,
                   type: 'system',
                   text: msgText,
@@ -1077,6 +1104,12 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                 <p className="text-gray-700 text-sm mt-1">
                   Code: <span className="font-mono font-bold text-[#be9d80]">{meetupData?.joinCode}</span>
                 </p>
+                {tokenPaid && (
+                  <div className="mt-2 inline-flex items-center gap-1.5 bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    Token Paid (₹20)
+                  </div>
+                )}
               </div>
               <div className="bg-white rounded-lg px-4 py-2 shadow-sm">
                 <p className="text-gray-900 text-sm flex items-center gap-2">
@@ -1164,13 +1197,13 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                     Order Summary ({orderItems.length} items)
                   </h3>
                   <span className="text-lg font-bold text-emerald-600">
-                    ₹{orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)}
+                    ₹{orderItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0)}
                   </span>
                 </div>
 
                 {/* Scrollable Items List */}
                 <div className="max-h-[60px] overflow-y-auto mb-3 space-y-1">
-                  {orderItems.map(item => (
+                  {orderItems.map((item: any) => (
                     <div key={item.id} className="flex justify-between text-sm text-gray-700">
                       <span className="truncate flex-1">{item.name} x{item.quantity}</span>
                       <span className="font-medium ml-2">₹{item.price * item.quantity}</span>
@@ -1183,7 +1216,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                   className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2"
                 >
                   <Check className="w-5 h-5" />
-                  Confirm Order • ₹{orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)}
+                  Confirm Order • ₹{orderItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0)}
                 </Button>
               </div>
             </div>

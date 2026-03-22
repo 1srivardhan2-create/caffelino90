@@ -116,14 +116,14 @@ io.on("connection", (socket) => {
     // ─── Cafe Dashboard: Join cafe room ──────────────────────────
     socket.on("join_cafe_room", async (cafeId) => {
         if (!cafeId) return;
-        
+
         socket.join(`cafe_${cafeId}`);
         console.log(`☕ Socket ${socket.id} joined cafe room: cafe_${cafeId}`);
-        
+
         try {
             const Cafe = require("./models/Cafe/Cafe");
             let cafe = null;
-            
+
             // Try as ID or ownerId
             if (require("mongoose").Types.ObjectId.isValid(cafeId)) {
                 cafe = await Cafe.findById(cafeId).lean();

@@ -3,6 +3,7 @@ import { ArrowLeft, Copy, Check, MapPin, Users, Calendar, Clock, Send, ShoppingB
 import { toast } from 'sonner';
 import { Button } from './ui/button';
 import { cn } from './ui/utils';
+import { BASE_URL } from '../utils/api';
 
 interface MeetupDashboardProps {
   user: any;
@@ -486,7 +487,7 @@ export default function MeetupDashboard({ user, meetupData, onNavigate, onBack }
                   {MOCK_MENU.slice(0, 3).map((item) => (
                     <div key={item.id} className="flex items-center gap-3 border border-neutral-200 rounded-lg p-3">
                       <img
-                        src={item.image?.startsWith('/uploads/') ? `https://caffelino90-9v4a.onrender.com${item.image}` : item.image}
+                        src={item.image?.startsWith('/uploads/') ? `${BASE_URL}${item.image}` : item.image}
                         alt={item.name}
                         className="w-12 h-12 object-cover rounded-lg"
                       />

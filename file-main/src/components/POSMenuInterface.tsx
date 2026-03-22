@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, Search, ShoppingCart, Plus, Minus, X, Check, Users, ToggleLeft, ToggleRight, Tag } from 'lucide-react';
 import { Button } from './ui/button';
 import { toast } from 'sonner';
+import { BASE_URL } from '../utils/api';
 
 interface POSMenuInterfaceProps {
   user: any;
@@ -100,7 +101,7 @@ export default function POSMenuInterface({
   const mappedMenuItems: MenuItem[] = (menuItems || []).map((item: any, index: number) => {
     let finalImage = item.image_url || item.image;
     if (finalImage && finalImage.startsWith('/uploads/')) {
-      finalImage = `https://caffelino90-9v4a.onrender.com${finalImage}`;
+      finalImage = `${BASE_URL}${finalImage}`;
     }
 
     return {

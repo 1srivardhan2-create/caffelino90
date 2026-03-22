@@ -3,6 +3,7 @@ import { ArrowLeft, MapPin, Star, Users, Check, TrendingUp, Coffee, Sparkles } f
 import { Button } from './ui/button';
 import { toast } from 'sonner';
 import { socketService } from '../services/socketService';
+import { BASE_URL } from '../utils/api';
 
 interface JoinVotingProps {
   user: any;
@@ -93,7 +94,7 @@ export default function JoinVoting({ user, meetupData, onNavigate, onBack }: Joi
     setMyVote(cafeId);
 
     try {
-      const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/vote', {
+      const res = await fetch(`${BASE_URL}/api/meetups/vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

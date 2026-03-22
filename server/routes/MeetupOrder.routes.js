@@ -182,6 +182,12 @@ router.get("/earnings/:cafeId", async (req, res) => {
             .sort({ createdAt: -1 })
             .lean();
 
+        // Also fetch active orders that are ACCEPTED or token_paid which haven't been 'COMPLETED' (and thus not in Earning yet)
+        const activeOrders = await MeetupOrder.find({ 
+            cafeId: { $in: uniqueCafeIds },
+            status: { $in: ["ACCEPTED", "token_paid"] }
+        }).lean();
+
         const now = new Date();
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const startOfWeek = new Date(startOfToday);
@@ -192,12 +198,38 @@ router.get("/earnings/:cafeId", async (req, res) => {
 
         earnings.forEach(e => {
             const amt = e.amount || 0;
+            const d = new Date(e.createdAt || e.date);
+            allTimeTotal += amt;
+            if (d >= startOfMonth) monthTotal += amt;
+            if (d >= startOfWeek) weekTotal += amt;
+            if (d >= startOfToday) todayTotal += amt;
+        });
+
+        // Add active orders to the totals and list
+        const activeEarnings = activeOrders.map(order => ({
+            _id: order._id,
+            orderId: order.orderId,
+            amount: order.total || order.totalAmount || 0,
+            paymentMethod: "pending",
+            status: order.status,
+            userName: order.userName,
+            items: order.items,
+            createdAt: order.createdAt || order.orderDate,
+            isPending: true
+        }));
+
+        activeEarnings.forEach(e => {
+            const amt = e.amount || 0;
             const d = new Date(e.createdAt);
             allTimeTotal += amt;
             if (d >= startOfMonth) monthTotal += amt;
             if (d >= startOfWeek) weekTotal += amt;
             if (d >= startOfToday) todayTotal += amt;
         });
+
+        const combinedEarnings = [...activeEarnings, ...earnings].sort((a, b) => 
+            new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime()
+        );
 
         res.json({
             success: true,
@@ -207,7 +239,7 @@ router.get("/earnings/:cafeId", async (req, res) => {
                 month: parseFloat(monthTotal.toFixed(2)),
                 allTime: parseFloat(allTimeTotal.toFixed(2)),
             },
-            earnings,
+            earnings: combinedEarnings,
         });
     } catch (error) {
         console.error("Get Earnings Error:", error);

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, Plus, Minus, ShoppingCart, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { orderDB, meetupMemberDB, OrderItem } from '../utils/database';
+import { BASE_URL } from '../utils/api';
 
 interface MenuSelectionMemberProps {
   onNavigate: (page: string, data?: any) => void;
@@ -231,7 +232,7 @@ export default function MenuSelectionMember({ onNavigate, meetupData, user }: Me
             >
               <div className="flex gap-3">
                 <img
-                  src={item.image?.startsWith('/uploads/') ? `https://caffelino90-9v4a.onrender.com${item.image}` : item.image}
+                  src={item.image?.startsWith('/uploads/') ? `${BASE_URL}${item.image}` : item.image}
                   alt={item.name}
                   className="w-20 h-20 rounded-[8px] object-cover"
                 />
@@ -299,7 +300,7 @@ export default function MenuSelectionMember({ onNavigate, meetupData, user }: Me
                 return (
                   <div key={itemId} className="flex items-center justify-between mb-2 text-[13px]">
                     <div className="flex items-center gap-2">
-                      <img src={item.image?.startsWith('/uploads/') ? `https://caffelino90-9v4a.onrender.com${item.image}` : item.image} alt={item.name} className="w-8 h-8 rounded object-cover" />
+                      <img src={item.image?.startsWith('/uploads/') ? `${BASE_URL}${item.image}` : item.image} alt={item.name} className="w-8 h-8 rounded object-cover" />
                       <span className="font-['Arial:Regular',_sans-serif] text-neutral-700">
                         {item.name} x {qty}
                       </span>

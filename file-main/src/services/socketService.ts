@@ -1,6 +1,8 @@
 import { io, Socket } from 'socket.io-client';
 
-const API_BASE_URL = window.location.hostname === 'localhost' ? "http://localhost:5000" : 'https://caffelino90-9v4a.onrender.com';
+import { BASE_URL } from '../utils/api';
+
+const API_BASE_URL = BASE_URL;
 
 class SocketService {
   public socket: Socket | null = null;
@@ -58,7 +60,7 @@ class SocketService {
 
   // --- Emit Events ---
 
-  sendMessage(data: { _id?: string; meetupId: string; userId: string; userName: string; message: string; type?: string; billData?: any; paymentData?: any; createdAt?: Date | string }) {
+  sendMessage(data: { _id?: string; meetupId: string; userId: string; userName: string; senderEmoji?: string; message: string; type?: string; billData?: any; paymentData?: any; createdAt?: Date | string }) {
     this.socket?.emit('send_message', data);
   }
 

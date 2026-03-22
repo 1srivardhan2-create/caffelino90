@@ -1,6 +1,8 @@
 // Cafe Service - Handles cafe registration, fetching, and verification API calls
 
-const API_BASE_URL = window.location.hostname === 'localhost' ? "http://localhost:5000/api" : "https://caffelino90-9v4a.onrender.com/api";
+import { BASE_URL } from '../utils/api';
+
+const API_BASE_URL = `${BASE_URL}/api`;
 
 /**
  * Register a new cafe (simplified, no file uploads)

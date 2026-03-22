@@ -17,6 +17,7 @@ import {
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { BASE_URL } from '../utils/api';
 import { safeStorage } from '../utils/safeStorage';
 
 interface EarningsSummary {
@@ -55,7 +56,7 @@ export default function CafeEarnings() {
   const fetchEarnings = async () => {
     if (!resolvedCafeId) return;
     try {
-      const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/meetup-orders/earnings/${resolvedCafeId}`);
+      const res = await fetch(`${BASE_URL}/api/meetup-orders/earnings/${resolvedCafeId}`);
       const data = await res.json();
       if (data.success) {
         setSummary(data.summary);

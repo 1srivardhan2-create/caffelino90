@@ -97,25 +97,25 @@ export default function MeetupCode({ user, meetupData, onNavigate, onBack }: Mee
       {/* Clean Progress Steps */}
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="flex items-center justify-center gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold shadow-sm">
-              <Check className="w-5 h-5" strokeWidth={3} />
+          <div className="flex items-center gap-1 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold shadow-sm">
+              <Check className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={3} />
             </div>
-            <span className="text-sm font-semibold text-gray-800">Details</span>
+            <span className="text-xs sm:text-sm font-semibold text-gray-800">Details</span>
           </div>
-          <div className="w-20 h-0.5 bg-green-500"></div>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold shadow-sm">
-              <Check className="w-5 h-5" strokeWidth={3} />
+          <div className="w-8 sm:w-20 h-0.5 bg-green-500"></div>
+          <div className="flex items-center gap-1 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold shadow-sm">
+              <Check className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={3} />
             </div>
-            <span className="text-sm font-semibold text-gray-800">Café</span>
+            <span className="text-xs sm:text-sm font-semibold text-gray-800">Café</span>
           </div>
-          <div className="w-20 h-0.5 bg-green-500"></div>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#be9d80] text-white flex items-center justify-center font-bold shadow-sm">
+          <div className="w-8 sm:w-20 h-0.5 bg-green-500"></div>
+          <div className="flex items-center gap-1 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#be9d80] text-white flex items-center justify-center font-bold shadow-sm text-sm sm:text-base">
               3
             </div>
-            <span className="text-sm font-semibold text-gray-800">Code</span>
+            <span className="text-xs sm:text-sm font-semibold text-gray-800">Code</span>
           </div>
         </div>
       </div>
@@ -159,7 +159,7 @@ export default function MeetupCode({ user, meetupData, onNavigate, onBack }: Mee
 
         {/* Join Code Display */}
         <div className="mb-8">
-          <div className="bg-gradient-to-br from-[#be9d80] to-[#a88968] p-10 rounded-2xl shadow-xl relative overflow-hidden">
+          <div className="bg-gradient-to-br from-[#be9d80] to-[#a88968] p-4 sm:p-10 rounded-2xl shadow-xl relative overflow-hidden">
             {/* Decorative Background Pattern */}
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-0 left-0 w-32 h-32 bg-white rounded-full -translate-x-16 -translate-y-16"></div>
@@ -167,9 +167,9 @@ export default function MeetupCode({ user, meetupData, onNavigate, onBack }: Mee
             </div>
 
             <div className="relative text-center">
-              <p className="text-white text-sm font-semibold mb-4 uppercase tracking-wide">Join Code</p>
-              <div className="inline-block bg-white px-10 py-7 rounded-xl shadow-2xl">
-                <p className="text-6xl font-bold text-[#be9d80] tracking-[0.25em] font-mono">
+              <p className="text-white text-xs sm:text-sm font-semibold mb-3 sm:mb-4 uppercase tracking-wide">Join Code</p>
+              <div className="inline-block bg-white px-4 py-4 sm:px-10 sm:py-7 rounded-xl shadow-2xl w-full max-w-[280px] sm:max-w-none">
+                <p className="text-2xl sm:text-5xl md:text-6xl font-bold text-[#be9d80] tracking-[0.1em] sm:tracking-[0.25em] font-mono break-all leading-relaxed">
                   {joinCode || '------'}
                 </p>
               </div>

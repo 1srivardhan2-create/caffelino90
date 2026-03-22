@@ -336,16 +336,20 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 px-1">
                     {approvedCafes.slice(0, 4).map((cafe: any, idx: number) => {
-                    const resolveImg = (imgStr: string) => {
+                    const resolveImg = (imgStr: any) => {
                       if (!imgStr) return null;
+                      if (typeof imgStr !== 'string') return null;
                       if (imgStr.startsWith('/uploads/')) return `${BASE_URL}${imgStr}`;
                       return imgStr; // Handles data: image/... and http://... natively
                     };
 
-                    const heroImage = ((cafe.Cafe_photos && cafe.Cafe_photos.length > 0) ? resolveImg(cafe.Cafe_photos[0]) : null) || 
+                    // Check multiple possible field names for photos
+                    const photos = cafe.Cafe_photos || cafe.cafePhotos || cafe.gallery || [];
+                    const heroImage = (photos.length > 0 ? resolveImg(photos[0]) : null) || 
                       'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800';
                     
-                    const profileSrc = resolveImg(cafe.profilePicture);
+                    // Check multiple possible field names for profile picture
+                    const profileSrc = resolveImg(cafe.profilePicture || (cafe.manager && (cafe.manager.profilePic || cafe.manager.profilePicture)));
 
                     return (
                       <div

@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { toast } from 'sonner';
+import { BASE_URL } from '../utils/api';
 
 interface UnifiedOrderSummaryProps {
   meetupData: any;
@@ -82,7 +83,7 @@ export default function UnifiedOrderSummary({
 
       // Send to real backend
       try {
-        await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/order', {
+        await fetch(`${BASE_URL}/api/meetups/order`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -278,7 +279,7 @@ export default function UnifiedOrderSummary({
                   {/* Item Image */}
                   <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                     <img
-                      src={item.image?.startsWith('/uploads/') ? `https://caffelino90-9v4a.onrender.com${item.image}` : item.image}
+                      src={item.image?.startsWith('/uploads/') ? `${BASE_URL}${item.image}` : item.image}
                       alt={item.name}
                       className="w-full h-full object-cover"
                     />

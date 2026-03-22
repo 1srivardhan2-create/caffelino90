@@ -2,14 +2,9 @@ import { useState } from 'react';
 import { Coffee, Users, Key } from 'lucide-react';
 import { toast } from 'sonner';
 import { socketService } from '../services/socketService';
+import { BASE_URL } from '../utils/api';
 
-interface JoinMeetupProps {
-  onNavigate: (page: string, data?: any) => void;
-  onBack: () => void;
-  user?: any;
-}
-
-const API_BASE = 'https://caffelino90-9v4a.onrender.com/api';
+const API_BASE = `${BASE_URL}/api`;
 
 export default function JoinMeetup({ onNavigate, onBack, user }: JoinMeetupProps) {
   const [joinCode, setJoinCode] = useState('');

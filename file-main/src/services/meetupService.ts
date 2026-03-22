@@ -1,6 +1,8 @@
 // Meetup Service - Handles meetup-related API calls
 
-const API_BASE_URL = window.location.hostname === 'localhost' ? "http://localhost:5000/api/meetups" : "https://caffelino90-9v4a.onrender.com/api/meetups";
+import { BASE_URL } from '../utils/api';
+
+const API_BASE_URL = `${BASE_URL}/api/meetups`;
 
 /**
  * Get all active meetups for a specific user from the backend
