@@ -1075,10 +1075,13 @@ const getMeetupOrders = async (req, res) => {
             }
         } catch (e) { /* ignore */ }
 
-        // De-duplicate
         const uniqueCafeIds = [...new Set(possibleCafeIds)];
 
-        const orders = await MeetupOrder.find({ cafeId: { $in: uniqueCafeIds } })
+        // Filter out orders that haven't paid the token
+        const orders = await MeetupOrder.find({ 
+            cafeId: { $in: uniqueCafeIds },
+            status: { $nin: ["draft", "pending", "PENDING", "PLACED"] }
+        })
             .sort({ createdAt: -1 })
             .lean();
 

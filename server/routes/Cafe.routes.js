@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const authCafe = require("../middlewares/authCafe");
 const cafeApproved = require("../middlewares/cafeApproved");
+const cafeExists = require("../middlewares/cafeExists");
 const upload = require("../middlewares/upload");
 
 const {
@@ -79,19 +80,19 @@ router.delete("/delete/cafe", authCafe, cafeApproved, deleteCafe);
 // PATCH /api/cafe/approve/:id — Admin approval
 router.patch("/approve/:id", approveCafe);
 
-// ─── Menu Management (auth + approved required) ─────────────────
+// ─── Menu Management (auth + cafeExists required) ─────────────────
 
 // POST /api/cafe/menuItem/cafe — Add a new menu item
-router.post("/menuItem/cafe", authCafe, cafeApproved, upload.fields([{ name: "image", maxCount: 1 }]), MenuItem);
+router.post("/menuItem/cafe", authCafe, cafeExists, upload.fields([{ name: "image", maxCount: 1 }]), MenuItem);
 
 // PUT /api/cafe/menuItem/edit/:id — Edit a menu item
-router.put("/menuItem/edit/:id", authCafe, cafeApproved, upload.fields([{ name: "image", maxCount: 1 }]), EditMenuItem);
+router.put("/menuItem/edit/:id", authCafe, cafeExists, upload.fields([{ name: "image", maxCount: 1 }]), EditMenuItem);
 
 // PATCH /api/cafe/menuItem/availability/:id — Toggle availability
 router.patch(
     "/menuItem/availability/:id",
     authCafe,
-    cafeApproved,
+    cafeExists,
     toggleMenuAvailability
 );
 
@@ -100,13 +101,13 @@ router.patch(
 router.get("/public/menu/:cafeId", getPublicMenu);
 
 // DELETE /api/cafe/delete/item/:itemid — Delete a menu item
-router.delete("/delete/item/:itemid", authCafe, cafeApproved, deleteItem);
+router.delete("/delete/item/:itemid", authCafe, cafeExists, deleteItem);
 
 // GET /api/cafe/cafe/items — Get all menu items
-router.get("/cafe/items", authCafe, cafeApproved, getItems);
+router.get("/cafe/items", authCafe, cafeExists, getItems);
 
 // GET /api/cafe/cafe/:menuId — Get single menu item by ID
-router.get("/cafe/:menuId", authCafe, cafeApproved, getItemById);
+router.get("/cafe/:menuId", authCafe, cafeExists, getItemById);
 
 // ─── Orders & Payments (auth + approved required) ───────────────
 

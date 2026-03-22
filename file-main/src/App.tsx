@@ -713,6 +713,7 @@ function AppContent() {
         currentPage !== "partner-registration" &&
         currentPage !== "partner-login-choice" &&
         currentPage !== "cafe-owner-google-login" &&
+        currentPage !== "cafe-owner-dashboard" &&
         currentPage !== "cafe-verification-pending" &&
         currentPage !== "admin" && (
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 shadow-lg">

@@ -149,11 +149,17 @@ const googleLogin = async (req, res) => {
             user: {
                 id: user._id,
                 name: user.name,
+                firstName: user.firstName,
+                lastName: user.lastName,
                 email: user.email,
                 picture: user.picture,
                 googleId: user.googleId,
                 role: "user",
                 profileCompleted: user.profileCompleted || false,
+                age: user.age,
+                gender: user.gender,
+                city: user.city,
+                mobileNumber: user.mobileNumber
             },
         });
     } catch (error) {
