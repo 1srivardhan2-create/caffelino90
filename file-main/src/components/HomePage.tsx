@@ -336,16 +336,16 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 px-1">
                     {approvedCafes.slice(0, 4).map((cafe: any, idx: number) => {
-                    // Helper to resolve an image string correctly
                     const resolveImg = (imgStr: string) => {
                       if (!imgStr) return null;
                       if (imgStr.startsWith('/uploads/')) return `${BASE_URL}${imgStr}`;
                       return imgStr; // Handles data: image/... and http://... natively
                     };
 
-                    const heroImage = resolveImg(cafe.profilePicture) || 
-                      ((cafe.Cafe_photos && cafe.Cafe_photos.length > 0) ? resolveImg(cafe.Cafe_photos[0]) : null) || 
+                    const heroImage = ((cafe.Cafe_photos && cafe.Cafe_photos.length > 0) ? resolveImg(cafe.Cafe_photos[0]) : null) || 
                       'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800';
+                    
+                    const profileSrc = resolveImg(cafe.profilePicture);
 
                     return (
                       <div
@@ -360,13 +360,21 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
                             alt={cafe.Name}
                             loading="lazy"
                             className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-                            style={{ width: '100%', height: '200px', objectFit: 'contain', borderRadius: '12px 12px 0 0' }}
+                            style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '12px 12px 0 0' }}
                             onError={(e: any) => { e.target.src = 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800'; }}
                           />
                           <div className="absolute top-3 left-3 bg-emerald-500 text-white px-2.5 py-1 rounded-full text-[11px] font-bold shadow-lg flex items-center gap-1 z-10">
                             <BadgeCheck className="w-3.5 h-3.5" />
                             Verified
                           </div>
+                          
+                          {/* Manager Profile Picture Badge */}
+                          {profileSrc && (
+                             <div className="absolute bottom-[-15px] right-4 w-[50px] h-[50px] rounded-full border-4 border-white shadow-md overflow-hidden bg-white z-20">
+                               <img src={profileSrc} alt="Manager" className="w-full h-full object-cover" />
+                             </div>
+                          )}
+
                           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
 

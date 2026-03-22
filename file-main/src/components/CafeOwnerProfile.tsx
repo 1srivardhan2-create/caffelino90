@@ -204,6 +204,10 @@ export default function CafeOwnerProfile({ onNavigate, onLogout }: CafeOwnerProf
             setCafePhotos(data.cafe.Cafe_photos);
             safeStorage.setItem('cafePhotos', JSON.stringify(data.cafe.Cafe_photos));
           }
+          // Load profilePicture from DB into profile state
+          if (data.cafe.profilePicture) {
+            setProfile((prev: ProfileData) => ({ ...prev, profilePhoto: data.cafe.profilePicture }));
+          }
         }
       }).catch((err: any) => {
         console.error('Error loading cafe from DB:', err);

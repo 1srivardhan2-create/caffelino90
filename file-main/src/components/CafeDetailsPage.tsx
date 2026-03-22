@@ -35,12 +35,14 @@ export default function CafeDetailsPage({ cafe, user, onBack, onNavigate }: Cafe
   // Normalize data for consistent rendering
   const cafeName = isDbCafe ? (cafe.Name || 'Unnamed Cafe') : cafe?.name;
   const cafeImage = isDbCafe
-    ? (cafe.profilePicture 
-        ? (cafe.profilePicture.startsWith('/uploads/') ? `https://caffelino90-9v4a.onrender.com${cafe.profilePicture}` : cafe.profilePicture)
-        : ((cafe.Cafe_photos && cafe.Cafe_photos.length > 0) 
-            ? (cafe.Cafe_photos[0].startsWith('/uploads/') ? `https://caffelino90-9v4a.onrender.com${cafe.Cafe_photos[0]}` : cafe.Cafe_photos[0]) 
-            : DEFAULT_CAFE_IMAGE))
+    ? ((cafe.Cafe_photos && cafe.Cafe_photos.length > 0) 
+        ? (cafe.Cafe_photos[0].startsWith('/uploads/') ? `https://caffelino90-9v4a.onrender.com${cafe.Cafe_photos[0]}` : cafe.Cafe_photos[0]) 
+        : DEFAULT_CAFE_IMAGE)
     : cafe?.image;
+    
+  const profilePicUrl = isDbCafe 
+    ? (cafe.profilePicture ? (cafe.profilePicture.startsWith('/uploads/') ? `https://caffelino90-9v4a.onrender.com${cafe.profilePicture}` : cafe.profilePicture) : '')
+    : '';
   const cafePhotos = isDbCafe ? (cafe.Cafe_photos || []).map((p: string) => resolveImageUrl(p)) : (cafe?.photos || []);
   const cafeAddress = isDbCafe ? (cafe.Cafe_Address || cafe.cafe_location || '') : (cafe?.location || '');
   const cafeCost = isDbCafe ? (cafe.Average_Cost || 0) : (cafe?.priceForTwo || 0);
@@ -120,14 +122,19 @@ export default function CafeDetailsPage({ cafe, user, onBack, onNavigate }: Cafe
       {/* Cafe Info */}
       <div className="bg-white border-b border-gray-200">
         <div className="px-4 py-5">
-          <div className="flex items-start gap-3 mb-2">
-            <Store className="w-6 h-6 text-[#8b5943] flex-shrink-0 mt-1" />
+          <div className="flex items-start gap-4 mb-2">
+            <Store className="w-6 h-6 text-[#8b5943] flex-shrink-0 mt-2" />
             <div className="flex-1">
-              <h2 className="text-[24px] font-['Arial:Regular',_sans-serif] text-[#0a0a0a] mb-1">
+              <h2 className="text-[26px] font-bold font-['Arial:Regular',_sans-serif] text-[#0a0a0a] mb-1">
                 {cafeName}
               </h2>
               <p className="text-[14px] text-gray-600 mb-2">{cafeType}</p>
             </div>
+            {profilePicUrl && (
+              <div className="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-white shadow-lg overflow-hidden bg-white -mt-10 z-20 relative">
+                <img src={profilePicUrl} alt={cafeManager || "Manager"} className="w-full h-full object-cover" />
+              </div>
+            )}
           </div>
 
           {/* Rating (for hardcoded cafes) */}
