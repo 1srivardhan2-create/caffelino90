@@ -162,25 +162,22 @@ function AppContent() {
 
   const getPersistedPage = (): Page => {
     const user = getPersistedUser();
-    
-    // Check if we have a saved current page in storage
     const savedCurrentPage = safeStorage.getItem('caffelino_currentPage') as Page;
-    
+    const userMode = safeStorage.getItem('caffelino_userMode');
+    const myCafeId = safeStorage.getItem('myCafeId');
+
     if (user) {
       if (hasCompletedProfile(user)) {
-        // If we have a saved page and it's not landing/login, try to return to it
         if (savedCurrentPage && !['landing', 'login', 'partner-login-choice'].includes(savedCurrentPage)) {
-           // Special check for cafe owner dashboard
            if (savedCurrentPage === 'cafe-owner-dashboard') {
-              const myCafeId = safeStorage.getItem('myCafeId');
               if (myCafeId) return 'cafe-owner-dashboard';
+              if (userMode === 'partner' || user.role === 'cafe' || user.isCafeOwner) return 'partner-registration';
+              return 'home';
            }
            return savedCurrentPage;
         }
 
-        const userMode = safeStorage.getItem('caffelino_userMode');
         if (userMode === 'partner' || user.role === 'cafe' || user.isCafeOwner) {
-          const myCafeId = safeStorage.getItem('myCafeId');
           return myCafeId ? 'cafe-owner-dashboard' : 'partner-registration';
         }
         return 'home';

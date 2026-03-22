@@ -46,9 +46,12 @@ export default function GoogleLoginButton({ onLoginSuccess, onLoginError, onProc
                         profileCompleted: response.user.profileCompleted || false,
                         verified: true,
                         authProvider: "google",
-                        age: 0,
-                        gender: "",
-                        city: "",
+                        age: response.user.age || 0,
+                        gender: response.user.gender || "",
+                        city: response.user.city || "",
+                        firstName: response.user.firstName || "",
+                        lastName: response.user.lastName || "",
+                        mobileNumber: response.user.mobileNumber || "",
                         interests: [],
                     };
                     // Save user ID for cafe registration

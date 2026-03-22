@@ -16,74 +16,48 @@ interface UnifiedCafeMenuProps {
   onBack: () => void;
 }
 
-// Simulated menu API
 const fetchCafeMenu = async (cafeId: string) => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1200));
-
-  // Mock menu data based on café ID
-  const CAFE_MENUS: Record<string, any> = {
-    '1': {
-      cafeName: 'Brew & Beans Café',
-      cafeRating: 4.5,
-      cafeReviews: 234,
-      categories: {
-        coffee: [
-          { id: 'c1', name: 'Espresso', price: 120, veg: true, popular: true, description: 'Rich, bold espresso shot', image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=400&h=300&fit=crop' },
-          { id: 'c2', name: 'Cappuccino', price: 150, veg: true, popular: true, description: 'Classic Italian cappuccino', image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400&h=300&fit=crop' },
-          { id: 'c3', name: 'Latte', price: 160, veg: true, description: 'Smooth and creamy latte', image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&h=300&fit=crop' },
-          { id: 'c4', name: 'Americano', price: 130, veg: true, description: 'Bold Americano coffee', image: 'https://images.unsplash.com/photo-1521302200778-33500795e128?w=400&h=300&fit=crop' },
-        ],
-        snacks: [
-          { id: 's1', name: 'Croissant', price: 80, veg: true, popular: true, description: 'Buttery, flaky croissant', image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&h=300&fit=crop' },
-          { id: 's2', name: 'Blueberry Muffin', price: 90, veg: true, description: 'Fresh blueberry muffin', image: 'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=400&h=300&fit=crop' },
-          { id: 's3', name: 'Club Sandwich', price: 180, veg: false, description: 'Triple-decker club sandwich', image: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&h=300&fit=crop' },
-          { id: 's4', name: 'Veggie Wrap', price: 150, veg: true, description: 'Fresh vegetable wrap', image: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=400&h=300&fit=crop' },
-        ],
-        desserts: [
-          { id: 'd1', name: 'Chocolate Cake', price: 180, veg: true, popular: true, description: 'Rich chocolate layer cake', image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop' },
-          { id: 'd2', name: 'Cheesecake', price: 200, veg: true, description: 'Creamy New York cheesecake', image: 'https://images.unsplash.com/photo-1533134486753-c833f0ed4866?w=400&h=300&fit=crop' },
-          { id: 'd3', name: 'Tiramisu', price: 220, veg: true, description: 'Classic Italian tiramisu', image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400&h=300&fit=crop' },
-        ],
-        beverages: [
-          { id: 'b1', name: 'Fresh Orange Juice', price: 120, veg: true, description: 'Freshly squeezed orange juice', image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=400&h=300&fit=crop' },
-          { id: 'b2', name: 'Iced Tea', price: 100, veg: true, description: 'Refreshing iced tea', image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop' },
-          { id: 'b3', name: 'Smoothie', price: 150, veg: true, popular: true, description: 'Mixed berry smoothie', image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=400&h=300&fit=crop' },
-        ]
-      }
-    },
-    '2': {
-      cafeName: 'Coffee Corner',
-      cafeRating: 4.2,
-      cafeReviews: 189,
-      categories: {
-        coffee: [
-          { id: 'c1', name: 'House Blend', price: 110, veg: true, popular: true, description: 'Our signature blend', image: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&h=300&fit=crop' },
-          { id: 'c2', name: 'Mocha', price: 170, veg: true, description: 'Chocolate mocha delight', image: 'https://images.unsplash.com/photo-1607260550778-aa9d29444ce1?w=400&h=300&fit=crop' },
-        ],
-        snacks: [
-          { id: 's1', name: 'Bagel', price: 70, veg: true, description: 'Toasted bagel with cream cheese', image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&h=300&fit=crop' },
-          { id: 's2', name: 'Danish Pastry', price: 95, veg: true, popular: true, description: 'Flaky Danish pastry', image: 'https://images.unsplash.com/photo-1509365390695-33aad2a3f1e8?w=400&h=300&fit=crop' },
-        ]
-      }
-    },
-    '3': {
-      cafeName: 'Urban Grind',
-      cafeRating: 4.7,
-      cafeReviews: 312,
-      categories: {
-        coffee: [
-          { id: 'c1', name: 'Cold Brew', price: 140, veg: true, popular: true, description: 'Smooth cold brew coffee', image: 'https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?w=400&h=300&fit=crop' },
-          { id: 'c2', name: 'Flat White', price: 155, veg: true, description: 'Velvety flat white', image: 'https://images.unsplash.com/photo-1575224300306-1b8da36134ec?w=400&h=300&fit=crop' },
-        ],
-        snacks: [
-          { id: 's1', name: 'Avocado Toast', price: 190, veg: true, popular: true, description: 'Smashed avocado on sourdough', image: 'https://images.unsplash.com/photo-1588137378633-dea1336ce1e2?w=400&h=300&fit=crop' },
-        ]
-      }
+  try {
+    // 1. Fetch menu from API
+    const response = await fetch(`${BASE_URL}/api/cafe/public/menu/${cafeId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch menu');
     }
-  };
+    const items = await response.json();
 
-  return CAFE_MENUS[cafeId] || null;
+    // 2. Transform flat array into categorized layout
+    const categories: Record<string, any[]> = {};
+    
+    items.forEach((item: any) => {
+      // Use existing Category or default to "Specials"
+      const categoryName = (item.Category || 'Specials').toLowerCase();
+      
+      if (!categories[categoryName]) {
+        categories[categoryName] = [];
+      }
+      
+      categories[categoryName].push({
+        id: item._id,
+        name: item.item_name,
+        price: Number(item.price) || 0,
+        veg: item.food_type?.toLowerCase() === 'veg',
+        popular: item.popular || false,
+        description: item.description_food || '',
+        image: item.image_url || 'https://images.unsplash.com/photo-1541167760492-9c33d5e80dc5?w=400&h=300&fit=crop'
+      });
+    });
+
+    // 3. Return object mimicking the old CAFE_MENUS structure
+    return {
+      cafeName: 'Cafe', // Note: Getting the real name requires cafe detail API, but we just need menu here usually
+      cafeRating: 4.5,
+      cafeReviews: 120,
+      categories
+    };
+  } catch (error) {
+    console.error('Error fetching real menu data:', error);
+    return null;
+  }
 };
 
 export default function UnifiedCafeMenu({ 
