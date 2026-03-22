@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, Coffee, MapPin, Star, Users, DollarSign, Sparkles, Check, Trophy, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
+import { BASE_URL } from '../utils/api';
 
 interface CafeVotingProps {
   user: any;
@@ -183,7 +184,7 @@ export default function CafeVoting({ user, meetupData, onNavigate, onBack }: Caf
 
   const handleEndVotingApi = async () => {
     try {
-      const res = await fetch(`https://caffelino90-9v4a.onrender.com/api/meetups/${meetupData._id || meetupData.id}/end-voting`, {
+      const res = await fetch(`${BASE_URL}/api/meetups/${meetupData._id || meetupData.id}/end-voting`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id || user._id })

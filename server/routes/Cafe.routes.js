@@ -28,6 +28,7 @@ const {
     testDump,
     updateCafePhotos,
     getMeetupOrders,
+    getPublicMenu,
 } = require("../controllers/cafe.controller");
 
 // ─── Simplified Routes (Google-authenticated users) ──────────
@@ -93,6 +94,10 @@ router.patch(
     cafeApproved,
     toggleMenuAvailability
 );
+
+// ─── Menu Management ──────────────────────────────────────────
+// GET /api/cafe/public/menu/:cafeId — Public menu access
+router.get("/public/menu/:cafeId", getPublicMenu);
 
 // DELETE /api/cafe/delete/item/:itemid — Delete a menu item
 router.delete("/delete/item/:itemid", authCafe, cafeApproved, deleteItem);

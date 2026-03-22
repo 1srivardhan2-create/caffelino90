@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowRight, Users, Coffee, Check, Trophy, Star, MapPin, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
+import { BASE_URL } from '../utils/api';
 import { toast } from 'sonner';
 import { socketService } from '../services/socketService';
 
@@ -103,7 +104,7 @@ export default function CafeVotingCreate({ user, meetupData, onNavigate, onBack 
     setMyVote(cafeId);
 
     try {
-      const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/vote', {
+      const res = await fetch(`${BASE_URL}/api/meetups/vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

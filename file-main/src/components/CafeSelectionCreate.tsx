@@ -3,6 +3,8 @@ import { ArrowRight, Users, Coffee, MapPin, Star, Check, Search, X, Sparkles } f
 import { Button } from './ui/button';
 import { toast } from 'sonner';
 import { getApprovedCafes } from '../services/cafeService';
+import { safeStorage } from '../utils/safeStorage';
+import { BASE_URL } from '../utils/api';
 
 interface CafeSelectionCreateProps {
   user: any;
@@ -116,7 +118,7 @@ export default function CafeSelectionCreate({ user, meetupData, onNavigate, onBa
     } else {
       try {
         // Direct Selection: Save to backend immediately so late joiners see it
-        const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/select-cafe', {
+        const res = await fetch(`${BASE_URL}/api/meetups/select-cafe`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

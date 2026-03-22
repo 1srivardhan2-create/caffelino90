@@ -679,42 +679,59 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       couponDiscount: posData.couponDiscount || 0,
       cgst: posData.cgst,
       sgst: posData.sgst,
-      commission: posData.commission,
       total: posData.total,
+      commission: posData.commission,
       splitEnabled: posData.splitEnabled,
-      members: posData.members,
       perPersonAmount: posData.perPersonAmount,
+      members: posData.members
     };
 
-    // Save order to the backend
+    // 🚀 SAVE ORDER TO BACKEND
     try {
-      await fetch(`${BASE_URL}/api/meetups/order`, {
+      const cafeId = selectedCafe?.id || selectedCafe?._id || selectedCafe?.cafeId || (meetupData as any)?.winnerCafe?.id || '';
+      const orderPayload = {
+        meetupId: meetupData?._id || meetupData?.id,
+        userId: currentUserId || 'guest',
+        userName: user?.firstName || user?.name || 'Guest',
+        cafeId: cafeId,
+        items: posData.items.map((i: any) => ({
+          menuItemId: i.id || i._id || '',
+          name: i.name,
+          price: i.price,
+          quantity: i.quantity || 1
+        })),
+        subtotal: posData.subtotal,
+        cgst: posData.cgst,
+        sgst: posData.sgst,
+        commission: posData.commission,
+        total: posData.total,
+        totalAmount: posData.total,
+        orderId: currentOrderId,
+        status: 'pending',
+        orderStatus: 'PLACED',
+        splitEnabled: posData.splitEnabled,
+        perPersonAmount: posData.perPersonAmount,
+        members: posData.members.map((m: any) => ({
+          userId: m.id || m.userId || '',
+          name: m.name || m.firstName || '',
+          avatar: m.avatar || ''
+        }))
+      };
+
+      console.log('💾 Saving order to backend...', orderPayload);
+      const res = await fetch(`${BASE_URL}/api/meetup-orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          meetupId: meetupData?._id || meetupData?.id,
-          userId: currentUserId || 'guest',
-          userName: user?.firstName || user?.name || user?.username || 'Guest',
-          cafeId: selectedCafe?.cafeId || selectedCafe?.id || '',
-          items: posData.items.map((i: any) => ({ menuItemId: i.id, name: i.name, price: i.price, quantity: i.quantity })),
-          subtotal: posData.subtotal,
-          cgst: posData.cgst,
-          sgst: posData.sgst,
-          commission: posData.commission,
-          total: posData.total,
-          splitEnabled: posData.splitEnabled,
-          members: posData.members,
-          perPersonAmount: posData.perPersonAmount,
-          status: 'PENDING',
-          orderId: currentOrderId,
-          coupon: {
-            code: posData.couponCode || '',
-            discount: posData.couponDiscount || 0
-          },
-        })
+        body: JSON.stringify(orderPayload)
       });
+      const data = await res.json();
+      if (data.success) {
+        console.log('✅ Order saved to backend:', data.order?._id);
+      } else {
+        console.error('❌ Failed to save order to backend:', data.message);
+      }
     } catch (err) {
-      console.error('Failed to save order:', err);
+      console.error('❌ Error saving order to backend:', err);
     }
 
     // If token is already paid (e.g. editing an order), emit to cafe immediately
@@ -724,7 +741,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
     // Add bill message locally for instant UI
     const tempId = `bill-${Date.now()}`;
-    setMessages((prev: Message[]) => {
+    setMessages((prev: any[]) => {
       const filtered = prev.filter(m => !(m.billData && m.billData.orderId === currentOrderId && m.type === 'bill'));
       return [...filtered, {
         id: tempId,
@@ -769,7 +786,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       let splitText = `🍽 Group Bill Split\n\nTotal Bill: ₹${posData.total}\n₹${posData.perPersonAmount} each`;
 
       const splitTempId = `split-${Date.now()}`;
-      setMessages((prev: Message[]) => [...prev, {
+      setMessages((prev: any[]) => [...prev, {
         id: splitTempId,
         type: 'system' as const,
         text: splitText,

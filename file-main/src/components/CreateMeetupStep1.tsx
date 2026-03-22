@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, Calendar, Clock, User, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
+import { BASE_URL } from '../utils/api';
 
 interface CreateMeetupStep1Props {
   user: any;
@@ -119,7 +120,7 @@ export default function CreateMeetupStep1({ user, onNavigate, onBack }: CreateMe
     try {
       const meetupTitle = `${adminName}'s Meetup`;
 
-      const createRes = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/create', {
+      const createRes = await fetch(`${BASE_URL}/api/meetups/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

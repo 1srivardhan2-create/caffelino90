@@ -1124,6 +1124,23 @@ const getMeetupOrders = async (req, res) => {
     }
 };
 
+const getPublicMenu = async (req, res) => {
+    try {
+        const { cafeId } = req.params;
+        if (!cafeId) return res.status(400).json({ message: "cafeId is required" });
+        
+        const items = await CafeMenu.find({ 
+            cafe_owner: cafeId, 
+            available: true 
+        }).sort({ Category: 1, item_name: 1 });
+        
+        res.json(items);
+    } catch (error) {
+        console.error("Get Public Menu Error:", error);
+        res.status(500).json({ message: "Failed to fetch menu", error: error.message });
+    }
+};
+
 module.exports = {
     registerCafe,
     Logincafe,
@@ -1148,4 +1165,5 @@ module.exports = {
     testDump,
     updateCafePhotos,
     getMeetupOrders,
+    getPublicMenu,
 };

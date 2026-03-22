@@ -9,6 +9,7 @@ import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { toast } from 'sonner';
 import { safeStorage } from '../utils/safeStorage';
+import { BASE_URL } from '../utils/api';
 
 export interface MenuItem {
   _id?: string;
@@ -22,7 +23,7 @@ export interface MenuItem {
   imageFile?: File; // For frontend uploading
 }
 
-const API_BASE_URL = 'https://caffelino90-9v4a.onrender.com/api';
+const API_BASE_URL = `${BASE_URL}/api`;
 
 export default function CafeMenuManagement() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);

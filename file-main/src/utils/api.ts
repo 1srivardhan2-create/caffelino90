@@ -1,7 +1,16 @@
 // LOCAL STORAGE IMPLEMENTATION - NO BACKEND
 // All data stored in browser localStorage
 
-export const BASE_URL = window.location.hostname === 'localhost' ? "http://localhost:5000" : 'https://caffelino90-9v4a.onrender.com';
+const getBaseUrl = () => {
+  if (typeof window === 'undefined') return "http://localhost:4000";
+  const hostname = window.location.hostname;
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.') || hostname.endsWith('.local')) {
+    return `http://${hostname}:4000`;
+  }
+  return 'https://caffelino90-9v4a.onrender.com';
+};
+
+export const BASE_URL = getBaseUrl();
 
 // Helper function to get data from localStorage
 function getLocalData(key: string) {

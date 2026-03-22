@@ -14,6 +14,19 @@ const getOrderQuery = (id) => {
     return { orderId: id };
 };
 
+// ─── Create Order ──────────────────────────────────────────────
+// POST /api/meetup-orders
+router.post("/", async (req, res) => {
+    try {
+        const order = await MeetupOrder.create(req.body);
+        console.log(`📦 New MeetupOrder created: ${order.orderId || order._id}`);
+        res.status(201).json({ success: true, order });
+    } catch (error) {
+        console.error("Create Order Error:", error);
+        res.status(500).json({ message: "Failed to create order", error: error.message });
+    }
+});
+
 // ─── Token Payment ─────────────────────────────────────────────
 // PATCH /api/meetup-orders/:id/token-paid
 router.patch("/:id/token-paid", async (req, res) => {
@@ -114,7 +127,7 @@ router.patch("/:id/cash-collected", async (req, res) => {
 // DELETE /api/meetup-orders/:id
 router.delete("/:id", async (req, res) => {
     try {
-        const query = req.params.id.startsWith("ORD_") ? { orderId: req.params.id } : { _id: req.params.id };
+        const query = getOrderQuery(req.params.id);
         const order = await MeetupOrder.findOne(query);
         if (!order) return res.status(404).json({ message: "Order not found" });
 

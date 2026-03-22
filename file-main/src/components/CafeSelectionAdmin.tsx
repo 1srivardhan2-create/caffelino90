@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Search, MapPin, Image as ImageIcon, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { BASE_URL } from '../utils/api';
 
 import { saveGroupState, updateGroupStage } from '../utils/groupStateManager';
 
@@ -106,7 +107,7 @@ export default function CafeSelectionAdmin({ user, meetupData, onNavigate, onBac
 
       try {
         // Save to backend
-        const res = await fetch('https://caffelino90-9v4a.onrender.com/api/meetups/add-cafes', {
+        const res = await fetch(`${BASE_URL}/api/meetups/add-cafes`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

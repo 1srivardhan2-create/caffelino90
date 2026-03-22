@@ -149,17 +149,37 @@ function AppContent() {
 
   const hasCompletedProfile = (user: User | null): boolean => {
     if (!user) return false;
-    if (user.profileCompleted) return true;
+    if (user.profileCompleted === true) return true;
+    if (user.role === 'cafe' || user.isCafeOwner) return true; // Cafe owners skip user profile
+    
+    // Check local storage for profile data
     const savedProfile = safeStorage.getItem(`user_${user.id}_profile`);
-    return !!savedProfile || !!user.gender || !!user.city;
+    if (savedProfile) return true;
+
+    // Check if essential fields are present
+    return !!(user.gender || user.city || user.mobileNumber);
   };
 
   const getPersistedPage = (): Page => {
     const user = getPersistedUser();
+    
+    // Check if we have a saved current page in storage
+    const savedCurrentPage = safeStorage.getItem('caffelino_currentPage') as Page;
+    
     if (user) {
       if (hasCompletedProfile(user)) {
+        // If we have a saved page and it's not landing/login, try to return to it
+        if (savedCurrentPage && !['landing', 'login', 'partner-login-choice'].includes(savedCurrentPage)) {
+           // Special check for cafe owner dashboard
+           if (savedCurrentPage === 'cafe-owner-dashboard') {
+              const myCafeId = safeStorage.getItem('myCafeId');
+              if (myCafeId) return 'cafe-owner-dashboard';
+           }
+           return savedCurrentPage;
+        }
+
         const userMode = safeStorage.getItem('caffelino_userMode');
-        if (userMode === 'partner' || user.role === 'cafe') {
+        if (userMode === 'partner' || user.role === 'cafe' || user.isCafeOwner) {
           const myCafeId = safeStorage.getItem('myCafeId');
           return myCafeId ? 'cafe-owner-dashboard' : 'partner-registration';
         }
@@ -199,14 +219,14 @@ function AppContent() {
     return null;
   };
 
-  const [currentPage, setCurrentPage] = useState<Page>(getPersistedPage);
-  const [pageHistory, setPageHistory] = useState<Page[]>(getPersistedHistory);
-  const [user, setUser] = useState<User | null>(getPersistedUser);
+  const [currentPage, setCurrentPage] = useState<Page>(getPersistedPage());
+  const [pageHistory, setPageHistory] = useState<Page[]>(getPersistedHistory());
+  const [user, setUser] = useState<User | null>(getPersistedUser());
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState<any>(getPersistedGroup);
-  const [selectedCafe, setSelectedCafe] = useState<any>(getPersistedCafe);
+  const [selectedGroup, setSelectedGroup] = useState<any>(getPersistedGroup());
+  const [selectedCafe, setSelectedCafe] = useState<any>(getPersistedCafe());
   const [unreadNotifications, setUnreadNotifications] = useState(0);
-  const [userMode, setUserMode] = useState<"go" | "partner" | null>(getPersistedMode);
+  const [userMode, setUserMode] = useState<"go" | "partner" | null>(getPersistedMode());
   const [deepLinkCode, setDeepLinkCode] = useState<string | null>(null);
 
   useEffect(() => { safeStorage.setItem('caffelino_currentPage', currentPage); }, [currentPage]);
@@ -267,6 +287,18 @@ function AppContent() {
     safeWindow.scrollTo(0, 0);
     safeDocument.scrollTop.set(0);
   }, [currentPage]);
+
+  const handleBack = () => {
+    if (pageHistory.length > 1) {
+      const newHistory = [...pageHistory];
+      newHistory.pop();
+      const prevPage = newHistory[newHistory.length - 1];
+      setPageHistory(newHistory);
+      setCurrentPage(prevPage);
+    } else {
+      setCurrentPage('home');
+    }
+  };
 
   const swipeHandlers = useSwipeable({
     onSwipedRight: (eventData) => {
@@ -333,12 +365,12 @@ function AppContent() {
         const cafeResult = await getMyCafe(userId);
 
         if (cafeResult && cafeResult.cafe) {
-          const cafe = cafeResult.cafe;
-          safeStorage.setItem('pendingCafeName', cafe.cafeName || '');
-          safeStorage.setItem('myCafeId', cafe.id);
+          const cafe = cafeResult.cafe as any;
+          safeStorage.setItem('pendingCafeName', (cafe.cafeName || '') as string);
+          safeStorage.setItem('myCafeId', (cafe.id || cafe._id) as string);
           safeStorage.setItem('myCafeOwnerId', userId);
-
-          if (cafe.status === true) {
+          
+          if (cafe.status === true || cafe.isVerified === true) {
             navigateTo("cafe-owner-dashboard", {
               cafeName: cafe.cafeName,
               email: userData.email,
@@ -346,7 +378,7 @@ function AppContent() {
               cafeId: cafe.id || cafe._id,
               userId: userData.id,
               id: userData.id
-            });
+            } as any);
           } else {
             navigateTo("cafe-verification-pending");
           }
@@ -398,77 +430,64 @@ function AppContent() {
     setLoading(false);
   };
 
-  const navigateTo = async (page: Page, data?: any) => {
+  const navigateTo = (page: string, data?: any) => {
+    const pageToNav = page as Page;
     setLoading(true, "Loading...");
-    await new Promise((resolve) => setTimeout(resolve, 600));
-
-    if (user && data?.groupId) {
-      const { saveActiveSession, getSessionStepFromPage } = await import('./utils/sessionManager');
-      const currentStep = getSessionStepFromPage(page);
-      saveActiveSession(user.id, data.groupId, currentStep, page, data);
-    }
-
-    const groupPages = [
-      "group-detail", "group-interaction", "group-home", "voting-complete",
-      "invite-members", "cafe-voting", "create-meetup-step2", "meetup-code",
-      "create-meetup-step3", "cafe-selection-create", "cafe-voting-create",
-      "create-meetup-step5", "meetup-chat", "cafe-selection-admin", "meetup-voting",
-      "voting-result", "meetup-group-page", "join-with-code-cafe-view",
-      "join-request-waiting", "bill-split-confirmation", "member-payment-screen",
-      "payment-status-dashboard", "payment-completion", "digital-receipt",
-      "menu-selection", "order-summary", "order-based-billing", "restaurant-bill-scan",
-      "bill-approval-admin", "group-chat", "meetup-chat-billing-completed",
-      "payment-online", "join-voting", "join-meetup"
-    ];
-
-    if (groupPages.includes(page) && data) {
-      setSelectedGroup(data);
-    }
-
-    if (page === "cafe-menu" && data) { setSelectedCafe(data); }
-
-    if (page === "cafe-owner-dashboard" && data) {
-      setUser((prevUser) => ({
-        ...prevUser,
-        cafeName: data.cafeName,
-        email: data.email,
-        isCafeOwner: data.isCafeOwner,
-      }));
-    }
-
-    if (["meetup-flow-controller", "meetup-dashboard", "cafe-selection-page", "cafe-voting-page"].includes(page as string)) {
-      if (data) setSelectedGroup(data);
-      else if (!selectedGroup) return navigateTo('home');
-    }
-
-    if (page === "meetup-chat-billing") {
-      if (data) setSelectedGroup(data);
-      else if (!selectedGroup) return navigateTo('home');
-    }
-
-    if (page === "cafe-details" && data) {
-      if (data.dbCafe) { setSelectedCafe(data.dbCafe); }
-      else {
-        const cafe = getCafeById(data.cafeId);
-        setSelectedCafe(cafe);
+    
+    setTimeout(async () => {
+      if (user && data?.groupId) {
+        try {
+          const { saveActiveSession, getSessionStepFromPage } = await import('./utils/sessionManager');
+          const currentStep = getSessionStepFromPage(pageToNav);
+          saveActiveSession(user.id, data.groupId, currentStep, pageToNav, data);
+        } catch (e) {}
       }
-    }
 
-    setCurrentPage(page);
-    setPageHistory((prev) => [...prev, page]);
-    setLoading(false);
-  };
+      const groupPages = [
+        "group-detail", "group-interaction", "group-home", "voting-complete",
+        "invite-members", "cafe-voting", "create-meetup-step2", "meetup-code",
+        "create-meetup-step3", "cafe-selection-create", "cafe-voting-create",
+        "create-meetup-step5", "meetup-chat", "cafe-selection-admin", "meetup-voting",
+        "voting-result", "meetup-group-page", "join-with-code-cafe-view",
+        "join-request-waiting", "bill-split-confirmation", "member-payment-screen",
+        "payment-status-dashboard", "payment-completion", "digital-receipt",
+        "menu-selection", "order-summary", "order-based-billing", "restaurant-bill-scan",
+        "bill-approval-admin", "group-chat", "meetup-chat-billing-completed",
+        "payment-online", "join-voting", "join-meetup"
+      ];
 
-  const handleBack = () => {
-    if (pageHistory.length > 1) {
-      const newHistory = [...pageHistory];
-      newHistory.pop();
-      const previousPage = newHistory[newHistory.length - 1];
-      setPageHistory(newHistory);
-      setCurrentPage(previousPage);
-    } else {
-      navigateTo("home");
-    }
+      if (groupPages.includes(pageToNav) && data) {
+        setSelectedGroup(data);
+      }
+
+      if (pageToNav === "cafe-menu" && data) { setSelectedCafe(data); }
+
+      if (pageToNav === "cafe-owner-dashboard" && data) {
+        if (data.cafeId) {
+          safeStorage.setItem('myCafeId', data.cafeId);
+        }
+        if (data.cafeName || data.email) {
+          setUser((prevUser) => prevUser ? ({
+            ...prevUser,
+            cafeName: data.cafeName || prevUser.cafeName,
+            email: data.email || prevUser.email,
+            isCafeOwner: true,
+          }) : null);
+        }
+      }
+
+      if (pageToNav === "cafe-details" && data) {
+        if (data.dbCafe) { setSelectedCafe(data.dbCafe); }
+        else if (data.cafeId) {
+          const cafe = getCafeById(data.cafeId);
+          setSelectedCafe(cafe);
+        }
+      }
+
+      setPageHistory((prev) => [...prev, pageToNav]);
+      setCurrentPage(pageToNav);
+      setLoading(false);
+    }, 600);
   };
 
   const handleCompleteProfile = async (profileData: any) => {

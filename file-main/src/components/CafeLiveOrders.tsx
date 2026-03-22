@@ -202,9 +202,9 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
     try {
       const res = await fetch(`${BASE_URL}/api/meetup-orders/deleted/${resolvedCafeId}`);
       const data = await res.json();
-      if (data.success && data.orders) {
-        setDeletedOrders(data.orders);
-        console.log(`✅ Loaded ${data.orders.length} deleted orders for cafe ${resolvedCafeId}`);
+      if (data.success && data.deletedOrders) {
+        setDeletedOrders(data.deletedOrders);
+        console.log(`✅ Loaded ${data.deletedOrders.length} deleted orders for cafe ${resolvedCafeId}`);
         return;
       }
     } catch (error) {
