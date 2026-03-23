@@ -36,18 +36,6 @@ export default function LandingPage({ onSelectMode, onBack }: LandingPageProps) 
         </div>
       )}
 
-      {/* Café Login Button - Top Right Corner */}
-      <div className="absolute top-4 right-4 md:top-8 md:right-8 z-10" style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }}>
-        <div className="glass-button-wrap">
-          <button 
-            className="glass-button"
-            onClick={() => onSelectMode('partner')}
-          >
-            <span>Café Login</span>
-          </button>
-          <div className="glass-button-shadow"></div>
-        </div>
-      </div>
 
       <div className="flex items-center justify-center size-full min-h-screen px-4">
         <div className="flex flex-col items-center justify-center w-full max-w-[672px] z-[1]" data-name="Container">
