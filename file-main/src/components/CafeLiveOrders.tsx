@@ -111,6 +111,14 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
           if (['completed', 'rejected', 'COMPLETED', 'REJECTED'].includes(data.status)) {
             return prev.filter(o => o.orderId !== data.orderId && o._id !== data.orderId);
           }
+          
+          const exists = prev.some(o => o.orderId === data.orderId || o._id === data.orderId);
+          if (!exists) {
+            // New order that we don't have yet, fetch it
+            loadOrders();
+            return prev;
+          }
+
           // Otherwise update its status
           return prev.map(o => {
             if (o.orderId === data.orderId || o._id === data.orderId) {
@@ -126,15 +134,22 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
         setOrders(prev => prev.filter(o => o.orderId !== data.orderId && o._id !== data.orderId));
       };
 
+      const handleRefreshOrders = () => {
+        console.log('🔄 Refresh orders notification received');
+        loadOrders();
+      };
+
       socketService.socket?.on('order-created', handleOrderCreated);
       socketService.socket?.on('order-status-update', handleOrderStatusUpdate);
       socketService.socket?.on('order-deleted', handleOrderDeleted);
+      socketService.socket?.on('refresh-orders', handleRefreshOrders);
 
       return () => {
         clearInterval(interval);
         socketService.socket?.off('order-created', handleOrderCreated);
         socketService.socket?.off('order-status-update', handleOrderStatusUpdate);
         socketService.socket?.off('order-deleted', handleOrderDeleted);
+        socketService.socket?.off('refresh-orders', handleRefreshOrders);
       };
     }
 

@@ -181,23 +181,26 @@ export default function UserProfile({ user, onNavigate, onLogout, onUpdateUser }
   };
   
   return (
-    <div className="min-h-screen bg-slate-50 pb-20">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-slate-50 pb-20 overflow-x-hidden">
+      <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
         {/* Back Button */}
-        <button 
-          onClick={() => onNavigate('home')}
-          className="caffelino-back-btn mb-4"
-        >
-          ← Back
-        </button>
+        <div className="mb-6 flex">
+          <button 
+            onClick={() => onNavigate('home')}
+            className="flex items-center gap-2 text-sm sm:text-base font-medium text-slate-800 bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+        </div>
 
         {/* Profile Header Card */}
-        <Card className="p-6 mb-6">
-          <div className="flex flex-col md:flex-row items-start gap-6">
-            <div className="relative">
+        <Card className="p-5 sm:p-8 mb-6 rounded-2xl shadow-sm">
+          <div className="flex flex-col items-center sm:hidden mb-6">
+            <div className="relative mb-4">
               {/* Show custom avatar if selected, otherwise fallback to GenderAvatar */}
               {user.avatarId && (user.gender === 'male' || user.gender === 'female') ? (
-                <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center text-6xl bg-gradient-to-br from-[#e8d5c4] to-[#d9bf9d] border-4 border-[#be9d80] shadow-lg">
+                <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center text-6xl bg-gradient-to-br from-[#e8d5c4] to-[#d9bf9d] border-4 border-[#be9d80] shadow-md mx-auto">
                   {getAvatarById(user.avatarId)?.emoji}
                 </div>
               ) : (
@@ -216,39 +219,104 @@ export default function UserProfile({ user, onNavigate, onLogout, onUpdateUser }
               )}
             </div>
 
-            <div className="flex-1">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h1 className="text-2xl">{user.name}, {user.age}</h1>
+            <div className="text-center w-full">
+              <div className="flex items-center justify-center gap-2 mb-2 flex-wrap">
+                <h1 className="text-2xl font-semibold break-words text-neutral-900">{user.name}, {user.age}</h1>
+                {user.verified && (
+                  <span className="text-green-600 flex-shrink-0" title="Verified"><Check className="w-5 h-5"/></span>
+                )}
+              </div>
+              
+              <div className="flex items-center justify-center gap-2 text-slate-600 mb-4 flex-wrap">
+                <div className="flex items-center gap-1">
+                  <MapPin className="w-4 h-4" />
+                  <span>{user.city}{user.locality ? `, ${user.locality}` : ''}</span>
+                </div>
+                <span className="hidden sm:inline text-slate-300">•</span>
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                  <span>4.8</span>
+                </div>
+              </div>
+
+              {user.bio && (
+                <p className="text-slate-700 text-sm mb-4 max-w-sm mx-auto">{user.bio}</p>
+              )}
+
+              <Button 
+                onClick={() => onNavigate('settings')}
+                className="w-full bg-black text-white hover:bg-gray-800 rounded-xl h-12"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </Button>
+            </div>
+          </div>
+
+          <div className="hidden sm:flex flex-row items-start gap-8">
+            <div className="relative flex-shrink-0">
+              {/* Show custom avatar if selected, otherwise fallback to GenderAvatar */}
+              {user.avatarId && (user.gender === 'male' || user.gender === 'female') ? (
+                <div className="w-28 h-28 rounded-full overflow-hidden flex items-center justify-center text-7xl bg-gradient-to-br from-[#e8d5c4] to-[#d9bf9d] border-4 border-[#be9d80] shadow-md">
+                  {getAvatarById(user.avatarId)?.emoji}
+                </div>
+              ) : (
+                <div className="transform scale-110">
+                  <GenderAvatar 
+                    photo={user.photo}
+                    gender={user.gender}
+                    name={user.name}
+                    size="xl"
+                    showBorder={true}
+                  />
+                </div>
+              )}
+              {user.cafeMood && (
+                <span className="absolute bottom-0 right-0 text-3xl bg-white rounded-full p-1.5 shadow-md">
+                  {user.cafeMood}
+                </span>
+              )}
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between mb-4 gap-4">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <h1 className="text-3xl font-semibold truncate text-neutral-900">{user.name}, {user.age}</h1>
                     {user.verified && (
-                      <span className="text-green-600" title="Verified">✓</span>
+                      <span className="text-green-600 p-0.5 bg-green-50 rounded-full" title="Verified"><Check className="w-4 h-4" /></span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 text-slate-600 mb-1">
-                    <MapPin className="w-4 h-4" />
-                    <span>{user.city}{user.locality ? `, ${user.locality}` : ''}</span>
-                  </div>
-                  {user.gender && (
-                    <p className="text-sm text-slate-500 capitalize">{user.gender}</p>
-                  )}
-                  <div className="flex items-center gap-2 mt-2">
-                    <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                    <span>4.8</span>
+                  <div className="flex items-center gap-3 text-slate-600 mb-2">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      <span className="truncate">{user.city}{user.locality ? `, ${user.locality}` : ''}</span>
+                    </div>
+                    {user.gender && (
+                      <>
+                        <span className="text-slate-300">•</span>
+                        <span className="capitalize">{user.gender}</span>
+                      </>
+                    )}
+                    <span className="text-slate-300">•</span>
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                      <span className="font-medium">4.8</span>
+                    </div>
                   </div>
                 </div>
+                
                 <Button 
-                  size="sm"
                   onClick={() => onNavigate('settings')}
-                  className="bg-black text-white hover:bg-gray-800"
+                  className="bg-black text-white hover:bg-gray-800 rounded-xl px-5 flex-shrink-0 shadow-sm"
                 >
-                  <Settings className="w-4 h-4 mr-2 text-white" />
+                  <Settings className="w-4 h-4 mr-2" />
                   Settings
                 </Button>
               </div>
 
               {user.bio && (
-                <p className="text-slate-700 mb-4">{user.bio}</p>
+                  <p className="text-slate-700 leading-relaxed mb-4">{user.bio}</p>
               )}
 
               {user.favoriteDrink && (

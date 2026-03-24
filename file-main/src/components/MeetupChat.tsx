@@ -264,12 +264,21 @@ export default function MeetupChat({ user, meetupData, onNavigate, onBack }: Mee
               <ArrowLeft className="w-5 h-5 text-white" />
             </button>
             <div>
-              <h1 className="text-white text-[18px] font-['Arial:Regular',_sans-serif]">
-                {meetupData.meetupName || 'Meetup Chat'}
+              <h1 className="text-white text-[18px] font-['Arial:Bold',_sans-serif]">
+                {meetupData?.meetupName || 'Meetup Chat'}
               </h1>
-              <p className="text-white/80 text-[12px] font-['Arial:Regular',_sans-serif]">
-                {members.length} members
-              </p>
+              <div className="text-white/90 text-[13px] font-['Arial:Regular',_sans-serif] mt-1 space-y-0.5">
+                <p className="flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5" />
+                  {cafeFinalized?.location || cafeFinalized?.cafe_location || 'Location not available'}
+                </p>
+                <p>
+                  Code: <span className="font-mono font-bold bg-black/20 px-1.5 py-0.5 rounded text-[12px]">{meetupData?.meetupCode || meetupData?.joinCode || 'N/A'}</span>
+                </p>
+                <p className="text-white/80 text-[12px] mt-1">
+                  {members.length} members
+                </p>
+              </div>
             </div>
           </div>
           <button

@@ -136,6 +136,18 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         setSplitMembers(parsed.splitMembers || []);
         setPerPersonAmount(parsed.perPersonAmount || 0);
         console.log('💾 Loaded saved order data for meetup:', meetupData?.joinCode);
+        
+        // Check backend if the order was already token_paid recently
+        if (parsed.orderId && !parsed.tokenPaid) {
+          fetch(`${BASE_URL}/api/meetup-orders/${parsed.orderId}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.success && data.order && data.order.status === 'token_paid') {
+                setTokenPaid(true);
+              }
+            }).catch(e => console.error("Error fetching order status", e));
+        }
+
       } catch (error) {
         console.error('Error loading saved order data:', error);
       }
@@ -688,7 +700,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
     // 🚀 SAVE ORDER TO BACKEND
     try {
-      const cafeId = selectedCafe?.id || selectedCafe?._id || selectedCafe?.cafeId || (meetupData as any)?.winnerCafe?.id || '';
+      const cafeId = meetupData?.cafeFinalized?.id || meetupData?.cafeFinalized?._id || meetupData?.cafeFinalized?.cafeId || selectedCafe?.id || selectedCafe?._id || selectedCafe?.cafeId || (meetupData as any)?.winnerCafe?.id || '';
       const orderPayload = {
         meetupId: meetupData?._id || meetupData?.id,
         userId: currentUserId || 'guest',
@@ -1119,7 +1131,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                   {selectedCafe?.location || selectedCafe?.cafe_location || 'Location not available'}
                 </p>
                 <p className="text-gray-700 text-sm mt-1">
-                  Code: <span className="font-mono font-bold text-[#be9d80]">{meetupData?.joinCode}</span>
+                  Code: <span className="font-mono font-bold text-[#be9d80]">{meetupData?.meetupCode || meetupData?.joinCode || 'N/A'}</span>
                 </p>
                 {tokenPaid && (
                   <div className="mt-2 inline-flex items-center gap-1.5 bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">

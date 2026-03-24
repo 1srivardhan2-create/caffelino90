@@ -18,12 +18,32 @@ const getOrderQuery = (id) => {
 // POST /api/meetup-orders
 router.post("/", async (req, res) => {
     try {
-        const order = await MeetupOrder.create(req.body);
+        const payload = req.body;
+        
+        // If an orderId exists, try to update it instead of creating duplicates
+        if (payload.orderId) {
+            // Check existing order to preserve token_paid status
+            const existingOrder = await MeetupOrder.findOne({ orderId: payload.orderId });
+            if (existingOrder && existingOrder.status === 'token_paid') {
+                payload.status = 'token_paid';
+                if (!payload.orderStatus) payload.orderStatus = 'token_paid';
+            }
+            
+            const order = await MeetupOrder.findOneAndUpdate(
+                { orderId: payload.orderId },
+                { $set: payload },
+                { new: true, upsert: true }
+            );
+            console.log(`📦 Upserted MeetupOrder: ${order.orderId || order._id}`);
+            return res.status(200).json({ success: true, order });
+        }
+
+        const order = await MeetupOrder.create(payload);
         console.log(`📦 New MeetupOrder created: ${order.orderId || order._id}`);
         res.status(201).json({ success: true, order });
     } catch (error) {
-        console.error("Create Order Error:", error);
-        res.status(500).json({ message: "Failed to create order", error: error.message });
+        console.error("Create/Update Order Error:", error);
+        res.status(500).json({ message: "Failed to create or update order", error: error.message });
     }
 });
 
@@ -45,6 +65,8 @@ router.patch("/:id/token-paid", async (req, res) => {
                 orderId: order.orderId || order._id.toString(),
                 status: "token_paid",
             });
+            // Emit refresh-orders to force dashboard update for this newly visible order
+            req.io.to(`cafe_${order.cafeId}`).emit("refresh-orders");
         }
 
         res.json({ success: true, order });
