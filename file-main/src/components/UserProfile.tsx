@@ -181,7 +181,7 @@ export default function UserProfile({ user, onNavigate, onLogout, onUpdateUser }
   };
   
   return (
-    <div className="min-h-screen bg-slate-50 pb-20 overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 pb-20 pt-16 sm:pt-6 overflow-x-hidden">
       <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
         {/* Back Button */}
         <div className="mb-6 flex">

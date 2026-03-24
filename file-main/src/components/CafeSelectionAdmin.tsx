@@ -115,7 +115,9 @@ export default function CafeSelectionAdmin({ user, meetupData, onNavigate, onBac
             cafes: selected.map(c => ({
               cafeId: c.id,
               cafeName: c.name,
-              cafeImage: c.image
+              cafeImage: c.image,
+              location: c.location,
+              cafe_location: c.location
             }))
           })
         });
@@ -170,31 +172,56 @@ export default function CafeSelectionAdmin({ user, meetupData, onNavigate, onBac
       setIsSaving(true);
 
       try {
-        // Here we could update the meetup directly with the selected cafe, but for now just move forward
-        toast.success(`${selected?.name} selected as the meetup location!`);
+        // Call backend auto-select endpoint so other users see it!
+        const res = await fetch(`${BASE_URL}/api/meetups/select-cafe`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            meetupId: meetupData._id,
+            userId: user.id || user._id,
+            cafe: {
+              cafeId: selected?.id,
+              cafeName: selected?.name,
+              name: selected?.name,
+              cafeImage: selected?.image,
+              image: selected?.image,
+              location: selected?.location,
+              cafe_location: selected?.location
+            }
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok && data.success) {
+          toast.success(`${selected?.name} selected as the meetup location!`);
 
-        const groupData = {
-          ...meetupData,
-          winnerCafe: selected,
-          selectedCafeId: selected?.id,
-          selectedCafe: selected,
-          votingEnabled: false,
-          votingSkipped: true,
-          votingClosed: true,
-        };
+          const groupData = {
+            ...meetupData,
+            winnerCafe: selected,
+            selectedCafeId: selected?.id,
+            selectedCafe: selected,
+            votingEnabled: false,
+            votingSkipped: true,
+            votingClosed: true,
+          };
 
-        updateGroupStage(
-          user.id,
-          meetupData.code,
-          'cafe-selected',
-          'Café Selected',
-          'meetup-chat-billing',
-          groupData
-        );
+          updateGroupStage(
+            user.id,
+            meetupData.code,
+            'cafe-selected',
+            'Café Selected',
+            'meetup-chat-billing',
+            groupData
+          );
 
-        onNavigate('meetup-chat-billing', groupData);
+          onNavigate('meetup-chat-billing', groupData);
+        } else {
+           toast.error(data.message || 'Failed to sync selected cafe with server.');
+        }
       } catch (err) {
         console.error(err);
+        toast.error('Network error while selecting cafe.');
       } finally {
         setIsSaving(false);
       }

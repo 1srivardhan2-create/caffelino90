@@ -185,6 +185,19 @@ function AppContent() {
         return 'complete-profile';
       }
     }
+    
+    // User is NOT logged in. Preserve common public pages instead of always forcing landing.
+    if (savedCurrentPage) {
+      const publicPages = [
+        'landing', 'login', 'partner-login-choice', 'about-us', 
+        'how-it-works', 'safety-guidelines', 'partner-registration', 
+        'cafe-owner-google-login'
+      ];
+      if (publicPages.includes(savedCurrentPage)) {
+        return savedCurrentPage;
+      }
+    }
+
     return 'landing';
   };
 
@@ -450,7 +463,7 @@ function AppContent() {
         "payment-status-dashboard", "payment-completion", "digital-receipt",
         "menu-selection", "order-summary", "order-based-billing", "restaurant-bill-scan",
         "bill-approval-admin", "group-chat", "meetup-chat-billing-completed",
-        "payment-online", "join-voting", "join-meetup"
+        "payment-online", "join-voting", "join-meetup", "meetup-chat-billing"
       ];
 
       if (groupPages.includes(pageToNav) && data) {

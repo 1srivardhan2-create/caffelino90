@@ -474,25 +474,33 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
     setInputText('');
 
     try {
+      const fallbackId = `guest-${Date.now()}`;
+      const payloadUserId = user?.id || user?._id || currentUserId || fallbackId;
+      const payloadUserName = user?.firstName || user?.name || 'Guest User';
+
       const res = await fetch(`${BASE_URL}/api/meetups/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           meetupId: meetupData._id,
-          userId: user?.id,
-          userName: user?.firstName || user?.name,
+          userId: payloadUserId,
+          userName: payloadUserName,
           message: textToSend
         })
       });
       const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Failed to send message');
+      }
 
       if (data.success && data.message) {
         // Broadcast via socketio so other users get it
         socketService.sendMessage({
           _id: data.message._id,
           meetupId: meetupData._id,
-          userId: user?.id,
-          userName: user?.firstName || user?.name,
+          userId: payloadUserId,
+          userName: payloadUserName,
           senderEmoji: (user?.avatarId ? getAvatarById(user.avatarId)?.emoji : null) || user?.avatarEmoji || '👤',
           message: textToSend,
           createdAt: data.message.createdAt
@@ -1124,7 +1132,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
               <div>
                 <h1 className="text-gray-900 text-lg font-bold flex items-center gap-2">
                   <Coffee className="w-5 h-5 text-[#be9d80]" />
-                  {selectedCafe?.name || 'Café'}
+                  {selectedCafe?.name || selectedCafe?.cafeName || 'Café'}
                 </h1>
                 <p className="text-gray-700 text-sm mt-1 flex items-center gap-1">
                   <MapPin className="w-4 h-4 text-[#be9d80]" />

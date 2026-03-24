@@ -40,6 +40,8 @@ const MeetupSchema = new mongoose.Schema(
                 cafeId: { type: String },
                 cafeName: { type: String },
                 cafeImage: { type: String },
+                location: { type: String },
+                cafe_location: { type: String },
             },
         ],
         votes: [
