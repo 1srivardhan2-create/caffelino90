@@ -13,7 +13,7 @@ const DEFAULT_CAFE_IMAGE = 'https://images.unsplash.com/photo-1554118811-1e0d582
 
 export default function AllCafesPage({ onNavigate, onBack }: AllCafesPageProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'rating' | 'delivery' | 'price'>('all');
+  const [selectedFilter, setSelectedFilter] = useState<'all' | 'cafe' | 'restaurant'>('all');
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [dbCafes, setDbCafes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -94,28 +94,24 @@ export default function AllCafesPage({ onNavigate, onBack }: AllCafesPageProps) 
     const matchesSearch = cafe.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       cafe.cuisine.toLowerCase().includes(searchQuery.toLowerCase()) ||
       cafe.location.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
+      
+    let matchesType = true;
+    if (selectedFilter === 'cafe') {
+      matchesType = cafe.cuisine.toLowerCase().includes('cafe');
+    } else if (selectedFilter === 'restaurant') {
+      matchesType = cafe.cuisine.toLowerCase().includes('restaurant');
+    }
+    
+    return matchesSearch && matchesType;
   });
 
   // Sort cafes
-  const sortedCafes = [...filteredCafes].sort((a, b) => {
-    switch (selectedFilter) {
-      case 'rating':
-        return b.rating - a.rating;
-      case 'delivery':
-        return parseInt(a.deliveryTime) - parseInt(b.deliveryTime);
-      case 'price':
-        return a.priceForTwo - b.priceForTwo;
-      default:
-        return 0;
-    }
-  });
+  const sortedCafes = filteredCafes;
 
   const filterOptions = [
-    { value: 'all', label: 'All Cafes', icon: '🏪' },
-    { value: 'rating', label: 'Highest Rated', icon: '⭐' },
-    { value: 'delivery', label: 'Fastest Delivery', icon: '⚡' },
-    { value: 'price', label: 'Price: Low to High', icon: '💰' },
+    { value: 'all', label: 'All Outlets', icon: '🏪' },
+    { value: 'cafe', label: 'Cafes', icon: '☕' },
+    { value: 'restaurant', label: 'Restaurants', icon: '🍽️' },
   ];
 
   return (

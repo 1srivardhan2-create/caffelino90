@@ -61,14 +61,7 @@ export default function Footer({ user, onShowAuth, onNavigate }: FooterProps) {
             <div>
               <h3 className="text-[16px] mb-3">Legal</h3>
               <ul className="space-y-2">
-                <li>
-                  <button 
-                    onClick={() => onNavigate?.('about-us')}
-                    className="text-slate-300 text-[14px] hover:text-white transition-colors text-left"
-                  >
-                    About Us
-                  </button>
-                </li>
+
                 <li>
                   <button 
                     onClick={() => onNavigate?.('how-it-works')}

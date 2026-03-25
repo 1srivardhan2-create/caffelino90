@@ -1022,7 +1022,9 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
                 toast.success('Order Confirmed. ₹20 token received.');
                 
-                const msgText = `Order Confirmed.\n₹20 token received.\nPlease pay remaining amount at the café counter.`;
+                const itemsText = orderItems.map((item: any) => `${item.name} x ${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}`).join('\\n');
+                const remaining = (billData.total || 0) - 20;
+                const msgText = `✅ Order Confirmed!\\n₹20 token received.\\n\\nOrder Details:\\n${itemsText}\\n\\nTotal Bill: ₹${billData.total.toFixed(2)}\\nAmount Remaining: ₹${remaining > 0 ? remaining.toFixed(2) : '0.00'}\\n\\nPlease pay remaining amount at the café counter.`;
                 setMessages((prev: any[]) => [...prev, {
                   id: `token-${Date.now()}`,
                   type: 'system',
