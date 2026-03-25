@@ -55,6 +55,7 @@ export default function MeetupCode({ user, meetupData, onNavigate, onBack }: Mee
     }
   };
 
+  const handleShareWhatsApp = () => {
     const message = `☕ *You're Invited to a Caffelino Meetup!*\n\n` +
       `🏪 *Cafe:* ${cafeName}\n` +
       `👤 *Hosted by:* ${meetupData.adminName}\n\n` +
@@ -66,6 +67,7 @@ export default function MeetupCode({ user, meetupData, onNavigate, onBack }: Mee
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
     toast.success('Opening WhatsApp...');
+  };
 
   const handleNext = () => {
     const completeData = {
