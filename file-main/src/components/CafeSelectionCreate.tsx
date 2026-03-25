@@ -38,15 +38,24 @@ export default function CafeSelectionCreate({ user, meetupData, onNavigate, onBa
       try {
         const response = await getApprovedCafes();
         if (response && response.success) {
-          const mappedCafes = (response.cafes || []).map((cafe: any) => ({
-            id: cafe._id,
-            name: cafe.Name || cafe.cafeName || 'Cafe',
-            costPerPerson: cafe.Average_Cost || cafe.averageCostPerPerson || 200,
-            image: cafe.profilePicture || (cafe.Cafe_photos && cafe.Cafe_photos.length > 0 ? cafe.Cafe_photos[0] : null) || 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400',
-            location: cafe.cafe_location || cafe.location || 'Unknown',
-            rating: cafe.rating || 4.5,
-            ambience: cafe.establishmentType || 'café'
-          }));
+          const mappedCafes = (response.cafes || []).map((cafe: any) => {
+            // Pick best location string: prefer cafe_location, then Cafe_Address, skip coordinate-like values
+            const rawLoc = cafe.cafe_location || cafe.location || '';
+            const isCoordLike = /^\s*-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?\s*$/.test(rawLoc);
+            const location = (!rawLoc || isCoordLike)
+              ? (cafe.Cafe_Address || 'Unknown')
+              : rawLoc;
+
+            return {
+              id: cafe._id,
+              name: cafe.Name || cafe.cafeName || 'Cafe',
+              costPerPerson: cafe.Average_Cost || cafe.averageCostPerPerson || 200,
+              image: cafe.profilePicture || (cafe.Cafe_photos && cafe.Cafe_photos.length > 0 ? cafe.Cafe_photos[0] : null) || 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400',
+              location,
+              rating: cafe.rating || 4.5,
+              ambience: cafe.establishmentType || 'café',
+            };
+          });
           setCafes(mappedCafes);
         }
       } catch (error) {
@@ -231,10 +240,10 @@ export default function CafeSelectionCreate({ user, meetupData, onNavigate, onBa
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-['Arial:Bold',sans-serif] text-[18px] text-[#101828]">
-              Select 3 Cafés
+              Select Café
             </h2>
             <span className="font-['Arial:Regular',sans-serif] text-[14px] text-[#1e1e1e]">
-              {selectedCafes.length} / 3 selected
+              {selectedCafes.length} / 1 selected
             </span>
           </div>
 

@@ -1136,7 +1136,13 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                 </h1>
                 <p className="text-gray-700 text-sm mt-1 flex items-center gap-1">
                   <MapPin className="w-4 h-4 text-[#be9d80]" />
-                  {selectedCafe?.location || selectedCafe?.cafe_location || 'Location not available'}
+                  {(() => {
+                    const loc = selectedCafe?.location || selectedCafe?.cafe_location || '';
+                    const isCoordLike = /^\s*-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?\s*$/.test(loc);
+                    return (!loc || isCoordLike)
+                      ? (selectedCafe?.Cafe_Address || selectedCafe?.cafeAddress || 'Location not available')
+                      : loc;
+                  })()}
                 </p>
                 <p className="text-gray-700 text-sm mt-1">
                   Code: <span className="font-mono font-bold text-[#be9d80]">{meetupData?.meetupCode || meetupData?.joinCode || 'N/A'}</span>
