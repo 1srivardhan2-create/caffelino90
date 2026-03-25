@@ -381,15 +381,8 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         }).catch(err => console.error("Failed to update token payment:", err));
       }
 
-      // Send confirmation message in chat
-      const confirmationMessage: Message = {
-        id: `token-confirmation-${Date.now()}`,
-        type: 'system',
-        text: `Order Confirmed.\n₹20 token received.\nPlease pay remaining amount at the café counter.`,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev: any[]) => [...prev, confirmationMessage]);
+      // Removed system message for token payment from chat to declutter.
+      // Bill is now available in the Notifications panel on User Home.
     }
   }, [meetupData]);
 
@@ -1022,9 +1015,29 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
                 toast.success('Order Confirmed. ₹20 token received.');
                 
-                const itemsText = orderItems.map((item: any) => `${item.name} x ${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}`).join('\\n');
-                const remaining = (billData.total || 0) - 20;
-                const msgText = `✅ Order Confirmed!\\n₹20 token received.\\n\\nOrder Details:\\n${itemsText}\\n\\nTotal Bill: ₹${billData.total.toFixed(2)}\\nAmount Remaining: ₹${remaining > 0 ? remaining.toFixed(2) : '0.00'}\\n\\nPlease pay remaining amount at the café counter.`;
+                // Add notification for token payment
+                const amountPaid = 20;
+                const orderItemsForNotification = orderItems.map((item: any) => ({
+                  name: item.name,
+                  quantity: item.quantity,
+                  price: item.price * item.quantity
+                }));
+
+                notifyPaymentSuccess({
+                  amount: amountPaid,
+                  transactionId: orderId,
+                  paymentMethod: 'Online',
+                  groupName: `${selectedCafe?.name || 'Café'} Meetup`,
+                  cafeName: selectedCafe?.name,
+                  orderNumber: orderId,
+                  orderItems: orderItemsForNotification,
+                });
+
+                if (onNotificationUpdate) {
+                  onNotificationUpdate();
+                }
+
+                const msgText = `✅ ₹20 token received. Bill details are available in your notifications.`;
                 setMessages((prev: any[]) => [...prev, {
                   id: `token-${Date.now()}`,
                   type: 'system',

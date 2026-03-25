@@ -109,7 +109,7 @@ export default function AllCafesPage({ onNavigate, onBack }: AllCafesPageProps) 
   const sortedCafes = filteredCafes;
 
   const filterOptions = [
-    { value: 'all', label: 'All Outlets', icon: '🏪' },
+    { value: 'all', label: 'All', icon: '🏪' },
     { value: 'cafe', label: 'Cafes', icon: '☕' },
     { value: 'restaurant', label: 'Restaurants', icon: '🍽️' },
   ];
@@ -150,13 +150,9 @@ export default function AllCafesPage({ onNavigate, onBack }: AllCafesPageProps) 
 
           {/* Filter Chips */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            <button
-              onClick={() => setShowFilterMenu(!showFilterMenu)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#8b5943] text-white rounded-full text-[14px] font-medium whitespace-nowrap transition-all hover:bg-[#7a4a35]"
-            >
+            <button className="flex items-center gap-2 px-4 py-2 bg-white text-gray-500 rounded-full text-[14px] font-medium whitespace-nowrap border border-gray-300 pointer-events-none cursor-default">
               <Filter className="w-4 h-4" />
-              <span>Filters</span>
-              <ChevronDown className={`w-4 h-4 transition-transform ${showFilterMenu ? 'rotate-180' : ''}`} />
+              <span>Filters:</span>
             </button>
             {filterOptions.map((option) => (
               <button
@@ -178,34 +174,7 @@ export default function AllCafesPage({ onNavigate, onBack }: AllCafesPageProps) 
         </div>
       </div>
 
-      {/* Filter Dropdown Menu */}
-      {showFilterMenu && (
-        <div className="bg-white border-b border-gray-200 shadow-lg">
-          <div className="max-w-7xl mx-auto px-4 py-4">
-            <p className="font-['Arial:Bold',sans-serif] text-[14px] text-gray-700 mb-3">Sort By</p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {filterOptions.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => {
-                    setSelectedFilter(option.value as any);
-                    setShowFilterMenu(false);
-                  }}
-                  className={`p-4 rounded-xl text-left transition-all border-2 ${selectedFilter === option.value
-                    ? 'bg-[#8b5943]/10 border-[#8b5943]'
-                    : 'bg-white border-gray-200 hover:border-[#8b5943]/50'
-                    }`}
-                >
-                  <div className="text-[24px] mb-1">{option.icon}</div>
-                  <p className="font-['Arial:Bold',sans-serif] text-[14px] text-[#0a0a0a]">
-                    {option.label}
-                  </p>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+{/* Removed filter dropdown grid logic */}
 
       {/* Loading State */}
       {isLoading && (

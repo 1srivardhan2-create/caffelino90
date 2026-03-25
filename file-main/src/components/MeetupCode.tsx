@@ -21,6 +21,7 @@ interface MeetupCodeProps {
 export default function MeetupCode({ user, meetupData, onNavigate, onBack }: MeetupCodeProps) {
   // Use the REAL code from the API (stored in meetupData by CreateMeetupStep1)
   const joinCode = meetupData?.code || meetupData?.meetupCode || meetupData?.joinCode || '';
+  const cafeName = (meetupData as any)?.selectedCafe?.name || (meetupData as any)?.selectedCafe?.cafeName || 'Cafe';
   const [copied, setCopied] = useState(false);
 
   // Format date for display
@@ -54,18 +55,17 @@ export default function MeetupCode({ user, meetupData, onNavigate, onBack }: Mee
     }
   };
 
-  const handleShareWhatsApp = () => {
-    const message = `🎉 *Join our Caffélino Meetup!*\\n\\n` +
-      `📅 *Date:* ${formatDate(meetupData.date)}\\n` +
-      `🕐 *Time:* ${formatTime(meetupData.time)}\\n` +
-      `👤 *Organized by:* ${meetupData.adminName}\\n\\n` +
-      `🔑 *Join Code:* *${joinCode}*\\n\\n` +
-      `Use this code to join our group on Caffélino!`;
+    const message = `☕ *You're Invited to a Caffelino Meetup!*\n\n` +
+      `🏪 *Cafe:* ${cafeName}\n` +
+      `👤 *Hosted by:* ${meetupData.adminName}\n\n` +
+      `🔑 *Join Code:* ${joinCode}\n\n` +
+      `Join our meetup and connect with amazing people!\n\n` +
+      `👉 Use this code in the Caffelino app to join.\n\n` +
+      `🌐 Visit: https://www.caffelino.in`;
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
     toast.success('Opening WhatsApp...');
-  };
 
   const handleNext = () => {
     const completeData = {

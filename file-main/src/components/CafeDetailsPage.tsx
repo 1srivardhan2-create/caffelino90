@@ -419,22 +419,58 @@ export default function CafeDetailsPage({ cafe, user, onBack, onNavigate }: Cafe
       {/* Full-screen Photo Modal */}
       {selectedPhoto && (
         <div
-          className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-4 selection:bg-transparent"
           onClick={() => setSelectedPhoto(null)}
         >
-          <button
-            onClick={(e) => { e.stopPropagation(); setSelectedPhoto(null); }}
-            className="absolute top-4 left-4 flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full hover:bg-white/30 transition-colors z-10"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span className="text-[15px] font-medium">Back</span>
-          </button>
+          {/* Top Controls */}
+          <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-20">
+            <button
+              onClick={(e) => { e.stopPropagation(); setSelectedPhoto(null); }}
+              className="flex items-center gap-2 bg-black/40 hover:bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span className="text-[15px] font-medium">Back</span>
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); setSelectedPhoto(null); }}
+              className="flex items-center justify-center w-10 h-10 bg-black/40 hover:bg-black/60 backdrop-blur-sm text-white rounded-full transition-colors"
+            >
+              <span className="text-xl font-bold leading-none">&times;</span>
+            </button>
+          </div>
+
+          {/* Previous Arrow */}
+          {cafePhotos.indexOf(selectedPhoto) > 0 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setSelectedPhoto(cafePhotos[cafePhotos.indexOf(selectedPhoto) - 1]); }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-12 h-12 bg-black/40 hover:bg-black/60 backdrop-blur-sm text-white rounded-full transition-colors z-20"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+          )}
+
           <img
             src={resolveImageUrl(selectedPhoto)}
             alt="Full size photo"
-            className="max-w-full max-h-full object-contain rounded-lg"
+            className="max-w-full max-h-screen object-contain pointer-events-none"
             onClick={(e) => e.stopPropagation()}
           />
+
+          {/* Next Arrow */}
+          {cafePhotos.indexOf(selectedPhoto) < cafePhotos.length - 1 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setSelectedPhoto(cafePhotos[cafePhotos.indexOf(selectedPhoto) + 1]); }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-12 h-12 bg-black/40 hover:bg-black/60 backdrop-blur-sm text-white rounded-full transition-colors z-20"
+              style={{ transform: 'translateY(-50%) rotate(180deg)' }}
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+          )}
+          
+          {/* Photo Counter */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/60 text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide backdrop-blur-sm z-20">
+            {cafePhotos.indexOf(selectedPhoto) + 1} / {cafePhotos.length}
+          </div>
         </div>
       )}
     </div>

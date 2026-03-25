@@ -78,7 +78,13 @@ export default function CreateMeetupStep2({ user, meetupData, onNavigate, onBack
   };
 
   const handleShareWhatsApp = () => {
-    const message = `Join my meetup on Caffélino!\n\nGroup: ${meetupData?.groupName}\nDate: ${new Date(meetupData?.date).toLocaleDateString()}\nTime: ${meetupData?.time}\n\nUse code: ${meetupData?.code}\nOr click: ${inviteLink}`;
+    const message = `☕ *You're Invited to a Caffelino Meetup!*\n\n` +
+      `🏪 *Cafe:* To be decided\n` +
+      `👤 *Hosted by:* ${meetupData?.adminName || 'Admin'}\n\n` +
+      `🔑 *Join Code:* ${meetupData?.code}\n\n` +
+      `Join our meetup and connect with amazing people!\n\n` +
+      `👉 Use this code in the Caffelino app to join.\n\n` +
+      `🌐 Visit: https://www.caffelino.in`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
