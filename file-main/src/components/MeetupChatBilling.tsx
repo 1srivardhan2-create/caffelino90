@@ -1030,6 +1030,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                   groupName: `${selectedCafe?.name || 'Café'} Meetup`,
                   cafeName: selectedCafe?.name,
                   orderNumber: orderId,
+                  totalBill: billData.total,
                   orderItems: orderItemsForNotification,
                 });
 

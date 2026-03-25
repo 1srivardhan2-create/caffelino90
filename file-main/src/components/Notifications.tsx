@@ -32,6 +32,7 @@ interface Notification {
     cafeName?: string;
     orderNumber?: string;
     receiptUrl?: string;
+    totalBill?: number;
     orderItems?: Array<{
       name: string;
       quantity: number;
@@ -229,6 +230,16 @@ export default function Notifications({ user, onNavigate, onBack }: Notification
                                     ₹{notification.paymentDetails.amount}
                                   </p>
                                 </div>
+
+                                {/* Total Bill (if exists) */}
+                                {notification.paymentDetails.totalBill !== undefined && (
+                                  <div className="mb-4 text-center py-3 bg-white rounded-lg">
+                                    <p className="text-sm text-slate-600 mb-1">Total Food Bill</p>
+                                    <p className="text-xl font-bold text-slate-800">
+                                      ₹{notification.paymentDetails.totalBill}
+                                    </p>
+                                  </div>
+                                )}
 
                                 {/* Order Items */}
                                 {notification.paymentDetails.orderItems && notification.paymentDetails.orderItems.length > 0 && (

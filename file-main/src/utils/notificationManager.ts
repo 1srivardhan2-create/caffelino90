@@ -22,6 +22,7 @@ export interface Notification {
     cafeName?: string;
     orderNumber?: string;
     receiptUrl?: string;
+    totalBill?: number;
     orderItems?: Array<{
       name: string;
       quantity: number;
@@ -305,6 +306,7 @@ export function notifyPaymentSuccess(data: {
   groupName: string;
   cafeName?: string;
   orderNumber?: string;
+  totalBill?: number;
   orderItems?: Array<{
     name: string;
     quantity: number;
@@ -327,6 +329,7 @@ export function notifyPaymentSuccess(data: {
       groupName: data.groupName,
       cafeName: data.cafeName,
       orderNumber: data.orderNumber,
+      totalBill: data.totalBill,
       orderItems: data.orderItems,
     },
   });
