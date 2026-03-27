@@ -57,6 +57,18 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        meetups: [
+            {
+                meetupId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Meetup",
+                },
+                name: String,
+                members: Array,
+                status: String,
+                joinedAt: { type: Date, default: Date.now },
+            }
+        ]
     },
     { timestamps: true }
 );

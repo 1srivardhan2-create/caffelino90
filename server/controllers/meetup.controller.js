@@ -7,6 +7,8 @@ const Cafe = require("../models/Cafe/Cafe_login");
 const mongoose = require("mongoose");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
+const User = require("../models/User/User");
+const Notification = require("../models/User/Notification");
 
 // ─── Helper: Generate random meetup code ─────────────────────────
 function generateMeetupCode() {
@@ -58,6 +60,13 @@ const createMeetup = async (req, res) => {
 
         console.log(`🎉 Meetup created: ${title} (${meetupCode}) by ${organizerName}`);
 
+        // Persist meetup in User document
+        if (mongoose.Types.ObjectId.isValid(organizerId)) {
+            await User.findByIdAndUpdate(organizerId, {
+                $push: { meetups: { meetupId: meetup._id, name: meetup.title, members: meetup.members, status: meetup.status } }
+            });
+        }
+
         res.status(201).json({
             success: true,
             message: "Meetup created successfully",
@@ -99,6 +108,13 @@ const joinMeetup = async (req, res) => {
         await meetup.save();
 
         console.log(`👤 ${name} joined meetup ${meetupCode}`);
+
+        // Persist meetup in User document
+        if (mongoose.Types.ObjectId.isValid(userId)) {
+            await User.findByIdAndUpdate(userId, {
+                $push: { meetups: { meetupId: meetup._id, name: meetup.title, members: meetup.members, status: meetup.status } }
+            });
+        }
 
         // Emit socket event for LIVE MEMBERS SYNC
         if (req.io) {
@@ -789,6 +805,21 @@ const placeOrder = async (req, res) => {
 
             console.log(`🍔 ${userName} ordered ₹${calculatedTotal} in meetup ${meetupId}`);
 
+            // Create persistent notification for the user
+            if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+                try {
+                    await Notification.create({
+                        userId,
+                        type: "BILL",
+                        message: `Your order of ₹${calculatedTotal} has been placed`,
+                        orderId: order.orderId || order._id.toString(),
+                        isRead: false
+                    });
+                } catch (notifErr) {
+                    console.error("Failed to create notification:", notifErr);
+                }
+            }
+
             return res.status(200).json({ 
                 success: true, 
                 message: "Order processed successfully",
@@ -911,7 +942,7 @@ const getActiveMeetups = async (req, res) => {
         const { userId } = req.params;
         const meetups = await Meetup.find({
             "members.userId": userId,
-            status: { $in: ["active", "voting", "ordering"] },
+            status: { $in: ["active", "voting", "ordering", "completed"] },
         }).sort({ createdAt: -1 });
 
         res.json({ success: true, meetups });
@@ -932,7 +963,7 @@ const getMyMeetups = async (req, res) => {
 
         const meetups = await Meetup.find({
             "members.userId": userId,
-            status: { $in: ["active", "voting", "ordering"] },
+            status: { $in: ["active", "voting", "ordering", "completed"] },
         }).sort({ createdAt: -1 });
 
         res.json({ success: true, meetups });
@@ -1027,6 +1058,16 @@ const verifyRazorpayPayment = async (req, res) => {
                     isTokenPayment: true
                 });
             }
+        }
+
+        // Notification for User
+        if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+            await Notification.create({
+                userId,
+                type: "BILL",
+                message: "Your meetup token/order is confirmed",
+                isRead: false
+            });
         }
 
         res.json({ success: true, message: "Payment verified successfully" });

@@ -96,6 +96,7 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
                 meetupId: m._id,
                 meetupName: m.title || m.meetupName,
                 cafeName: m.selectedCafe?.cafeName || m.selectedCafe?.name,
+                selectedCafe: m.selectedCafe,
                 isAdmin: (memberInfo.role === 'admin' || m.organizerId === user.id),
                 groupCode: m.meetupCode,
               }

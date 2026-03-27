@@ -61,6 +61,16 @@ const placeOrder = async (req, res) => {
         await session.commitTransaction();
         session.endSession();
 
+        // Notification for User (Outside transaction is fine since order succeeded)
+        const Notification = require("../models/User/Notification");
+        await Notification.create({
+            userId,
+            type: "BILL",
+            message: `Your order of ₹${totalAmount} is confirmed`,
+            orderId: order[0]._id,
+            isRead: false
+        });
+
         res.status(201).json({
             message: "Order placed successfully",
             order: order[0],

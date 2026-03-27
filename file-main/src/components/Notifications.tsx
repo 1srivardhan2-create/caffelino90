@@ -5,6 +5,7 @@ import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { ScrollArea } from './ui/scroll-area';
 import { toast } from 'sonner';
+import { BASE_URL } from '../utils/api';
 
 interface NotificationsProps {
   user: any;
@@ -50,17 +51,31 @@ export default function Notifications({ user, onNavigate, onBack }: Notification
     loadNotifications();
   }, []);
 
-  const loadNotifications = () => {
-    // Load only real-time notifications from localStorage
-    const storedNotifications = localStorage.getItem('userNotifications');
-    if (storedNotifications) {
-      try {
-        const parsed = JSON.parse(storedNotifications);
-        setNotifications(parsed);
-      } catch (error) {
-        console.error('Error loading notifications:', error);
-        setNotifications([]);
+  const loadNotifications = async () => {
+    if (!user || !user.id) return;
+    try {
+      const res = await fetch(`${BASE_URL}/api/notifications/${user.id}`);
+      const data = await res.json();
+      if (data.success) {
+        setNotifications(data.notifications.map((n: any) => ({
+          id: n._id,
+          type: 'payment',
+          title: 'Bill Update',
+          message: n.message,
+          time: new Date(n.createdAt).toLocaleString(),
+          isRead: n.isRead,
+          paymentDetails: n.metadata?.paymentDetails || {
+             amount: n.message.match(/₹(\d+(?:\.\d+)?)/)?.[1] || 0,
+             transactionId: n.orderId || 'N/A',
+             paymentMethod: 'Cash/Online',
+             paidAt: n.createdAt,
+             groupName: 'Meetup Order',
+          }
+        })));
       }
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+      setNotifications([]);
     }
   };
 

@@ -907,6 +907,20 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         orderItems: orderItemsForNotification,
       });
 
+      // Also persist notification to backend
+      try {
+        await fetch(`${BASE_URL}/api/notifications`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user?.id,
+            type: 'BILL',
+            message: `Your cash order of ₹${amountPaid.toFixed(0)} is confirmed`,
+            orderId: orderId,
+          })
+        });
+      } catch (e) { console.error('Failed to persist notification:', e); }
+
       // Trigger notification update in App.tsx
       if (onNotificationUpdate) {
         onNotificationUpdate();
@@ -1033,6 +1047,20 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                   totalBill: billData.total,
                   orderItems: orderItemsForNotification,
                 });
+
+                // Also persist notification to backend
+                try {
+                  await fetch(`${BASE_URL}/api/notifications`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      userId: user?.id,
+                      type: 'BILL',
+                      message: `Your ₹20 token payment is confirmed. Total bill: ₹${billData.total}`,
+                      orderId: orderId,
+                    })
+                  });
+                } catch (e) { console.error('Failed to persist notification:', e); }
 
                 if (onNotificationUpdate) {
                   onNotificationUpdate();
