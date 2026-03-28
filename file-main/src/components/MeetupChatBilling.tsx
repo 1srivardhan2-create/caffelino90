@@ -1684,15 +1684,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                   <Check className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-bold text-emerald-700 text-lg mb-1">₹20 Token Paid ✅</h3>
-                {splitBill ? (
-                  <p className="text-sm text-indigo-600 font-medium">
-                    Your share: ₹{Number(amountPerPerson || 0).toFixed(2)} at counter
-                  </p>
-                ) : (
-                  <p className="text-sm text-gray-600 font-medium">
-                    Remaining to pay: ₹{Number((bill.total || 0) - 20).toFixed(2)} at counter
-                  </p>
-                )}
+                <p className="text-sm text-gray-600 font-medium">Order sent to café dashboard</p>
               </div>
             ) : isAdmin ? (
               <>
@@ -1704,32 +1696,11 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                   Confirm Table Token — Pay ₹20
                 </Button>
 
-                <p className="text-sm text-gray-600 text-center mt-3">
-                  ℹ️ Remaining amount to be paid at the café counter
-                </p>
 
-                {splitBill ? (
-                  <p className="text-xs text-indigo-600 text-center mt-1 font-medium">
-                    Each person pays ₹{Number(amountPerPerson || 0).toFixed(2)} at the counter
-                  </p>
-                ) : (
-                  <p className="text-xs text-orange-600 text-center mt-1 font-medium">
-                    Remaining: ₹{Number((bill.total || 0) - 20).toFixed(2)} at counter
-                  </p>
-                )}
               </>
             ) : (
               <div className="text-center bg-gray-50 rounded-lg p-4">
                 <p className="text-gray-600 font-medium">Waiting for admin to confirm table token...</p>
-                {splitBill ? (
-                  <p className="text-xs text-indigo-600 text-center mt-2 font-medium">
-                    Your share: ₹{Number(amountPerPerson || 0).toFixed(2)} at counter
-                  </p>
-                ) : (
-                  <p className="text-xs text-orange-600 text-center mt-2 font-medium">
-                    Total remaining at counter: ₹{Number((bill.total || 0) - 20).toFixed(2)}
-                  </p>
-                )}
               </div>
             )}
           </div>
