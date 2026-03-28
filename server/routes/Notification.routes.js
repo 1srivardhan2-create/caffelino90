@@ -20,7 +20,7 @@ router.get("/:userId", async (req, res) => {
 // POST /api/notifications - Create a notification
 router.post("/", async (req, res) => {
     try {
-        const { userId, type, message, orderId } = req.body;
+        const { userId, type, message, orderId, metadata } = req.body;
         if (!userId || !message) {
             return res.status(400).json({ success: false, message: "userId and message are required" });
         }
@@ -29,6 +29,7 @@ router.post("/", async (req, res) => {
             type: type || "BILL",
             message,
             orderId: orderId || null,
+            metadata: metadata || null,
             isRead: false,
         });
         res.status(201).json({ success: true, notification });

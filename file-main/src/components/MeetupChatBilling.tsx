@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Users, Coffee, Send, ShoppingCart, Plus, Minus, Receipt, CreditCard, Banknote, Check, Edit2, MapPin, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Users, Coffee, Send, ShoppingCart, Plus, Minus, Receipt, CreditCard, Banknote, Check, Edit2, MapPin, CheckCircle, Calendar, Clock } from 'lucide-react';
 import { Button } from './ui/button';
 import { toast } from 'sonner';
 import POSMenuInterface, { POSConfirmData } from './POSMenuInterface';
@@ -583,24 +583,65 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       }];
     });
 
-    try {
-      const res = await fetch(`${BASE_URL}/api/meetups/message`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          meetupId: meetupData?._id,
+      // Save order to backend as Draft
+      try {
+        const orderPayload = {
+          meetupId: meetupData?._id || meetupData?.id,
           userId: user?.id,
-          userName: user?.firstName || user?.name,
-          type: 'bill',
-          billData
-        })
-      });
-      const data = await res.json();
-      if (data.success && data.message) {
-        socketService.sendMessage({
-          _id: data.message._id,
-          meetupId: meetupData?._id || '',
-          userId: user?.id || '',
+          userName: user?.firstName || user?.name || user?.email,
+          userPhone: user?.mobileNumber || user?.phone || '',
+          cafeId: selectedCafe?.cafeId || selectedCafe?.id || selectedCafe?._id || '',
+          cafeName: selectedCafe?.name || selectedCafe?.cafeName || '',
+          items: orderItems.map((i: any) => ({
+            menuItemId: i.id || i._id || '',
+            name: i.name,
+            price: i.price,
+            quantity: i.quantity || 1
+          })),
+          subtotal: itemTotal,
+          cgst,
+          sgst,
+          commission,
+          total,
+          totalAmount: total,
+          orderId: currentOrderId,
+          status: 'draft',
+          orderStatus: 'PLACED',
+          splitEnabled: splitBill,
+          perPersonAmount: splitBill && splitMembers.length > 0 ? parseFloat((total / splitMembers.length).toFixed(2)) : total,
+          members: splitMembers.map((m: any) => ({
+            userId: m.id || m.userId || '',
+            name: m.name || m.firstName || '',
+            avatar: m.avatar || ''
+          }))
+        };
+        await fetch(`${BASE_URL}/api/meetup-orders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orderPayload)
+        });
+      } catch (err) {
+        console.error('❌ Error saving order to backend:', err);
+      }
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/meetups/message`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            meetupId: meetupData?._id,
+            userId: user?.id,
+            userName: user?.firstName || user?.name,
+            type: 'bill',
+            billData
+          })
+        });
+        const data = await res.json();
+        if (data.success && data.message) {
+          socketService.sendMessage({
+            _id: data.message._id,
+            meetupId: meetupData?._id || '',
+            userId: user?.id || '',
           userName: user?.firstName || user?.name || '',
           message: '',
           type: 'bill',
@@ -720,7 +761,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         total: posData.total,
         totalAmount: posData.total,
         orderId: currentOrderId,
-        status: 'pending',
+        status: 'draft',
         orderStatus: 'PLACED',
         splitEnabled: posData.splitEnabled,
         perPersonAmount: posData.perPersonAmount,
@@ -1187,6 +1228,13 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                       ? (selectedCafe?.Cafe_Address || selectedCafe?.cafeAddress || 'Location not available')
                       : loc;
                   })()}
+                </p>
+                <p className="text-gray-700 text-sm mt-1 flex items-center gap-1">
+                  <Calendar className="w-4 h-4 text-[#be9d80]" />
+                  <span>{meetupData?.date || 'Date TBD'}</span>
+                  <span className="mx-1 text-gray-400">•</span>
+                  <Clock className="w-4 h-4 text-[#be9d80]" />
+                  <span>{meetupData?.time || 'Time TBD'}</span>
                 </p>
                 <p className="text-gray-700 text-sm mt-1">
                   Code: <span className="font-mono font-bold text-[#be9d80]">{meetupData?.meetupCode || meetupData?.joinCode || 'N/A'}</span>

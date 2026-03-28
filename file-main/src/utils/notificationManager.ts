@@ -1,4 +1,6 @@
 // Notification Manager - Real-time notification system
+import { safeStorage } from './safeStorage';
+import { BASE_URL } from './api';
 
 export interface Notification {
   id: string;
@@ -140,16 +142,7 @@ export function notifyPaymentReceived(memberName: string, amount: number, meetup
     isRead: false,
     actionLabel: 'View Receipt',
     iconColor: 'text-green-600 bg-green-100',
-    paymentDetails: {
-      amount: amount,
-      transactionId: 'TXN123456789',
-      paymentMethod: 'Credit Card',
-      paidAt: new Date().toISOString(),
-      groupName: groupName,
-      cafeName: 'Cafe XYZ',
-      orderNumber: 'ORD123456789',
-      receiptUrl: 'https://example.com/receipt.pdf'
-    }
+
   });
 }
 
@@ -313,10 +306,10 @@ export function notifyPaymentSuccess(data: {
     price: number;
   }>;
 }) {
-  return addNotification({
+  const notif = addNotification({
     type: 'payment',
     title: 'Payment Successful ✅',
-    message: `You paid ₹${data.amount} for \"${data.groupName}\"`,
+    message: `You paid ₹${data.amount} for "${data.groupName}"`,
     time: 'Just now',
     isRead: false,
     actionLabel: 'View Receipt',
@@ -333,4 +326,26 @@ export function notifyPaymentSuccess(data: {
       orderItems: data.orderItems,
     },
   });
+
+  try {
+    const userStr = safeStorage.getItem('caffelino_user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      fetch(`${BASE_URL}/api/notifications`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id || user._id,
+          type: 'payment',
+          message: notif.message,
+          orderId: data.transactionId || data.orderNumber,
+          metadata: { paymentDetails: notif.paymentDetails }
+        })
+      });
+    }
+  } catch (err) {
+    console.error('Failed to save notification to backend:', err);
+  }
+
+  return notif;
 }
