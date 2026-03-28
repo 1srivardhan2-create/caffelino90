@@ -182,9 +182,9 @@ const leaveMeetup = async (req, res) => {
         // If organizer leaves, delete the entire meetup
         if (meetup.organizerId === userId) {
             await Meetup.findByIdAndDelete(meetupId);
-            // Optionally clean up orders and messages associated with this meetup
+            // Optionally clean up messages associated with this meetup
             await MeetupMessage.deleteMany({ meetupId });
-            await MeetupOrder.deleteMany({ meetupId });
+            // DO NOT delete orders so they persist for the cafe dashboard
             
             console.log(`🗑️ Organizer left: Meetup ${meetup.meetupCode} deleted`);
             return res.json({ success: true, message: "Meetup deleted because organizer left", deleted: true });
