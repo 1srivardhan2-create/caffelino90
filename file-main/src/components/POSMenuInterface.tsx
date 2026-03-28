@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ArrowLeft, Search, ShoppingCart, Plus, Minus, X, Check, Users, ToggleLeft, ToggleRight, Tag } from 'lucide-react';
 import { Button } from './ui/button';
 import { toast } from 'sonner';
@@ -73,6 +73,11 @@ export default function POSMenuInterface({
   const [splitEnabled, setSplitEnabled] = useState(initialSplitEnabled || false);
   const [couponInput, setCouponInput] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(false);
+  const cartSectionRef = useRef<HTMLDivElement>(null);
+
+  const scrollToCart = () => {
+    cartSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   // Get member names from live membersList with proper fallbacks
   const members: string[] = (membersList || []).map((m: any) => {
@@ -216,7 +221,7 @@ export default function POSMenuInterface({
         members: effectiveMembers,
         perPersonAmount,
       });
-      toast.success('Order confirmed and sent to café!');
+      toast.success('Bill confirmed! Pay ₹20 to send to café ☕');
       setIsConfirming(false);
     }, 1000);
   };
@@ -242,12 +247,16 @@ export default function POSMenuInterface({
             </button>
             <h1 className="text-xl font-bold text-gray-800">Point of Sale (POS)</h1>
             {isAdmin && (
-              <div className="flex items-center gap-2">
+              <button
+                onClick={scrollToCart}
+                className="flex items-center gap-2 bg-[#ff6b35]/10 hover:bg-[#ff6b35]/20 px-3 py-1.5 rounded-full transition-colors"
+                title="View Cart"
+              >
                 <ShoppingCart className="w-5 h-5 text-[#ff6b35]" />
                 <span className="bg-[#ff6b35] text-white px-2 py-0.5 rounded-full text-xs font-bold">
                   {totalCartItems}
                 </span>
-              </div>
+              </button>
             )}
           </div>
 
@@ -322,7 +331,7 @@ export default function POSMenuInterface({
 
         {/* Right Side - Cart / Order Summary (Admin Only) */}
         {isAdmin && (
-          <div className="lg:w-96 bg-white border-l border-gray-200 flex flex-col shadow-xl">
+          <div ref={cartSectionRef} id="pos-cart-section" className="lg:w-96 bg-white border-l border-gray-200 flex flex-col shadow-xl">
           {/* Order Header */}
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between mb-2">
@@ -512,6 +521,22 @@ export default function POSMenuInterface({
           </div>
         )}
       </div>
+
+      {/* Floating Cart FAB for mobile — scrolls to cart section */}
+      {isAdmin && orderItems.length > 0 && (
+        <button
+          onClick={scrollToCart}
+          className="lg:hidden fixed bottom-6 right-6 z-50 w-16 h-16 bg-[#ff6b35] text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-[#e55a2b] transition-all active:scale-95"
+          style={{ boxShadow: '0 8px 25px rgba(255, 107, 53, 0.4)' }}
+        >
+          <div className="relative">
+            <ShoppingCart className="w-7 h-7" />
+            <span className="absolute -top-2 -right-3 bg-white text-[#ff6b35] w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center shadow">
+              {totalCartItems}
+            </span>
+          </div>
+        </button>
+      )}
     </div>
   );
 }
