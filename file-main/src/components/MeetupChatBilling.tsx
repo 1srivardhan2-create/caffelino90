@@ -684,28 +684,6 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       members: billData.members,
     });
     console.log('📦 Order-created emitted for cafe:', cafeIdToEmit);
-
-    // Save to localStorage for cafe dashboard fallback (polling)
-    try {
-      const existingOrders = JSON.parse(localStorage.getItem('cafeOrders') || '[]');
-      const newOrder = {
-        orderNumber: currentOrderId,
-        meetupName: `Meetup ${meetupData?.meetupCode || meetupData?.joinCode || ''}`,
-        groupName: user?.firstName || user?.name || 'Group',
-        meetupId: meetupData?._id || meetupData?.id,
-        memberCount: meetupData?.members?.length || 1,
-        items: orderItems.map((i: any) => ({ name: i.name, quantity: i.quantity, price: i.price })),
-        totalAmount: billData.total,
-        orderDate: new Date().toLocaleDateString('en-IN'),
-        orderTime: new Date().toLocaleTimeString('en-IN'),
-        status: 'token_paid',
-        adminName: user?.firstName || user?.name || '',
-        adminPhone: '',
-        createdAt: new Date().toISOString(),
-      };
-      existingOrders.unshift(newOrder);
-      localStorage.setItem('cafeOrders', JSON.stringify(existingOrders));
-    } catch (e) { /* ignore */ }
   };
 
   const handlePOSConfirmOrder = async (posData: POSConfirmData) => {

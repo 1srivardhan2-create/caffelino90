@@ -155,9 +155,15 @@ io.on("connection", (socket) => {
         console.log(`☕ Socket ${socket.id} left cafe room cafe_${cafeId}`);
     });
 
-    // ─── Order created — forward to cafe dashboard ───────────────
+    // ─── Order created — forward to cafe dashboard (ONLY paid orders) ───
     socket.on("order-created", (data) => {
-        console.log("📦 POS emitted order-created:", data.orderId || data.orderNumber);
+        console.log("📦 POS emitted order-created:", data.orderId || data.orderNumber, "status:", data.status);
+        // Block unpaid orders from reaching the dashboard
+        const paidStatuses = ['token_paid', 'accepted', 'ACCEPTED', 'confirmed', 'CONFIRMED', 'PREPARING', 'READY', 'COMPLETED', 'CASH_COLLECTED', 'TOKEN_PAID'];
+        if (data.status && !paidStatuses.includes(data.status)) {
+            console.log(`⏳ Blocked order relay (status: ${data.status} — not paid yet)`);
+            return;
+        }
         if (data.cafeId) {
             io.to(`cafe_${data.cafeId}`).emit("order-created", data);
             console.log(`🎯 Order forwarded to cafe room: cafe_${data.cafeId}`);

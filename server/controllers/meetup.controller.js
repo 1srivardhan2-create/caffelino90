@@ -764,43 +764,49 @@ const placeOrder = async (req, res) => {
                 }
             }
 
-            // Also emit order-created to cafe dashboard room
-            const cafeRoom = cafeId || order.cafeId || "";
-            if (cafeRoom) {
-                // Fetch meetup info for enriched order
-                let meetupInfo = null;
-                try {
-                    meetupInfo = await Meetup.findById(meetupId).select("meetupCode organizerName members selectedCafe").lean();
-                } catch (e) { /* ignore */ }
+            // Only emit order-created to cafe dashboard if the order has been paid
+            // Draft/PLACED/PENDING orders should NOT be sent to the dashboard
+            const paidStatuses = ["TOKEN_PAID", "ACCEPTED", "CONFIRMED", "PREPARING", "READY", "COMPLETED", "CASH_COLLECTED"];
+            if (paidStatuses.includes(finalStatus)) {
+                const cafeRoom = cafeId || order.cafeId || "";
+                if (cafeRoom) {
+                    // Fetch meetup info for enriched order
+                    let meetupInfo = null;
+                    try {
+                        meetupInfo = await Meetup.findById(meetupId).select("meetupCode organizerName members selectedCafe").lean();
+                    } catch (e) { /* ignore */ }
 
-                console.log(`📡 Emitting order-created to room: cafe_${cafeRoom}`);
-                req.io.to(`cafe_${cafeRoom}`).emit("order-created", {
-                    orderNumber: order.orderId ? (order.orderId.includes('_') ? order.orderId.split("_")[1].slice(-6) : order.orderId.slice(-6)) : order._id.toString().slice(-6).toUpperCase(),
-                    orderId: order.orderId || order._id.toString(),
-                    meetupName: meetupInfo ? `Meetup ${meetupInfo.meetupCode}` : "Meetup Order",
-                    groupName: meetupInfo?.organizerName || userName || "Group",
-                    meetupId: meetupId,
-                    cafeId: cafeRoom,
-                    memberCount: meetupInfo?.members?.length || 1,
-                    items: items.map(i => ({
-                        name: i.name,
-                        quantity: i.quantity || 1,
-                        price: i.price || 0,
-                    })),
-                    totalAmount: calculatedTotal,
-                    subtotal: calculatedSubtotal,
-                    cgst: calculatedCgst,
-                    sgst: calculatedSgst,
-                    orderDate: new Date().toLocaleDateString("en-IN"),
-                    orderTime: new Date().toLocaleTimeString("en-IN"),
-                    status: "pending", // UI shows 'pending' for 'confirmed' orders initially
-                    adminName: userName || "",
-                    adminPhone: "",
-                    createdAt: order.createdAt || new Date().toISOString(),
-                    splitEnabled: splitEnabled || false,
-                    perPersonAmount: perPersonAmount || calculatedTotal,
-                    members: members || [],
-                });
+                    console.log(`📡 Emitting order-created to room: cafe_${cafeRoom} (status: ${finalStatus})`);
+                    req.io.to(`cafe_${cafeRoom}`).emit("order-created", {
+                        orderNumber: order.orderId ? (order.orderId.includes('_') ? order.orderId.split("_")[1].slice(-6) : order.orderId.slice(-6)) : order._id.toString().slice(-6).toUpperCase(),
+                        orderId: order.orderId || order._id.toString(),
+                        meetupName: meetupInfo ? `Meetup ${meetupInfo.meetupCode}` : "Meetup Order",
+                        groupName: meetupInfo?.organizerName || userName || "Group",
+                        meetupId: meetupId,
+                        cafeId: cafeRoom,
+                        memberCount: meetupInfo?.members?.length || 1,
+                        items: items.map(i => ({
+                            name: i.name,
+                            quantity: i.quantity || 1,
+                            price: i.price || 0,
+                        })),
+                        totalAmount: calculatedTotal,
+                        subtotal: calculatedSubtotal,
+                        cgst: calculatedCgst,
+                        sgst: calculatedSgst,
+                        orderDate: new Date().toLocaleDateString("en-IN"),
+                        orderTime: new Date().toLocaleTimeString("en-IN"),
+                        status: "token_paid",
+                        adminName: userName || "",
+                        adminPhone: "",
+                        createdAt: order.createdAt || new Date().toISOString(),
+                        splitEnabled: splitEnabled || false,
+                        perPersonAmount: perPersonAmount || calculatedTotal,
+                        members: members || [],
+                    });
+                }
+            } else {
+                console.log(`⏳ Order ${order.orderId} NOT emitted to dashboard (status: ${finalStatus} — payment required first)`);
             }
 
             console.log(`🍔 ${userName} ordered ₹${calculatedTotal} in meetup ${meetupId}`);
