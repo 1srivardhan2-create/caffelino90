@@ -190,7 +190,7 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
       const response = await orderAPI.getAllOrders();
       if (response.success && response.orders && response.orders.length > 0) {
         const activeOrders = response.orders
-          .filter((order: Order) => !['completed', 'rejected', 'COMPLETED', 'REJECTED'].includes(order.status))
+          .filter((order: Order) => !['completed', 'rejected', 'COMPLETED', 'REJECTED', 'draft', 'pending', 'PENDING', 'PLACED'].includes(order.status))
           .sort((a: Order, b: Order) => {
             const timeA = new Date(a.createdAt || a.orderDate).getTime();
             const timeB = new Date(b.createdAt || b.orderDate).getTime();
@@ -207,7 +207,7 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
     if (isBrowser) {
       const storedOrders = JSON.parse(safeStorage.getItem('cafeOrders') || '[]');
       const activeOrders = storedOrders
-        .filter((order: Order) => !['completed', 'rejected', 'COMPLETED', 'REJECTED'].includes(order.status))
+        .filter((order: Order) => !['completed', 'rejected', 'COMPLETED', 'REJECTED', 'draft', 'pending', 'PENDING', 'PLACED'].includes(order.status))
         .sort((a: Order, b: Order) => {
           const timeA = new Date(a.createdAt || a.orderDate).getTime();
           const timeB = new Date(b.createdAt || b.orderDate).getTime();
