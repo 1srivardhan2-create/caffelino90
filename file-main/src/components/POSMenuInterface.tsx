@@ -512,7 +512,7 @@ export default function POSMenuInterface({
                 ) : (
                   <>
                     <Check className="w-5 h-5" />
-                    Confirm Bill — ₹{total.toFixed(2)}
+                    Done — ₹{total.toFixed(2)}
                   </>
                 )}
               </Button>
