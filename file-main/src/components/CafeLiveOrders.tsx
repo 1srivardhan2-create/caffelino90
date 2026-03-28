@@ -91,6 +91,12 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
 
       const handleOrderCreated = (data: any) => {
         console.log('📦 Live order received via socket:', data);
+        // Only show orders that have paid the token (or later statuses)
+        const allowedStatuses = ['token_paid', 'accepted', 'ACCEPTED', 'completed', 'COMPLETED', 'confirmed', 'CONFIRMED', 'READY', 'CASH_COLLECTED'];
+        if (data.status && !allowedStatuses.includes(data.status)) {
+          console.log('⏳ Order skipped (token not paid yet):', data.status);
+          return;
+        }
         toast.success(`🆕 New order from ${data.groupName || 'Meetup'}!`, {
           description: `${data.items?.length || 0} items • ₹${(data.totalAmount || 0).toFixed(2)}`,
           duration: 8000,

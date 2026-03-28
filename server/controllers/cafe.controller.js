@@ -1077,10 +1077,10 @@ const getMeetupOrders = async (req, res) => {
 
         const uniqueCafeIds = [...new Set(possibleCafeIds)];
 
-        // Filter out orders that haven't paid the token
+        // Only return orders that have completed token payment or later statuses
         const orders = await MeetupOrder.find({ 
             cafeId: { $in: uniqueCafeIds },
-            status: { $nin: ["draft", "pending", "PENDING", "PLACED"] }
+            status: { $in: ["token_paid", "accepted", "ACCEPTED", "completed", "COMPLETED", "confirmed", "CONFIRMED", "READY", "CASH_COLLECTED"] }
         })
             .sort({ createdAt: -1 })
             .lean();
