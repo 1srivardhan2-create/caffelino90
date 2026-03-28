@@ -156,7 +156,7 @@ export default function MenuSelection({ user, meetupData, onNavigate, onBack }: 
       sgst: sgst,
       total: totalWithGST, // Total with GST
       timestamp: isEditingOrder ? existingOrder?.timestamp : timestamp,
-      status: 'pending',
+      status: 'draft',
       groupCode: meetupData.code,
       cafeName: meetupData.winnerCafe?.name || meetupData.cafeName
     };
@@ -183,7 +183,7 @@ export default function MenuSelection({ user, meetupData, onNavigate, onBack }: 
         hour: '2-digit', 
         minute: '2-digit' 
       }),
-      status: 'pending',
+      status: 'draft',
       adminName: user.name,
       adminPhone: user.mobileNumber || '+91 XXXXXXXXXX',
       createdAt: isEditingOrder ? existingOrder?.timestamp : timestamp,
@@ -208,39 +208,8 @@ export default function MenuSelection({ user, meetupData, onNavigate, onBack }: 
       toast.error('Failed to save order. Using local storage as backup.');
     }
 
-    // FALLBACK: Also save to localStorage for backward compatibility
-    const existingOrders = JSON.parse(localStorage.getItem('cafeOrders') || '[]');
-    
-    if (isEditingOrder && existingOrder?.orderId) {
-      // Update existing order instead of creating a new one
-      const orderIndex = existingOrders.findIndex((o: any) => o.orderNumber === existingOrder.orderId);
-      if (orderIndex !== -1) {
-        // Update the existing order with new items and total
-        existingOrders[orderIndex] = {
-          ...existingOrders[orderIndex],
-          items: cartWithEmojis,
-          subtotal: subtotal,
-          cgst: cgst,
-          sgst: sgst,
-          totalAmount: totalWithGST,
-          memberCount: meetupData?.members?.length || 1,
-          billBreakdown: {
-            cgst: cgst,
-            sgst: sgst,
-            splitAmong: meetupData?.members?.length || 1,
-            perPerson: Math.round((totalWithGST / (meetupData?.members?.length || 1)) * 100) / 100
-          }
-        };
-      } else {
-        // Order not found, add as new
-        existingOrders.push(cafeOrder);
-      }
-    } else {
-      // New order - add to array
-      existingOrders.push(cafeOrder);
-    }
-    
-    localStorage.setItem('cafeOrders', JSON.stringify(existingOrders));
+    // Note: Orders are saved as 'draft' and will only appear on the cafe dashboard
+    // after the ₹20 Razorpay token payment is completed
 
     // Mark that payment message should be sent in chat
     meetupData.orderConfirmed = true;

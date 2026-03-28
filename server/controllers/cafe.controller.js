@@ -518,7 +518,11 @@ const approveCafe = async (req, res) => {
 // Get all orders for the logged-in cafe (with populated user + item details)
 const getCafeOrders = async (req, res) => {
     try {
-        const orders = await Order.find({ cafe: req.cafe.id })
+        // Only return orders that have been paid (exclude PLACED/draft orders)
+        const orders = await Order.find({
+            cafe: req.cafe.id,
+            orderStatus: { $in: ["ACCEPTED", "PREPARING", "READY", "COMPLETED", "CASH_COLLECTED"] }
+        })
             .sort({ createdAt: -1 })
             .populate("user", "name phone")
             .populate("items.menuItem", "item_name");

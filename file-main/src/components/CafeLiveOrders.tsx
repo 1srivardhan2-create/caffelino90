@@ -170,7 +170,7 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
         const data = await res.json();
         if (data.success && data.orders && data.orders.length > 0) {
           const activeOrders = data.orders
-            .filter((order: Order) => !['completed', 'rejected', 'COMPLETED', 'REJECTED'].includes(order.status))
+            .filter((order: Order) => !['completed', 'rejected', 'COMPLETED', 'REJECTED', 'draft', 'pending', 'PENDING', 'PLACED'].includes(order.status))
             .sort((a: Order, b: Order) => {
               const timeA = new Date(a.createdAt || a.orderDate).getTime();
               const timeB = new Date(b.createdAt || b.orderDate).getTime();
