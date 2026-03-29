@@ -46,13 +46,13 @@ export default function CafeOrdersPage() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       setIsLoading(false);
     };
-    
+
     loadOrders();
   }, []);
 
   const handleMarkPaid = (orderId: string) => {
-    setOrders(orders.map(o => 
-      o.id === orderId 
+    setOrders(orders.map(o =>
+      o.id === orderId
         ? { ...o, status: 'paid' as const, paidAt: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) }
         : o
     ));
@@ -60,7 +60,7 @@ export default function CafeOrdersPage() {
   };
 
   const handleCancelOrder = (orderId: string) => {
-    setOrders(orders.map(o => 
+    setOrders(orders.map(o =>
       o.id === orderId ? { ...o, status: 'cancelled' as const } : o
     ));
     toast.success('Order cancelled');
@@ -74,7 +74,7 @@ export default function CafeOrdersPage() {
   const filteredOrders = orders.filter(order => {
     const matchesFilter = filterStatus === 'all' || order.status === filterStatus;
     const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         order.groupName.toLowerCase().includes(searchQuery.toLowerCase());
+      order.groupName.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -215,18 +215,18 @@ export default function CafeOrdersPage() {
                   <Badge
                     variant={
                       order.status === 'paid' ? 'default' :
-                      order.status === 'pending' ? 'secondary' :
-                      'outline'
+                        order.status === 'pending' ? 'secondary' :
+                          'outline'
                     }
                     className={
                       order.status === 'paid' ? 'bg-green-100 text-green-700 border-green-200' :
-                      order.status === 'pending' ? 'bg-amber-100 text-amber-700 border-amber-200' :
-                      'bg-red-100 text-red-700 border-red-200'
+                        order.status === 'pending' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                          'bg-red-100 text-red-700 border-red-200'
                     }
                   >
                     {order.status === 'paid' ? '✅ Paid' :
-                     order.status === 'pending' ? '⏳ Pending' :
-                     '❌ Cancelled'}
+                      order.status === 'pending' ? '⏳ Pending' :
+                        '❌ Cancelled'}
                   </Badge>
                 </TableCell>
                 <TableCell>
