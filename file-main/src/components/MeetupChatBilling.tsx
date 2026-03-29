@@ -675,7 +675,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       sgst: billData.sgst,
       orderDate: new Date().toLocaleDateString('en-IN'),
       orderTime: new Date().toLocaleTimeString('en-IN'),
-      status: 'token_paid',
+      status: 'confirmed',
       adminName: user?.firstName || user?.name || '',
       adminPhone: '',
       createdAt: new Date().toISOString(),
@@ -1026,7 +1026,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
               const verifyData = await verifyRes.json();
               
               if (verifyData.success) {
-                // IMPORTANT: Update the meetup order status to 'token_paid' in our DB
+                // IMPORTANT: Update the meetup order status to 'confirmed' in our DB
                 if (orderId) {
                   try {
                     await fetch(`${BASE_URL}/api/meetup-orders/${orderId}/token-paid`, {

@@ -24,9 +24,9 @@ router.post("/", async (req, res) => {
         if (payload.orderId) {
             // Check existing order to preserve token_paid status
             const existingOrder = await MeetupOrder.findOne({ orderId: payload.orderId });
-            if (existingOrder && existingOrder.status === 'token_paid') {
-                payload.status = 'token_paid';
-                if (!payload.orderStatus) payload.orderStatus = 'token_paid';
+            if (existingOrder && existingOrder.status === 'confirmed') {
+                payload.status = 'confirmed';
+                if (!payload.orderStatus) payload.orderStatus = 'confirmed';
             }
             
             const order = await MeetupOrder.findOneAndUpdate(
@@ -54,7 +54,7 @@ router.patch("/:id/token-paid", async (req, res) => {
         const query = getOrderQuery(req.params.id);
         const order = await MeetupOrder.findOneAndUpdate(
             query,
-            { status: "token_paid", orderStatus: "token_paid", tokenAmount: req.body.tokenAmount || 20 },
+            { status: "confirmed", orderStatus: "confirmed", tokenPaid: true, tokenAmount: req.body.tokenAmount || 20 },
             { new: true }
         );
         if (!order) return res.status(404).json({ message: "Order not found" });
@@ -63,7 +63,7 @@ router.patch("/:id/token-paid", async (req, res) => {
         if (req.io) {
             req.io.to(`cafe_${order.cafeId}`).emit("order-status-update", {
                 orderId: order.orderId || order._id.toString(),
-                status: "token_paid",
+                status: "confirmed",
             });
             // Emit refresh-orders to force dashboard update for this newly visible order
             req.io.to(`cafe_${order.cafeId}`).emit("refresh-orders");
