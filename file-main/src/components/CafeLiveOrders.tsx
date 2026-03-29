@@ -93,7 +93,7 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
         console.log('📦 Live order received via socket:', data);
         // Only show orders that have paid the token (or later statuses)
         const allowedStatuses = ['token_paid', 'accepted', 'ACCEPTED', 'completed', 'COMPLETED', 'confirmed', 'CONFIRMED', 'READY', 'CASH_COLLECTED'];
-        if (data.status && !allowedStatuses.includes(data.status)) {
+        if (!data.status || !allowedStatuses.includes(data.status)) {
           console.log('⏳ Order skipped (token not paid yet):', data.status);
           return;
         }
@@ -170,8 +170,11 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
         const data = await res.json();
         if (data.success && data.orders && data.orders.length > 0) {
           const activeOrders = data.orders
-            .filter((order: Order) => !['completed', 'rejected', 'COMPLETED', 'REJECTED', 'draft', 'pending', 'PENDING', 'PLACED'].includes(order.status))
-            .sort((a: Order, b: Order) => {
+            .filter((order: any) => {
+              const normalizedStatus = (order.status || '').toLowerCase();
+              return !['completed', 'rejected', 'draft', 'pending', 'placed'].includes(normalizedStatus);
+            })
+            .sort((a: any, b: any) => {
               const timeA = new Date(a.createdAt || a.orderDate).getTime();
               const timeB = new Date(b.createdAt || b.orderDate).getTime();
               return timeB - timeA;
@@ -190,8 +193,11 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
       const response = await orderAPI.getAllOrders();
       if (response.success && response.orders && response.orders.length > 0) {
         const activeOrders = response.orders
-          .filter((order: Order) => !['completed', 'rejected', 'COMPLETED', 'REJECTED', 'draft', 'pending', 'PENDING', 'PLACED'].includes(order.status))
-          .sort((a: Order, b: Order) => {
+          .filter((order: any) => {
+            const normalizedStatus = (order.status || '').toLowerCase();
+            return !['completed', 'rejected', 'draft', 'pending', 'placed'].includes(normalizedStatus);
+          })
+          .sort((a: any, b: any) => {
             const timeA = new Date(a.createdAt || a.orderDate).getTime();
             const timeB = new Date(b.createdAt || b.orderDate).getTime();
             return timeB - timeA;
@@ -207,8 +213,11 @@ export default function CafeLiveOrders({ isOnline, cafeId }: { isOnline: boolean
     if (isBrowser) {
       const storedOrders = JSON.parse(safeStorage.getItem('cafeOrders') || '[]');
       const activeOrders = storedOrders
-        .filter((order: Order) => !['completed', 'rejected', 'COMPLETED', 'REJECTED', 'draft', 'pending', 'PENDING', 'PLACED'].includes(order.status))
-        .sort((a: Order, b: Order) => {
+        .filter((order: any) => {
+          const normalizedStatus = (order.status || '').toLowerCase();
+          return !['completed', 'rejected', 'draft', 'pending', 'placed'].includes(normalizedStatus);
+        })
+        .sort((a: any, b: any) => {
           const timeA = new Date(a.createdAt || a.orderDate).getTime();
           const timeB = new Date(b.createdAt || b.orderDate).getTime();
           return timeB - timeA;

@@ -160,7 +160,7 @@ io.on("connection", (socket) => {
         console.log("📦 POS emitted order-created:", data.orderId || data.orderNumber, "status:", data.status);
         // Block unpaid orders from reaching the dashboard
         const paidStatuses = ['token_paid', 'accepted', 'ACCEPTED', 'confirmed', 'CONFIRMED', 'PREPARING', 'READY', 'COMPLETED', 'CASH_COLLECTED', 'TOKEN_PAID'];
-        if (data.status && !paidStatuses.includes(data.status)) {
+        if (!data.status || !paidStatuses.includes(data.status)) {
             console.log(`⏳ Blocked order relay (status: ${data.status} — not paid yet)`);
             return;
         }
