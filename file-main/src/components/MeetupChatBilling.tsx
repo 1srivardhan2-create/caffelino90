@@ -89,7 +89,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         </div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">Meetup session loading...</h2>
         <p className="text-gray-600 mb-6 max-w-xs">We're getting your chat ready. If it doesn't load soon, try going back and opening it again.</p>
-        <Button 
+        <Button
           onClick={() => onNavigate('home')}
           className="bg-[#be9d80] text-white hover:bg-[#a88968]"
         >
@@ -136,7 +136,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         setSplitMembers(parsed.splitMembers || []);
         setPerPersonAmount(parsed.perPersonAmount || 0);
         console.log('💾 Loaded saved order data for meetup:', meetupData?.joinCode);
-        
+
         // Check backend if the order was already token_paid recently
         if (parsed.orderId && !parsed.tokenPaid) {
           fetch(`${BASE_URL}/api/meetup-orders/${parsed.orderId}`)
@@ -313,11 +313,11 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         }
 
         return [...filtered, {
-            id: data._id || `msg-${Date.now()}-${Math.random()}`,
-            type: data.type || 'user',
-            sender: data.userName,
-            senderEmoji: data.senderEmoji || '👤',
-            text: data.message,
+          id: data._id || `msg-${Date.now()}-${Math.random()}`,
+          type: data.type || 'user',
+          sender: data.userName,
+          senderEmoji: data.senderEmoji || '👤',
+          text: data.message,
           billData: data.billData,
           paymentData: data.paymentData,
           timestamp: new Date(data.createdAt || Date.now()),
@@ -344,7 +344,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         setNumberOfPeople(updatedMembers.length);
         console.log('🔔 member_joined socket: updated members to', updatedMembers.length, '-', updatedMembers.map((m: any) => m.name || m.firstName).join(', '));
       }
-      
+
       const systemMessage = {
         id: `sys-${Date.now()}`,
         type: 'system' as const,
@@ -583,65 +583,65 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       }];
     });
 
-      // Save order to backend as Draft
-      try {
-        const orderPayload = {
-          meetupId: meetupData?._id || meetupData?.id,
-          userId: user?.id,
-          userName: user?.firstName || user?.name || user?.email,
-          userPhone: user?.mobileNumber || user?.phone || '',
-          cafeId: selectedCafe?.cafeId || selectedCafe?.id || selectedCafe?._id || '',
-          cafeName: selectedCafe?.name || selectedCafe?.cafeName || '',
-          items: orderItems.map((i: any) => ({
-            menuItemId: i.id || i._id || '',
-            name: i.name,
-            price: i.price,
-            quantity: i.quantity || 1
-          })),
-          subtotal: itemTotal,
-          cgst,
-          sgst,
-          commission,
-          total,
-          totalAmount: total,
-          orderId: currentOrderId,
-          status: 'draft',
-          orderStatus: 'PLACED',
-          splitEnabled: splitBill,
-          perPersonAmount: splitBill && splitMembers.length > 0 ? parseFloat((total / splitMembers.length).toFixed(2)) : total,
-          members: splitMembers.map((m: any) => ({
-            userId: m.id || m.userId || '',
-            name: m.name || m.firstName || '',
-            avatar: m.avatar || ''
-          }))
-        };
-        await fetch(`${BASE_URL}/api/meetup-orders`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(orderPayload)
-        });
-      } catch (err) {
-        console.error('❌ Error saving order to backend:', err);
-      }
+    // Save order to backend as Draft
+    try {
+      const orderPayload = {
+        meetupId: meetupData?._id || meetupData?.id,
+        userId: user?.id,
+        userName: user?.firstName || user?.name || user?.email,
+        userPhone: user?.mobileNumber || user?.phone || '',
+        cafeId: selectedCafe?.cafeId || selectedCafe?.id || selectedCafe?._id || '',
+        cafeName: selectedCafe?.name || selectedCafe?.cafeName || '',
+        items: orderItems.map((i: any) => ({
+          menuItemId: i.id || i._id || '',
+          name: i.name,
+          price: i.price,
+          quantity: i.quantity || 1
+        })),
+        subtotal: itemTotal,
+        cgst,
+        sgst,
+        commission,
+        total,
+        totalAmount: total,
+        orderId: currentOrderId,
+        status: 'draft',
+        orderStatus: 'PLACED',
+        splitEnabled: splitBill,
+        perPersonAmount: splitBill && splitMembers.length > 0 ? parseFloat((total / splitMembers.length).toFixed(2)) : total,
+        members: splitMembers.map((m: any) => ({
+          userId: m.id || m.userId || '',
+          name: m.name || m.firstName || '',
+          avatar: m.avatar || ''
+        }))
+      };
+      await fetch(`${BASE_URL}/api/meetup-orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderPayload)
+      });
+    } catch (err) {
+      console.error('❌ Error saving order to backend:', err);
+    }
 
-      try {
-        const res = await fetch(`${BASE_URL}/api/meetups/message`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            meetupId: meetupData?._id,
-            userId: user?.id,
-            userName: user?.firstName || user?.name,
-            type: 'bill',
-            billData
-          })
-        });
-        const data = await res.json();
-        if (data.success && data.message) {
-          socketService.sendMessage({
-            _id: data.message._id,
-            meetupId: meetupData?._id || '',
-            userId: user?.id || '',
+    try {
+      const res = await fetch(`${BASE_URL}/api/meetups/message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          meetupId: meetupData?._id,
+          userId: user?.id,
+          userName: user?.firstName || user?.name,
+          type: 'bill',
+          billData
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.message) {
+        socketService.sendMessage({
+          _id: data.message._id,
+          meetupId: meetupData?._id || '',
+          userId: user?.id || '',
           userName: user?.firstName || user?.name || '',
           message: '',
           type: 'bill',
@@ -981,6 +981,23 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
   // Split bill is now managed in POS — no separate dialog needed
 
   const handleTokenPayment = async () => {
+    // Capture orderId NOW to avoid stale closure in Razorpay handler
+    const currentOrderId = orderId || (() => {
+      // Fallback: try to recover orderId from localStorage
+      const storageKey = getStorageKey();
+      if (storageKey) {
+        try {
+          const saved = localStorage.getItem(storageKey);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            return parsed.orderId || '';
+          }
+        } catch (e) { /* ignore */ }
+      }
+      return '';
+    })();
+    console.log('🔑 handleTokenPayment: using orderId =', currentOrderId);
+
     try {
       const res = await fetch(`${BASE_URL}/api/create-order`, {
         method: 'POST',
@@ -988,7 +1005,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         body: JSON.stringify({
           meetupId: meetupData?._id || meetupData?.id,
           userId: currentUserId || 'guest',
-          orderId: orderId // Link it to the current order if available
+          orderId: currentOrderId // Link it to the current order if available
         })
       });
       let data;
@@ -1001,7 +1018,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       if (!res.ok) {
         throw new Error(data.message || data.error || `Server error (${res.status})`);
       }
-      
+
       if (data.success && data.orderId) {
         const options = {
           key: 'rzp_live_STzO1DnRlqY3vN',
@@ -1024,10 +1041,13 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                 })
               });
               const verifyData = await verifyRes.json();
-              
+
               if (verifyData.success) {
-                // IMPORTANT: Update the meetup order status to 'confirmed' in our DB
-                if (orderId) {
+                // IMPORTANT: Update the meetup order status to 'ACCEPTED' in our DB
+                // Use captured currentOrderId to avoid stale closure issues
+                const effectiveOrderId = currentOrderId || orderId;
+                console.log('✅ Payment verified, updating order:', effectiveOrderId);
+                if (effectiveOrderId) {
                   try {
                     const billData = calculateBill();
                     const orderPayload = {
@@ -1043,26 +1063,31 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                       sgst: billData.sgst,
                       totalAmount: billData.total
                     };
-                    
-                    await fetch(`${BASE_URL}/api/meetup-orders/${orderId}/token-paid`, {
+
+                    const tokenRes = await fetch(`${BASE_URL}/api/meetup-orders/${effectiveOrderId}/token-paid`, {
                       method: 'PATCH',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify(orderPayload)
                     });
+                    const tokenData = await tokenRes.json();
+                    console.log('📦 token-paid API response:', tokenData);
                   } catch (orderUpdateErr) {
                     console.error('Failed to update order status on backend:', orderUpdateErr);
                   }
+                } else {
+                  console.error('❌ No orderId available to update token payment!');
                 }
 
                 setTokenPaid(true);
                 setOrderConfirmed(true);
-                
+
                 // Emit order to cafe now that token is paid
                 const billData = calculateBill();
-                emitOrderToCafe(orderId, billData);
+                const emitId = effectiveOrderId || orderId;
+                emitOrderToCafe(emitId, billData);
 
                 toast.success('Order Confirmed. ₹20 token received.');
-                
+
                 // Add notification for token payment
                 const amountPaid = 20;
                 const orderItemsForNotification = orderItems.map((item: any) => ({
@@ -1073,11 +1098,11 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
 
                 notifyPaymentSuccess({
                   amount: amountPaid,
-                  transactionId: orderId,
+                  transactionId: effectiveOrderId || orderId,
                   paymentMethod: 'Online',
                   groupName: `${selectedCafe?.name || 'Café'} Meetup`,
                   cafeName: selectedCafe?.name,
-                  orderNumber: orderId,
+                  orderNumber: effectiveOrderId || orderId,
                   totalBill: billData.total,
                   orderItems: orderItemsForNotification,
                 });
@@ -1091,7 +1116,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                       userId: user?.id,
                       type: 'BILL',
                       message: `Your ₹20 token payment is confirmed. Total bill: ₹${billData.total}`,
-                      orderId: orderId,
+                      orderId: effectiveOrderId || orderId,
                     })
                   });
                 } catch (e) { console.error('Failed to persist notification:', e); }
@@ -1107,7 +1132,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                   text: msgText,
                   timestamp: new Date()
                 }]);
-                
+
                 await fetch(`${BASE_URL}/api/meetups/message`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -1123,8 +1148,8 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                 toast.error('Payment verification failed.');
               }
             } catch (err) {
-               console.error('Verify error:', err);
-               toast.error('Error verifying payment.');
+              console.error('Verify error:', err);
+              toast.error('Error verifying payment.');
             }
           },
           prefill: {
@@ -1136,14 +1161,14 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
             color: '#be9d80'
           }
         };
-        
+
         const rzp = new (window as any).Razorpay(options);
         rzp.on('payment.failed', function (response: any) {
           toast.error(`Payment failed: ${response.error.description}. Please try again.`);
         });
         rzp.open();
       } else {
-         toast.error(data?.message || 'Could not initiate payment. Missing order details.');
+        toast.error(data?.message || 'Could not initiate payment. Missing order details.');
       }
     } catch (err: any) {
       console.error('Razorpay init error:', err);

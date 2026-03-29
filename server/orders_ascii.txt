@@ -1,0 +1,47 @@
+[
+  {
+    "_id": "69c8fce995aca4e4c7f2c45c",
+    "orderId": "966611",
+    "__v": 0,
+    "cafeId": "69c7f4f826613be68275a09d",
+    "cgst": 8.8,
+    "commission": 0,
+    "coupon": {
+      "code": "",
+      "discount": 0
+    },
+    "createdAt": "2026-03-29T10:20:25.116Z",
+    "items": [
+      {
+        "menuItemId": "69c7f54026613be68275a0b1",
+        "name": "cheese cake",
+        "price": 88,
+        "quantity": 4,
+        "_id": "69c8fce980d5b21b4397935b"
+      }
+    ],
+    "meetupId": "69c8fcd780d5b21b43979346",
+    "members": [
+      {
+        "userId": "",
+        "name": "",
+        "avatar": "",
+        "_id": "69c8fce980d5b21b4397935a"
+      }
+    ],
+    "orderStatus": "confirmed",
+    "paymentStatus": "PENDING",
+    "perPersonAmount": 369.6,
+    "sgst": 8.8,
+    "splitEnabled": false,
+    "status": "confirmed",
+    "subtotal": 352,
+    "tokenAmount": 20,
+    "tokenPaid": true,
+    "total": 369.6,
+    "totalAmount": 369.6,
+    "updatedAt": "2026-03-29T10:21:18.052Z",
+    "userId": "google_caffelino_9_gmail_com",
+    "userName": "Vardhan"
+  }
+]

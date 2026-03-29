@@ -1114,7 +1114,7 @@ const getMeetupOrders = async (req, res) => {
                 sgst: order.sgst || 0,
                 orderDate: new Date(order.createdAt).toLocaleDateString("en-IN"),
                 orderTime: new Date(order.createdAt).toLocaleTimeString("en-IN"),
-                status: (order.status === "confirmed" || order.status === "token_paid") ? "pending" : order.status,
+                status: (order.status === "confirmed" || order.status === "token_paid") ? "accepted" : order.status,
                 adminName: order.userName || "",
                 adminPhone: "",
                 createdAt: order.createdAt,
