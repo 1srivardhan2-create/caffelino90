@@ -675,7 +675,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
       sgst: billData.sgst,
       orderDate: new Date().toLocaleDateString('en-IN'),
       orderTime: new Date().toLocaleTimeString('en-IN'),
-      status: 'confirmed',
+      status: 'ACCEPTED',
       adminName: user?.firstName || user?.name || '',
       adminPhone: '',
       createdAt: new Date().toISOString(),

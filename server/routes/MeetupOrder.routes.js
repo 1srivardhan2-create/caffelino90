@@ -19,14 +19,32 @@ const getOrderQuery = (id) => {
 router.post("/", async (req, res) => {
     try {
         const payload = req.body;
+        // Also set the Object ID references for the Owner Portal
+        if (payload.cafeId) {
+            payload.cafe = payload.cafeId;
+        }
         
+        // The Owner Portal requires a 'user' ObjectId field to populate customer details
+        if (payload.userId && mongoose.isValidObjectId(payload.userId)) {
+            payload.user = payload.userId;
+        }
+
+        // The Owner Portal requires a 'menuItem' ObjectId field on each item to display names
+        if (payload.items && Array.isArray(payload.items)) {
+            payload.items = payload.items.map(item => {
+                if (item.menuItemId && mongoose.isValidObjectId(item.menuItemId)) {
+                    item.menuItem = item.menuItemId;
+                }
+                return item;
+            });
+        }
+
         // If an orderId exists, try to update it instead of creating duplicates
         if (payload.orderId) {
-            // Check existing order to preserve token_paid status
             const existingOrder = await MeetupOrder.findOne({ orderId: payload.orderId });
-            if (existingOrder && existingOrder.status === 'confirmed') {
-                payload.status = 'confirmed';
-                if (!payload.orderStatus) payload.orderStatus = 'confirmed';
+            if (existingOrder && (existingOrder.status === 'confirmed' || existingOrder.status === 'ACCEPTED')) {
+                payload.status = 'ACCEPTED';
+                if (!payload.orderStatus) payload.orderStatus = 'ACCEPTED';
             }
             
             const order = await MeetupOrder.findOneAndUpdate(
@@ -54,7 +72,13 @@ router.patch("/:id/token-paid", async (req, res) => {
         const query = getOrderQuery(req.params.id);
         const order = await MeetupOrder.findOneAndUpdate(
             query,
-            { status: "confirmed", orderStatus: "confirmed", tokenPaid: true, tokenAmount: req.body.tokenAmount || 20 },
+            { 
+                status: "ACCEPTED", 
+                orderStatus: "ACCEPTED", 
+                paymentStatus: "PAID", 
+                tokenPaid: true, 
+                tokenAmount: req.body.tokenAmount || 20 
+            },
             { new: true }
         );
         if (!order) return res.status(404).json({ message: "Order not found" });
@@ -63,7 +87,7 @@ router.patch("/:id/token-paid", async (req, res) => {
         if (req.io) {
             req.io.to(`cafe_${order.cafeId}`).emit("order-status-update", {
                 orderId: order.orderId || order._id.toString(),
-                status: "confirmed",
+                status: "ACCEPTED",
             });
             // Emit refresh-orders to force dashboard update for this newly visible order
             req.io.to(`cafe_${order.cafeId}`).emit("refresh-orders");

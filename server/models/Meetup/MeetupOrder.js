@@ -20,8 +20,17 @@ const MeetupOrderSchema = new mongoose.Schema(
             type: String,
             default: "",
         },
+        cafe: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Cafe",
+        },
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
         items: [
             {
+                menuItem: { type: mongoose.Schema.Types.ObjectId, ref: 'CafeMenu' },
                 menuItemId: { type: String },
                 name: { type: String },
                 price: { type: Number },

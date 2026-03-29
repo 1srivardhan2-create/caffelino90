@@ -1,3 +1,7 @@
-concu | pp: BASE64(len=87759) | photos: 0 []
-havali | pp: EMPTY(len=0) | photos: 0 []
-prizmo | pp: EMPTY(len=0) | photos: 0 []
+﻿[dotenv@17.3.1] injecting env (9) from .env -- tip: ≡ƒ¢í∩╕Å auth for agents: https://vestauth.com
+Connected
+Cafe found:
+{
+  "_id": "69c7f4f826613be68275a09d",
+  "Name": "dwaraka"
+}

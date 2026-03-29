@@ -1,0 +1,13 @@
+﻿[dotenv@17.3.1] injecting env (9) from .env -- tip: ΓÜÖ∩╕Å  specify custom .env file path with { path: '/custom/path/.env' }
+Connected
+Found 10 orders in Cafe_orders (orders collection)
+- ID: 69c8fce995aca4e4c7f2c45c, Status: confirmed, Total: 369.6, Cafe: undefined
+- ID: 69c8c2f395aca4e4c7f2c2f8, Status: token_paid, Total: 92.4, Cafe: undefined
+- ID: 69c8be5295aca4e4c7f2c2f4, Status: PLACED, Total: 1016.4, Cafe: undefined
+- ID: 69c8b8cb95aca4e4c7f2c2e4, Status: PLACED, Total: 92.4, Cafe: undefined
+- ID: 69c8b39b95aca4e4c7f2c2ce, Status: PLACED, Total: 646.8, Cafe: undefined
+- ID: 69c8328695aca4e4c7f2c16c, Status: PLACED, Total: 184.8, Cafe: undefined
+- ID: 69c82eb395aca4e4c7f2c15d, Status: PLACED, Total: 868.56, Cafe: undefined
+- ID: 69c82cff95aca4e4c7f2c14c, Status: PLACED, Total: 92.4, Cafe: undefined
+- ID: 69c82a6995aca4e4c7f2c148, Status: PLACED, Total: 92.4, Cafe: undefined
+- ID: 69c825d495aca4e4c7f2c13a, Status: PLACED, Total: 92.4, Cafe: undefined

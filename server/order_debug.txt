@@ -1,0 +1,107 @@
+﻿[dotenv@17.3.1] injecting env (9) from .env -- tip: ΓÜÖ∩╕Å  write to custom object with { processEnv: myObject }
+Connected to MongoDB
+
+Found 10 recent orders:
+
+--- Order #1 ---
+  orderId:     966611
+  status:      confirmed
+  orderStatus: confirmed
+  tokenPaid:   true
+  cafeId:      69c7f4f826613be68275a09d
+  total:       369.6
+  items:       cheese cake
+  createdAt:   Sun Mar 29 2026 15:50:25 GMT+0530 (India Standard Time)
+
+--- Order #2 ---
+  orderId:     458926
+  status:      token_paid
+  orderStatus: token_paid
+  tokenPaid:   false
+  cafeId:      69c7f4f826613be68275a09d
+  total:       92.4
+  items:       cheese cake
+  createdAt:   Sun Mar 29 2026 11:43:06 GMT+0530 (India Standard Time)
+
+--- Order #3 ---
+  orderId:     423700
+  status:      draft
+  orderStatus: PLACED
+  tokenPaid:   false
+  cafeId:      69c7f4f826613be68275a09d
+  total:       1016.4
+  items:       cheese cake
+  createdAt:   Sun Mar 29 2026 11:23:22 GMT+0530 (India Standard Time)
+
+--- Order #4 ---
+  orderId:     368458
+  status:      draft
+  orderStatus: PLACED
+  tokenPaid:   false
+  cafeId:      69c7f4f826613be68275a09d
+  total:       92.4
+  items:       cheese cake
+  createdAt:   Sun Mar 29 2026 10:59:47 GMT+0530 (India Standard Time)
+
+--- Order #5 ---
+  orderId:     732422
+  status:      draft
+  orderStatus: PLACED
+  tokenPaid:   false
+  cafeId:      69c7f4f826613be68275a09d
+  total:       646.8
+  items:       cheese cake
+  createdAt:   Sun Mar 29 2026 10:37:39 GMT+0530 (India Standard Time)
+
+--- Order #6 ---
+  orderId:     420188
+  status:      draft
+  orderStatus: PLACED
+  tokenPaid:   false
+  cafeId:      69c7f4f826613be68275a09d
+  total:       184.8
+  items:       cheese cake
+  createdAt:   Sun Mar 29 2026 01:26:54 GMT+0530 (India Standard Time)
+
+--- Order #7 ---
+  orderId:     349066
+  status:      draft
+  orderStatus: PLACED
+  tokenPaid:   false
+  cafeId:      69c7f4f826613be68275a09d
+  total:       868.56
+  items:       cheese cake
+  createdAt:   Sun Mar 29 2026 01:10:35 GMT+0530 (India Standard Time)
+
+--- Order #8 ---
+  orderId:     151018
+  status:      draft
+  orderStatus: PLACED
+  tokenPaid:   false
+  cafeId:      69c7f4f826613be68275a09d
+  total:       92.4
+  items:       cheese cake
+  createdAt:   Sun Mar 29 2026 01:03:19 GMT+0530 (India Standard Time)
+
+--- Order #9 ---
+  orderId:     944021
+  status:      draft
+  orderStatus: PLACED
+  tokenPaid:   false
+  cafeId:      69c7f4f826613be68275a09d
+  total:       92.4
+  items:       cheese cake
+  createdAt:   Sun Mar 29 2026 00:52:17 GMT+0530 (India Standard Time)
+
+--- Order #10 ---
+  orderId:     411287
+  status:      draft
+  orderStatus: PLACED
+  tokenPaid:   false
+  cafeId:      69c7f4f826613be68275a09d
+  total:       92.4
+  items:       cheese cake
+  createdAt:   Sun Mar 29 2026 00:32:44 GMT+0530 (India Standard Time)
+
+Unique cafeIds in orders: 69c7f4f826613be68275a09d
+  cafeId "69c7f4f826613be68275a09d" -> Cafe: "dwaraka" (ownerId: undefined, _id: 69c7f4f826613be68275a09d)
