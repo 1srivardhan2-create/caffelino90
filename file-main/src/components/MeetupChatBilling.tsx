@@ -1029,10 +1029,25 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                 // IMPORTANT: Update the meetup order status to 'confirmed' in our DB
                 if (orderId) {
                   try {
+                    const billData = calculateBill();
+                    const orderPayload = {
+                      tokenAmount: 20,
+                      items: orderItems.map((i: any) => ({
+                        menuItemId: i.id || i._id || '',
+                        name: i.name,
+                        price: i.price,
+                        quantity: i.quantity || 1
+                      })),
+                      subtotal: billData.itemTotal,
+                      cgst: billData.cgst,
+                      sgst: billData.sgst,
+                      totalAmount: billData.total
+                    };
+                    
                     await fetch(`${BASE_URL}/api/meetup-orders/${orderId}/token-paid`, {
                       method: 'PATCH',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ tokenAmount: 20 })
+                      body: JSON.stringify(orderPayload)
                     });
                   } catch (orderUpdateErr) {
                     console.error('Failed to update order status on backend:', orderUpdateErr);

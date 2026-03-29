@@ -70,15 +70,37 @@ router.post("/", async (req, res) => {
 router.patch("/:id/token-paid", async (req, res) => {
     try {
         const query = getOrderQuery(req.params.id);
+        
+        const { tokenAmount, items, subtotal, cgst, sgst, totalAmount } = req.body;
+        
+        let updateData = { 
+            status: "ACCEPTED", 
+            orderStatus: "ACCEPTED", 
+            paymentStatus: "PAID", 
+            tokenPaid: true, 
+            tokenAmount: tokenAmount || 20 
+        };
+
+        // If the frontend sends the latest bill details, update them
+        if (items && Array.isArray(items)) {
+            updateData.items = items.map(item => {
+                if (item.menuItemId && mongoose.isValidObjectId(item.menuItemId)) {
+                    item.menuItem = item.menuItemId;
+                }
+                return item;
+            });
+        }
+        if (subtotal !== undefined) updateData.subtotal = subtotal;
+        if (cgst !== undefined) updateData.cgst = cgst;
+        if (sgst !== undefined) updateData.sgst = sgst;
+        if (totalAmount !== undefined) {
+            updateData.totalAmount = totalAmount;
+            updateData.total = totalAmount;
+        }
+
         const order = await MeetupOrder.findOneAndUpdate(
             query,
-            { 
-                status: "ACCEPTED", 
-                orderStatus: "ACCEPTED", 
-                paymentStatus: "PAID", 
-                tokenPaid: true, 
-                tokenAmount: req.body.tokenAmount || 20 
-            },
+            updateData,
             { new: true }
         );
         if (!order) return res.status(404).json({ message: "Order not found" });
