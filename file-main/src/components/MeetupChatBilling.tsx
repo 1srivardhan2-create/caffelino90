@@ -1618,8 +1618,8 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-t-4 border-orange-400 px-4 py-4 max-w-3xl mx-auto w-full shadow-lg">
           <h3 className="font-bold text-gray-900 mb-4 text-xl">📋 Billing Summary</h3>
 
-          {/* 1. Edit Order Items Button — reopens POS */}
-          {isAdmin && !tokenPaid ? (
+          {/* 1. Edit Order Items Button — only visible before token payment */}
+          {isAdmin && !tokenPaid && (
             <Button
               onClick={handleEditOrder}
               className="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 rounded-xl flex items-center justify-center gap-2 mb-3 shadow-sm"
@@ -1627,17 +1627,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
               <Edit2 className="w-5 h-5" />
               Edit Order Items
             </Button>
-          ) : tokenPaid ? (
-            <div className="bg-gray-100 border border-gray-200 py-3 px-4 rounded-xl flex flex-col items-center justify-center mb-3">
-              <div className="flex items-center gap-2 font-bold text-gray-700">
-                <Lock className="w-5 h-5" />
-                🔒 Order Locked
-              </div>
-              <p className="text-xs text-center text-gray-500 mt-1.5 font-medium">
-                ✅ Table confirmed successfully. This order cannot be edited anymore.
-              </p>
-            </div>
-          ) : null}
+          )}
 
           {/* Item List + Bill Breakdown */}
           <div className="bg-white rounded-xl p-4 mb-3 border-2 border-orange-300 shadow-md">
