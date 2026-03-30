@@ -43,7 +43,14 @@ router.post("/", async (req, res) => {
         // If an orderId exists, try to update it instead of creating duplicates
         if (payload.orderId) {
             const existingOrder = await MeetupOrder.findOne({ orderId: payload.orderId });
-            if (existingOrder && (existingOrder.status === 'confirmed' || existingOrder.status === 'ACCEPTED')) {
+
+            // Strict Validation: Prevent editing if order is already locked/paid
+            if (existingOrder && (existingOrder.tokenPaid || existingOrder.status === 'ACCEPTED' || existingOrder.status === 'COMPLETED' || existingOrder.paymentStatus === 'PAID')) {
+                console.warn(`🔒 Unauthorized edit attempt on locked order: ${payload.orderId}`);
+                return res.status(403).json({ success: false, message: "⚠️ Order is locked and cannot be edited." });
+            }
+
+            if (existingOrder && (existingOrder.status === 'confirmed')) {
                 payload.status = 'ACCEPTED';
                 if (!payload.orderStatus) payload.orderStatus = 'ACCEPTED';
             }
