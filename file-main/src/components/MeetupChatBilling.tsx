@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Users, Coffee, Send, ShoppingCart, Plus, Minus, Receipt, CreditCard, Banknote, Check, Edit2, MapPin, CheckCircle, Calendar, Clock } from 'lucide-react';
+import { ArrowLeft, Users, Coffee, Send, ShoppingCart, Plus, Minus, Receipt, CreditCard, Banknote, Check, Edit2, MapPin, CheckCircle, Calendar, Clock, Lock } from 'lucide-react';
 import { Button } from './ui/button';
 import { toast } from 'sonner';
 import POSMenuInterface, { POSConfirmData } from './POSMenuInterface';
@@ -74,6 +74,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
   const [tokenPaid, setTokenPaid] = useState(false);
   const [splitMembers, setSplitMembers] = useState<string[]>([]);
   const [perPersonAmount, setPerPersonAmount] = useState(0);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -142,8 +143,15 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
           fetch(`${BASE_URL}/api/meetup-orders/${parsed.orderId}`)
             .then(res => res.json())
             .then(data => {
-              if (data.success && data.order && data.order.status === 'token_paid') {
+              if (data.success && data.order && (
+                data.order.tokenPaid === true ||
+                data.order.status === 'token_paid' ||
+                data.order.status === 'ACCEPTED' ||
+                data.order.status === 'COMPLETED' ||
+                data.order.paymentStatus === 'PAID'
+              )) {
                 setTokenPaid(true);
+                setOrderConfirmed(true);
               }
             }).catch(e => console.error("Error fetching order status", e));
         }
@@ -968,11 +976,15 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
   };
 
   const handleEditOrder = () => {
+    // 🔒 BLOCK editing if token is already paid — order is locked
+    if (tokenPaid) {
+      toast.error('🔒 Order is locked after payment. Editing is disabled.');
+      return;
+    }
     // Reopen POS interface for editing — preserves orderItems
     setOrderConfirmed(false);
     setShowOrderSection(true);
     setPaymentCompleted(false);
-    // We intentionally do not reset tokenPaid so that if it was paid, it stays paid.
     // Remove the last bill and split messages
     setMessages((prev: Message[]) => prev.filter((m: Message) => m.type !== 'bill' && !(m.type === 'system' && m.text?.includes('Group Bill Split'))));
     toast.info('Edit your order in POS and confirm again');
@@ -1607,15 +1619,25 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
           <h3 className="font-bold text-gray-900 mb-4 text-xl">📋 Billing Summary</h3>
 
           {/* 1. Edit Order Items Button — reopens POS */}
-          {isAdmin && (
+          {isAdmin && !tokenPaid ? (
             <Button
               onClick={handleEditOrder}
-              className="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 rounded-xl flex items-center justify-center gap-2 mb-3"
+              className="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 rounded-xl flex items-center justify-center gap-2 mb-3 shadow-sm"
             >
               <Edit2 className="w-5 h-5" />
               Edit Order Items
             </Button>
-          )}
+          ) : tokenPaid ? (
+            <div className="bg-gray-100 border border-gray-200 py-3 px-4 rounded-xl flex flex-col items-center justify-center mb-3">
+              <div className="flex items-center gap-2 font-bold text-gray-700">
+                <Lock className="w-5 h-5" />
+                🔒 Order Locked
+              </div>
+              <p className="text-xs text-center text-gray-500 mt-1.5 font-medium">
+                ✅ Table confirmed successfully. This order cannot be edited anymore.
+              </p>
+            </div>
+          ) : null}
 
           {/* Item List + Bill Breakdown */}
           <div className="bg-white rounded-xl p-4 mb-3 border-2 border-orange-300 shadow-md">
@@ -1702,12 +1724,12 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                   <Check className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-bold text-emerald-700 text-lg mb-1">₹20 Token Paid ✅</h3>
-                <p className="text-sm text-gray-600 font-medium">Order sent to café dashboard</p>
+                <p className="text-sm text-gray-600 font-medium">🔒 Your order is confirmed and locked. Editing is disabled.</p>
               </div>
             ) : isAdmin ? (
               <>
                 <Button
-                  onClick={handleTokenPayment}
+                  onClick={() => setShowConfirmPopup(true)}
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-6 text-lg rounded-xl flex items-center justify-center gap-3 shadow-lg"
                 >
                   <CreditCard className="w-6 h-6" />
@@ -1745,7 +1767,39 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
             <Send className="w-5 h-5" />
           </button>
         </div>
-      </div>
+    </div>
+
+      {/* Confirmation Popup */}
+      {showConfirmPopup && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl relative animate-in zoom-in duration-200">
+            <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+              ⚠️ Order Lock Warning
+            </h3>
+            <p className="text-gray-600 mb-6 font-medium text-[15px] leading-relaxed">
+              Once you confirm the table by paying <span className="font-bold text-gray-900">₹20</span>, your order will be locked and cannot be edited.
+            </p>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1 rounded-xl h-11"
+                onClick={() => setShowConfirmPopup(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="flex-1 bg-emerald-600 hover:bg-emerald-700 rounded-xl text-white h-11"
+                onClick={() => {
+                  setShowConfirmPopup(false);
+                  handleTokenPayment();
+                }}
+              >
+                Confirm & Pay
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
