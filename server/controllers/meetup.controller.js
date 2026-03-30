@@ -717,6 +717,11 @@ const placeOrder = async (req, res) => {
             const finalStatus = status ? status.toUpperCase() : "PENDING";
 
             if (order) {
+                // 🔒 LOCK CHECK: Prevent editing if order is already locked/paid
+                if (order.tokenPaid || order.status === 'ACCEPTED' || order.status === 'COMPLETED' || order.paymentStatus === 'PAID') {
+                    console.warn(`🔒 Unauthorized edit attempt on locked order via placeOrder: ${orderId}`);
+                    return res.status(403).json({ success: false, message: "⚠️ Order is locked and cannot be edited after payment." });
+                }
                 // Update existing order
                 order.items = items;
                 order.subtotal = calculatedSubtotal;
