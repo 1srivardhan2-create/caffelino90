@@ -20,6 +20,10 @@ const MeetupOrderSchema = new mongoose.Schema(
             type: String,
             default: "",
         },
+        cafeName: {
+            type: String,
+            default: "",
+        },
         cafe: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Cafe",

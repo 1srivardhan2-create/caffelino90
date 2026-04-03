@@ -5,6 +5,7 @@ const MeetupOrder = require("../models/Meetup/MeetupOrder");
 const Cafe = require("../models/Cafe/Cafe_login");
 const Earning = require("../models/Cafe/Earning");
 const DeletedOrder = require("../models/Cafe/DeletedOrder");
+const CafeOrder = require("../models/Cafe/CafeOrder");
 
 // Helper to get order query by ID or orderId
 const getOrderQuery = (id) => {
@@ -14,6 +15,20 @@ const getOrderQuery = (id) => {
     }
     return { orderId: id };
 };
+
+// ─── Get Single Order ──────────────────────────────────────────
+// GET /api/meetup-orders/:id
+router.get("/:id", async (req, res) => {
+    try {
+        const query = getOrderQuery(req.params.id);
+        const order = await MeetupOrder.findOne(query).lean();
+        if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+        res.json({ success: true, order });
+    } catch (error) {
+        console.error("Get Order Error:", error);
+        res.status(500).json({ success: false, message: "Failed to fetch order", error: error.message });
+    }
+});
 
 // ─── Create Order ──────────────────────────────────────────────
 // POST /api/meetup-orders
@@ -113,6 +128,54 @@ router.patch("/:id/token-paid", async (req, res) => {
         );
         if (!order) return res.status(404).json({ message: "Order not found" });
 
+        // ─── Save to CafeOrders collection (persistent bill with cafeName) ───
+        try {
+            // Try to get cafeName from the order or look it up
+            let cafeName = order.cafeName || "";
+            if (!cafeName && order.cafeId) {
+                const cafe = await Cafe.findOne({
+                    $or: [
+                        ...(mongoose.Types.ObjectId.isValid(order.cafeId) ? [{ _id: order.cafeId }] : []),
+                        { ownerId: order.cafeId }
+                    ]
+                }).lean();
+                if (cafe) cafeName = cafe.Name || "";
+            }
+
+            await CafeOrder.findOneAndUpdate(
+                { orderId: order.orderId || order._id.toString() },
+                {
+                    $set: {
+                        orderId: order.orderId || order._id.toString(),
+                        cafeId: order.cafeId || "",
+                        cafeName: cafeName,
+                        userId: order.userId || "",
+                        userName: order.userName || "",
+                        meetupId: order.meetupId?.toString() || "",
+                        items: (order.items || []).map(i => ({
+                            name: i.name,
+                            price: i.price,
+                            quantity: i.quantity || 1,
+                            menuItemId: i.menuItemId || "",
+                        })),
+                        subtotal: order.subtotal || 0,
+                        cgst: order.cgst || 0,
+                        sgst: order.sgst || 0,
+                        total: order.total || order.totalAmount || 0,
+                        tokenPaid: true,
+                        tokenAmount: order.tokenAmount || 20,
+                        status: "ACCEPTED",
+                        paymentStatus: "PAID",
+                        paymentMethod: "online",
+                    }
+                },
+                { upsert: true, new: true }
+            );
+            console.log(`📋 CafeOrder saved for order: ${order.orderId || order._id}`);
+        } catch (cafeOrderErr) {
+            console.error("Failed to save CafeOrder:", cafeOrderErr.message);
+        }
+
         // Emit via socket if available
         if (req.io) {
             req.io.to(`cafe_${order.cafeId}`).emit("order-status-update", {
@@ -182,6 +245,53 @@ router.patch("/:id/cash-collected", async (req, res) => {
             })),
             date: new Date(),
         });
+
+        // ─── Save/Update CafeOrder for cash-collected ───
+        try {
+            let cafeName = order.cafeName || "";
+            if (!cafeName && order.cafeId) {
+                const cafe = await Cafe.findOne({
+                    $or: [
+                        ...(mongoose.Types.ObjectId.isValid(order.cafeId) ? [{ _id: order.cafeId }] : []),
+                        { ownerId: order.cafeId }
+                    ]
+                }).lean();
+                if (cafe) cafeName = cafe.Name || "";
+            }
+
+            await CafeOrder.findOneAndUpdate(
+                { orderId: order.orderId || order._id.toString() },
+                {
+                    $set: {
+                        orderId: order.orderId || order._id.toString(),
+                        cafeId: order.cafeId || "",
+                        cafeName: cafeName,
+                        userId: order.userId || "",
+                        userName: order.userName || "",
+                        meetupId: order.meetupId?.toString() || "",
+                        items: (order.items || []).map(i => ({
+                            name: i.name,
+                            price: i.price,
+                            quantity: i.quantity || 1,
+                            menuItemId: i.menuItemId || "",
+                        })),
+                        subtotal: order.subtotal || 0,
+                        cgst: order.cgst || 0,
+                        sgst: order.sgst || 0,
+                        total: order.total || order.totalAmount || 0,
+                        tokenPaid: order.tokenPaid || false,
+                        tokenAmount: order.tokenAmount || 0,
+                        status: "COMPLETED",
+                        paymentStatus: "PAID",
+                        paymentMethod: "cash",
+                    }
+                },
+                { upsert: true, new: true }
+            );
+            console.log(`📋 CafeOrder saved (cash) for order: ${order.orderId || order._id}`);
+        } catch (cafeOrderErr) {
+            console.error("Failed to save CafeOrder (cash):", cafeOrderErr.message);
+        }
 
         // Emit via socket
         if (req.io) {

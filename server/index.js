@@ -64,6 +64,9 @@ app.use("/api/meetup-orders", meetupOrderRoutes);
 const notificationRoutes = require("./routes/Notification.routes");
 app.use("/api/notifications", notificationRoutes);
 
+// CafeOrders (persistent bills with cafe names)
+const cafeOrderRoutes = require("./routes/CafeOrder.routes");
+app.use("/api/cafe-orders", cafeOrderRoutes);
 
 // Razorpay explicit routes as requested
 const { createRazorpayOrder, verifyRazorpayPayment } = require("./controllers/meetup.controller");
