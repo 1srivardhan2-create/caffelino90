@@ -1003,7 +1003,11 @@ const createRazorpayOrder = async (req, res) => {
         const options = {
             amount: 2000, 
             currency: "INR",
-            receipt: `receipt_${meetupId}_${Date.now()}`.substring(0, 40)
+            receipt: `receipt_${meetupId}_${Date.now()}`.substring(0, 40),
+            notes: {
+                platform: "Caffelino",
+                purpose: "Table Confirmation"
+            }
         };
 
         const order = await razorpayInstance.orders.create(options);

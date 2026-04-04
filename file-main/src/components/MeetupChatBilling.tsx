@@ -942,8 +942,22 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
           body: JSON.stringify({
             userId: user?.id,
             type: 'BILL',
-            message: `Your cash order of ₹${amountPaid.toFixed(0)} is confirmed`,
+            message: `Your cash order of ₹${amountPaid.toFixed(0)} is confirmed at ${selectedCafe?.name || 'Café'}`,
             orderId: orderId,
+            cafeName: selectedCafe?.name || '',
+            metadata: {
+              paymentDetails: {
+                amount: amountPaid,
+                transactionId: orderId,
+                paymentMethod: 'Cash',
+                paidAt: new Date().toISOString(),
+                groupName: `${selectedCafe?.name || 'Café'} Meetup`,
+                cafeName: selectedCafe?.name || '',
+                orderNumber: orderId,
+                totalBill: bill.total,
+                orderItems: orderItemsForNotification,
+              }
+            }
           })
         });
       } catch (e) { console.error('Failed to persist notification:', e); }
@@ -1036,8 +1050,8 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
           key: 'rzp_live_STzO1DnRlqY3vN',
           amount: data.amount,
           currency: data.currency,
-          name: 'Caffélino',
-          description: '₹20 Token Confirmation',
+          name: 'Caffelino',
+          description: '₹20 Table Confirmation - Caffelino',
           order_id: data.orderId,
           handler: async function (response: any) {
             try {
@@ -1127,8 +1141,22 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                     body: JSON.stringify({
                       userId: user?.id,
                       type: 'BILL',
-                      message: `Your ₹20 token payment is confirmed. Total bill: ₹${billData.total}`,
+                      message: `Your ₹20 token payment is confirmed at ${selectedCafe?.name || 'Café'}. Total bill: ₹${billData.total}`,
                       orderId: effectiveOrderId || orderId,
+                      cafeName: selectedCafe?.name || '',
+                      metadata: {
+                        paymentDetails: {
+                          amount: 20,
+                          transactionId: effectiveOrderId || orderId,
+                          paymentMethod: 'Online',
+                          paidAt: new Date().toISOString(),
+                          groupName: `${selectedCafe?.name || 'Café'} Meetup`,
+                          cafeName: selectedCafe?.name || '',
+                          orderNumber: effectiveOrderId || orderId,
+                          totalBill: billData.total,
+                          orderItems: orderItemsForNotification,
+                        }
+                      }
                     })
                   });
                 } catch (e) { console.error('Failed to persist notification:', e); }
@@ -1137,7 +1165,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                   onNotificationUpdate();
                 }
 
-                const msgText = `✅ ₹20 token received. Bill details are available in your notifications.`;
+                const msgText = `✅ ₹20 Token Paid\n🔒 Your order is confirmed via Caffelino\nEditing is now disabled`;
                 setMessages((prev: any[]) => [...prev, {
                   id: `token-${Date.now()}`,
                   type: 'system',
@@ -1462,7 +1490,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
             if (message.type === 'system') {
               return (
                 <div key={message.id} className="flex justify-center">
-                  <div className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm">
+                  <div className="bg-gray-100 text-gray-700 px-4 py-3 rounded-2xl text-sm whitespace-pre-wrap text-center font-medium shadow-sm border border-gray-200">
                     {message.text}
                   </div>
                 </div>

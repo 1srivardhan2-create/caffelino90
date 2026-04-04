@@ -57,21 +57,32 @@ export default function Notifications({ user, onNavigate, onBack }: Notification
       const res = await fetch(`${BASE_URL}/api/notifications/${user.id}`);
       const data = await res.json();
       if (data.success) {
-        setNotifications(data.notifications.map((n: any) => ({
-          id: n._id,
-          type: 'payment',
-          title: 'Bill Update',
-          message: n.message,
-          time: new Date(n.createdAt).toLocaleString(),
-          isRead: n.isRead,
-          paymentDetails: n.metadata?.paymentDetails || {
-             amount: n.message.match(/₹(\d+(?:\.\d+)?)/)?.[1] || 0,
-             transactionId: n.orderId || 'N/A',
-             paymentMethod: 'Cash/Online',
-             paidAt: n.createdAt,
-             groupName: 'Meetup Order',
-          }
-        })));
+        setNotifications(data.notifications.map((n: any) => {
+          // Extract payment details from metadata if available
+          const pd = n.metadata?.paymentDetails || {};
+          const amount = pd.amount || parseFloat(n.message?.match(/₹(\d+(?:\.\d+)?)/)?.[1] || '0');
+          const cafeName = n.cafeName || pd.cafeName || '';
+          
+          return {
+            id: n._id,
+            type: 'payment',
+            title: cafeName ? `Bill - ${cafeName}` : 'Bill Update',
+            message: n.message,
+            time: new Date(n.createdAt).toLocaleString(),
+            isRead: n.isRead,
+            paymentDetails: {
+              amount: amount,
+              transactionId: pd.transactionId || n.orderId || 'N/A',
+              paymentMethod: pd.paymentMethod || 'Cash/Online',
+              paidAt: pd.paidAt || n.createdAt,
+              groupName: pd.groupName || 'Meetup Order',
+              cafeName: cafeName,
+              orderNumber: pd.orderNumber || n.orderId || '',
+              totalBill: pd.totalBill,
+              orderItems: pd.orderItems || [],
+            }
+          };
+        }));
       }
     } catch (error) {
       console.error('Error loading notifications:', error);
