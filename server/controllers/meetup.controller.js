@@ -699,11 +699,42 @@ const placeOrder = async (req, res) => {
                 return res.status(400).json({ message: "Invalid meetupId format" });
             }
 
-            const calculatedSubtotal = subtotal || items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
-            const calculatedCgst = cgst || parseFloat((calculatedSubtotal * 0.025).toFixed(2));
-            const calculatedSgst = sgst || parseFloat((calculatedSubtotal * 0.025).toFixed(2));
-            const calculatedCommission = commission || parseFloat((calculatedSubtotal * 0.06).toFixed(2));
-            const calculatedTotal = total || parseFloat((calculatedSubtotal + calculatedCgst + calculatedSgst).toFixed(2));
+            // --- STRICT COUPON VALIDATION ---
+            let isOliveBistro = false;
+            try {
+                const meetupInfo = await Meetup.findById(meetupId).select("selectedCafe").lean();
+                if (meetupInfo && meetupInfo.selectedCafe && 
+                   (meetupInfo.selectedCafe.name === "Olive Bistro & Bar" || meetupInfo.selectedCafe.cafeName === "Olive Bistro & Bar")) {
+                    isOliveBistro = true;
+                }
+            } catch (e) {
+                console.error("Error fetching meetup for coupon validation:", e);
+            }
+
+            const strictSubtotal = items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+            const strictCgst = parseFloat((strictSubtotal * 0.025).toFixed(2));
+            const strictSgst = parseFloat((strictSubtotal * 0.025).toFixed(2));
+            const strictCommission = commission || parseFloat((strictSubtotal * 0.06).toFixed(2));
+            const strictTotal = parseFloat((strictSubtotal + strictCgst + strictSgst).toFixed(2));
+
+            let calculatedSubtotal = subtotal || strictSubtotal;
+            let calculatedCgst = cgst || strictCgst;
+            let calculatedSgst = sgst || strictSgst;
+            let calculatedCommission = commission || strictCommission;
+            let calculatedTotal = total || strictTotal;
+
+            // 🚨 Override and strictly calculate total if Olive Bistro & Bar
+            if (isOliveBistro) {
+                // If they attempted to send a manipulated total (lower than strictTotal due to coupons)
+                if (calculatedTotal < strictTotal) {
+                     console.warn(`🚨 Blocked coupon/discount attempt for Olive Bistro & Bar! Overriding to full amount.`);
+                     require("fs").appendFileSync("order_debug.log", `[${new Date().toISOString()}] 🚨 Coupon blocked for Olive Bistro & Bar. Overrode total from ${calculatedTotal} to ${strictTotal}.\n`);
+                     calculatedSubtotal = strictSubtotal;
+                     calculatedCgst = strictCgst;
+                     calculatedSgst = strictSgst;
+                     calculatedTotal = strictTotal;
+                }
+            }
 
             const formattedMembers = Array.isArray(members) 
                 ? members.map(m => typeof m === 'string' ? { name: m, userId: userId || '' } : m)

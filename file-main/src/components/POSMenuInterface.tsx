@@ -170,7 +170,14 @@ export default function POSMenuInterface({
   };
 
   // ─── COUPON LOGIC (single coupon: CAFFELINO6 = ₹50 off) ──────────
+  const cafeName = meetupData?.selectedCafe?.name || meetupData?.selectedCafe?.cafeName || '';
+  const isCouponDisabled = cafeName === "Olive Bistro & Bar";
+
   const handleApplyCoupon = () => {
+    if (isCouponDisabled) {
+      toast.error('Coupons are not valid for Olive Bistro & Bar');
+      return;
+    }
     const code = couponInput.toUpperCase().trim();
     if (!code) {
       toast.error('Please enter a coupon code');
@@ -192,7 +199,7 @@ export default function POSMenuInterface({
 
   // ─── TOTALS: Subtotal → Coupon (6%) → CGST → SGST → Total ──
   const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const couponDiscount = appliedCoupon ? parseFloat((subtotal * VALID_COUPON.discountPercent / 100).toFixed(2)) : 0;
+  const couponDiscount = (appliedCoupon && !isCouponDisabled) ? parseFloat((subtotal * VALID_COUPON.discountPercent / 100).toFixed(2)) : 0;
   const subtotalAfterCoupon = subtotal - couponDiscount;
   const cgst = parseFloat((subtotalAfterCoupon * 0.025).toFixed(2));
   const sgst = parseFloat((subtotalAfterCoupon * 0.025).toFixed(2));
@@ -398,41 +405,43 @@ export default function POSMenuInterface({
           {orderItems.length > 0 && (
             <div className="border-t border-gray-200 p-4 bg-gray-50">
               {/* Coupon Section — Simple input only */}
-              <div className="mb-4 bg-white rounded-lg p-3 border border-gray-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <Tag className="w-4 h-4 text-[#ff6b35]" />
-                  <span className="text-sm font-medium text-gray-700">Apply Coupon</span>
-                </div>
+              {!isCouponDisabled && (
+                <div className="mb-4 bg-white rounded-lg p-3 border border-gray-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Tag className="w-4 h-4 text-[#ff6b35]" />
+                    <span className="text-sm font-medium text-gray-700">Apply Coupon</span>
+                  </div>
 
-                {appliedCoupon ? (
-                  <div className="flex items-center justify-between bg-green-50 border border-green-300 rounded-lg px-3 py-2">
-                    <div>
-                      <span className="font-bold text-green-700 text-sm">{VALID_COUPON.code}</span>
-                      <p className="text-xs text-green-600">-₹{couponDiscount.toFixed(2)} off</p>
+                  {appliedCoupon ? (
+                    <div className="flex items-center justify-between bg-green-50 border border-green-300 rounded-lg px-3 py-2">
+                      <div>
+                        <span className="font-bold text-green-700 text-sm">{VALID_COUPON.code}</span>
+                        <p className="text-xs text-green-600">-₹{couponDiscount.toFixed(2)} off</p>
+                      </div>
+                      <button onClick={handleRemoveCoupon} className="text-red-500 hover:text-red-700">
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
-                    <button onClick={handleRemoveCoupon} className="text-red-500 hover:text-red-700">
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={couponInput}
-                      onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                      placeholder="Enter coupon code"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#ff6b35]"
-                      onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
-                    />
-                    <Button
-                      onClick={handleApplyCoupon}
-                      className="bg-[#ff6b35] hover:bg-[#e55a2b] text-white text-sm px-4"
-                    >
-                      Apply
-                    </Button>
-                  </div>
-                )}
-              </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponInput}
+                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                        placeholder="Enter coupon code"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#ff6b35]"
+                        onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                      />
+                      <Button
+                        onClick={handleApplyCoupon}
+                        className="bg-[#ff6b35] hover:bg-[#e55a2b] text-white text-sm px-4"
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Totals: Subtotal → Coupon → CGST → SGST → Total */}
               <div className="space-y-2 mb-4">
