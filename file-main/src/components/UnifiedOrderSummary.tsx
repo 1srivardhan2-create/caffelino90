@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, ShoppingCart, Edit2, Trash2, Plus, Minus, Lock, AlertCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Edit2, Trash2, Plus, Minus, Lock, AlertCircle, CheckCircle, Users } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
@@ -23,6 +23,7 @@ export default function UnifiedOrderSummary({
 }: UnifiedOrderSummaryProps) {
   const [orderItems, setOrderItems] = useState(meetupData?.orderItems || []);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [memberCount, setMemberCount] = useState(meetupData?.members?.length || 1);
 
   // Check if order is already confirmed
   const isOrderConfirmed = meetupData?.orderConfirmed || false;
@@ -98,8 +99,9 @@ export default function UnifiedOrderSummary({
             commission: parseFloat((bill.total * 0.06).toFixed(2)),
             total: bill.total,
             splitEnabled: false,
+            memberCount: memberCount,
             members: meetupData?.members || [],
-            perPersonAmount: bill.total,
+            perPersonAmount: Math.ceil(bill.total / memberCount),
             status: 'PENDING',
             orderId: orderNumber,
           })
@@ -130,7 +132,7 @@ export default function UnifiedOrderSummary({
         cafeAddress: meetupData?.winnerCafe?.address || '',
         meetupName: meetupData?.groupName || meetupData?.meetupName || 'Group Meetup',
         adminName: user?.name || meetupData?.adminName || 'Admin',
-        memberCount: meetupData?.members?.length || 1,
+        memberCount: memberCount,
         status: 'confirmed',
         confirmedAt: now.toISOString()
       };
@@ -399,11 +401,36 @@ export default function UnifiedOrderSummary({
                   </div>
                 </div>
 
+                {/* Member Count Configuration */}
+                {isAdmin && !isOrderConfirmed && (
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mt-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                       <Users className="w-5 h-5 text-orange-600" />
+                       <span className="text-orange-900 font-bold font-['Arial:Regular',_sans-serif]">Number of Members</span>
+                    </div>
+                    <div className="flex items-center gap-3 bg-white px-2 py-1 rounded-lg border border-orange-200">
+                        <button 
+                           onClick={() => setMemberCount(Math.max(1, memberCount - 1))}
+                           className="w-8 h-8 flex items-center justify-center bg-orange-100 text-orange-700 rounded-md hover:bg-orange-200"
+                        >
+                           <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="font-bold text-[16px] w-6 text-center">{memberCount}</span>
+                        <button 
+                           onClick={() => setMemberCount(memberCount + 1)}
+                           className="w-8 h-8 flex items-center justify-center bg-orange-100 text-orange-700 rounded-md hover:bg-orange-200"
+                        >
+                           <Plus className="w-4 h-4" />
+                        </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Split Info */}
-                {meetupData?.members?.length > 1 && (
+                {memberCount > 1 && (
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
                     <p className="text-[14px] text-blue-900 font-['Arial:Regular',_sans-serif]">
-                      Split among {meetupData.members.length} members: <span className="font-bold">₹{Math.ceil(bill.total / meetupData.members.length)}</span> per person
+                      Split among {memberCount} members: <span className="font-bold">₹{Math.ceil(bill.total / memberCount)}</span> per person
                     </p>
                   </div>
                 )}

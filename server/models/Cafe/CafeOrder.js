@@ -53,6 +53,10 @@ const cafeOrderSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
+        memberCount: {
+            type: Number,
+            default: 1,
+        },
         tokenPaid: {
             type: Boolean,
             default: false,

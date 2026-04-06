@@ -162,6 +162,7 @@ router.patch("/:id/token-paid", async (req, res) => {
                         cgst: order.cgst || 0,
                         sgst: order.sgst || 0,
                         total: order.total || order.totalAmount || 0,
+                        memberCount: order.memberCount || 1,
                         tokenPaid: true,
                         tokenAmount: order.tokenAmount || 20,
                         status: "ACCEPTED",

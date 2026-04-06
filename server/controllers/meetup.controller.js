@@ -679,7 +679,7 @@ const applyCoupon = async (req, res) => {
 // ─── PLACE ORDER ─────────────────────────────────────────────────
 const placeOrder = async (req, res) => {
     try {
-        const { meetupId, userId, userName, items, total, subtotal, cgst, sgst, status, cafeId, orderId, splitEnabled, perPersonAmount, members, commission } = req.body;
+        const { meetupId, userId, userName, items, total, subtotal, cgst, sgst, status, cafeId, orderId, splitEnabled, perPersonAmount, members, commission, memberCount } = req.body;
         
         // Debug logging
         require("fs").appendFileSync("order_debug.log", `[${new Date().toISOString()}] Incoming order: ${userName} for cafe: ${cafeId}, status: ${status}, orderId: ${orderId}\n`);
@@ -765,6 +765,7 @@ const placeOrder = async (req, res) => {
                 order.orderStatus = finalStatus;
                 order.splitEnabled = splitEnabled || false;
                 order.perPersonAmount = perPersonAmount || 0;
+                order.memberCount = memberCount || 1;
                 order.members = formattedMembers;
                 order.cafeId = cafeId || order.cafeId || "";
                 await order.save();
@@ -787,6 +788,7 @@ const placeOrder = async (req, res) => {
                         orderId: orderId || `ORD_${Date.now()}`,
                         splitEnabled: splitEnabled || false,
                         perPersonAmount: perPersonAmount || 0,
+                        memberCount: memberCount || 1,
                         members: formattedMembers,
                         cafeId: cafeId || "",
                         paymentStatus: "PENDING"
@@ -820,7 +822,7 @@ const placeOrder = async (req, res) => {
                         groupName: meetupInfo?.organizerName || userName || "Group",
                         meetupId: meetupId,
                         cafeId: cafeRoom,
-                        memberCount: meetupInfo?.members?.length || 1,
+                        memberCount: memberCount || meetupInfo?.members?.length || 1,
                         items: items.map(i => ({
                             name: i.name,
                             quantity: i.quantity || 1,
@@ -892,7 +894,7 @@ const getOrders = async (req, res) => {
         const orders = await MeetupOrder.find({ meetupId });
 
         const grandTotal = orders.reduce((sum, o) => sum + o.total, 0);
-        const memberCount = orders.length || 1;
+        const memberCount = orders[0]?.memberCount || orders.length || 1;
         const perPersonSplit = Math.ceil(grandTotal / memberCount);
 
         res.json({
@@ -931,7 +933,7 @@ const confirmBill = async (req, res) => {
 
         const orders = await MeetupOrder.find({ meetupId });
         const grandTotal = orders.reduce((sum, o) => sum + o.total, 0);
-        const memberCount = meetup.members.length || 1;
+        const memberCount = orders[0]?.memberCount || meetup.members.length || 1;
 
         // 6% platform commission — internal, NOT shown to users
         const platformCommission = grandTotal * 0.06;
@@ -1092,7 +1094,7 @@ const verifyRazorpayPayment = async (req, res) => {
                 
                 // Get totals to share with users
                 const grandTotal = orders.reduce((sum, o) => sum + o.total, 0);
-                const memberCount = meetup.members.length || 1;
+                const memberCount = orders[0]?.memberCount || meetup.members.length || 1;
                 const perPersonSplit = Math.ceil(grandTotal / memberCount);
 
                 req.io.to(meetupId).emit("bill_confirmed", {

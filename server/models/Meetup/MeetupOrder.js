@@ -66,6 +66,10 @@ const MeetupOrderSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
+        memberCount: {
+            type: Number,
+            default: 1,
+        },
         status: {
             type: String,
             enum: ["draft", "token_paid", "accepted", "completed", "pending", "confirmed", "PENDING", "ACCEPTED", "COMPLETED", "CONFIRMED", "PLACED", "READY", "CASH_COLLECTED"],

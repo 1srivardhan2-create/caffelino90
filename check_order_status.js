@@ -17,7 +17,7 @@ async function checkOrders() {
             .lean();
 
         console.log(`\n📦 Found ${orders.length} recent orders:\n`);
-        
+
         orders.forEach((order, i) => {
             console.log(`--- Order #${i + 1} ---`);
             console.log(`  orderId:     ${order.orderId}`);
@@ -36,7 +36,7 @@ async function checkOrders() {
             const Cafe = require('./server/models/Cafe/Cafe_login');
             const uniqueCafeIds = [...new Set(orders.map(o => o.cafeId).filter(Boolean))];
             console.log(`\n🏪 Unique cafeIds in orders: ${uniqueCafeIds.join(', ')}`);
-            
+
             for (const cid of uniqueCafeIds) {
                 let cafe = null;
                 if (mongoose.Types.ObjectId.isValid(cid)) {
