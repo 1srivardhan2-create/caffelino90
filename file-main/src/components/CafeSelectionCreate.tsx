@@ -29,7 +29,7 @@ interface CafeSelectionCreateProps {
 export default function CafeSelectionCreate({ user, meetupData, onNavigate, onBack }: CafeSelectionCreateProps) {
   // Hardcode voting to false for direct selection flow
   const [votingEnabled, setVotingEnabled] = useState(false);
-  const [selectedCafes, setSelectedCafes] = useState<string[]>([]);
+  const [selectedCafe, setSelectedCafe] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [cafes, setCafes] = useState<any[]>([]);
 
@@ -90,30 +90,20 @@ export default function CafeSelectionCreate({ user, meetupData, onNavigate, onBa
 
   const handleSelectCafe = (cafeId: string) => {
     if (votingEnabled) {
-      if (selectedCafes.includes(cafeId)) {
-        setSelectedCafes(selectedCafes.filter(id => id !== cafeId));
-      } else {
-        if (selectedCafes.length < 3) {
-          setSelectedCafes([...selectedCafes, cafeId]);
-        } else {
-          toast.error('You can only select 3 cafes for voting');
-        }
-      }
+      // Direct selection only, voting logic removed to fit simple string state.
+      setSelectedCafe(cafeId);
     } else {
-      setSelectedCafes([cafeId]);
+      setSelectedCafe(cafeId);
     }
   };
 
   const handleContinue = async () => {
-    const maxSelection = votingEnabled ? 3 : 1;
-    const minSelection = votingEnabled ? 3 : 1;
-
-    if (selectedCafes.length < minSelection) {
-      toast.error(`Please select ${votingEnabled ? '3 cafes' : '1 cafe'}`);
+    if (!selectedCafe) {
+      toast.error('Please select 1 cafe');
       return;
     }
 
-    const selectedCafeObjects = cafes.filter(cafe => selectedCafes.includes(cafe.id));
+    const selectedCafeObjects = cafes.filter(cafe => cafe.id === selectedCafe);
 
     const completeData = {
       ...meetupData,
@@ -238,69 +228,56 @@ export default function CafeSelectionCreate({ user, meetupData, onNavigate, onBa
 
         {/* Select Cafes Section */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-['Arial:Bold',sans-serif] text-[18px] text-[#101828]">
-              Select Café
-            </h2>
-            <span className="font-['Arial:Regular',sans-serif] text-[14px] text-[#1e1e1e]">
-              {selectedCafes.length} / 1 selected
-            </span>
-          </div>
+          <div className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
+            <h2 className="text-lg font-semibold mb-2">Select Café</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredCafes.map(cafe => {
-              const isSelected = selectedCafes.includes(cafe.id);
-              return (
-                <button
-                  key={cafe.id}
-                  onClick={() => handleSelectCafe(cafe.id)}
-                  className={`relative bg-white rounded-2xl border-2 overflow-hidden transition-all text-left hover:shadow-lg ${isSelected
-                    ? 'border-[#00c950] shadow-md scale-[1.02]'
-                    : 'border-[#e5e7eb] hover:border-[#8b5943]'
+            {/* GRID START */}
+            <div className="grid grid-cols-2 gap-3">
+              {filteredCafes.map((cafe) => {
+                const isSelected = selectedCafe === cafe.id;
+                return (
+                  <div
+                    key={cafe.id}
+                    onClick={() => setSelectedCafe(cafe.id)}
+                    className={`rounded-xl overflow-hidden border cursor-pointer transition active:scale-95 ${
+                      isSelected
+                        ? "border-green-500 shadow-md bg-green-50"
+                        : "border-gray-200 bg-white hover:border-green-300"
                     }`}
-                >
-                  {/* Image */}
-                  <div className="relative h-40 overflow-hidden">
-                    <img
-                      src={cafe.image}
-                      alt={cafe.name}
-                      className="w-full h-full object-cover"
-                    />
-                    {isSelected && (
-                      <div className="absolute top-3 right-3 w-8 h-8 bg-[#00c950] rounded-full flex items-center justify-center shadow-lg">
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 20 20">
-                          <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
+                  >
+                    {/* IMAGE */}
+                    <div className="relative">
+                      <img
+                        src={cafe.image}
+                        alt={cafe.name}
+                        className="w-full h-28 object-cover"
+                      />
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 w-6 h-6 bg-[#00c950] rounded-full flex items-center justify-center shadow-lg">
+                          <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                        </div>
+                      )}
+                    </div>
 
-                  {/* Content */}
-                  <div className="p-4">
-                    <h4 className="font-['Arial:Bold',sans-serif] text-[16px] text-[#101828] mb-2">{cafe.name}</h4>
+                    {/* DETAILS */}
+                    <div className="p-2">
+                      <h3 className="text-sm font-semibold text-gray-900 truncate">
+                        {cafe.name}
+                      </h3>
 
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-[#4a5565]" />
-                        <span className="font-['Arial:Regular',sans-serif] text-[14px] text-[#4a5565]">{cafe.location}</span>
-                      </div>
+                      <p className="text-xs text-gray-500 truncate">
+                        {cafe.location}
+                      </p>
 
-                      <div className="flex items-center gap-2">
-                        <Star className="w-4 h-4 fill-[#FFB900] text-[#FFB900]" />
-                        <span className="font-['Arial:Regular',sans-serif] text-[14px] text-[#4a5565]">{cafe.rating}</span>
-                        <span className="font-['Arial:Regular',sans-serif] text-[14px] text-[#99a1af]">•</span>
-                        <span className="font-['Arial:Regular',sans-serif] text-[14px] text-[#6a7282]">{cafe.ambience}</span>
-                      </div>
-
-                      <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
-                        <span className="font-['Arial:Bold',sans-serif] text-[16px] text-[#be9d80]">₹{cafe.costPerPerson}</span>
-                        <span className="font-['Arial:Regular',sans-serif] text-[14px] text-[#6a7282]">per person</span>
+                      <div className="text-xs mt-1 text-yellow-500 font-medium">
+                        ★ {cafe.rating || 4.2}
                       </div>
                     </div>
                   </div>
-                </button>
-              );
-            })}
+                );
+              })}
+            </div>
+            {/* GRID END */}
           </div>
 
           {filteredCafes.length === 0 && (
@@ -316,7 +293,7 @@ export default function CafeSelectionCreate({ user, meetupData, onNavigate, onBa
         <div className="max-w-5xl mx-auto px-6">
           <button
             onClick={handleContinue}
-            disabled={selectedCafes.length < (votingEnabled ? 3 : 1)}
+            disabled={!selectedCafe}
             className="w-full py-4 bg-[#c9b5a0] text-[#0a0a0a] rounded-2xl font-['Arial:Bold',sans-serif] text-[16px] hover:bg-[#b8a490] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
           >
             Confirm Café →

@@ -84,6 +84,8 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
               groupId: m._id,
               groupName: m.title || m.meetupName || "Unnamed Meetup",
               groupCode: m.meetupCode,
+              meetupDate: m.date || '',
+              meetupTime: m.time || '',
               currentStage: stage,
               status: status,
               userRole: (memberInfo.role === 'admin' || m.organizerId === user.id) ? 'creator' : 'member',
@@ -99,6 +101,8 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
                 selectedCafe: m.selectedCafe,
                 isAdmin: (memberInfo.role === 'admin' || m.organizerId === user.id),
                 groupCode: m.meetupCode,
+                date: m.date || '',
+                time: m.time || '',
               }
             };
             
