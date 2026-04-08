@@ -1799,7 +1799,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
               ⚠️ Order Lock Warning
             </h3>
             <p className="text-gray-600 mb-6 font-medium text-[15px] leading-relaxed">
-              Once you confirm the table by paying <span className="font-bold text-gray-900">₹20</span>, your order will be locked and cannot be edited.
+              Once you confirm the table by paying <span className="font-bold text-gray-900">₹20</span>, your order will be locked and cannot be edited. <span className="text-red-600 font-semibold">This amount is non-refundable.</span>
             </p>
             <div className="flex gap-3">
               <Button

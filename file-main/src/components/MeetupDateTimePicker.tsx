@@ -74,13 +74,23 @@ export default function MeetupDateTimePicker({
         if (!isPast) {
           const ampm = hour >= 12 ? 'PM' : 'AM';
           const displayHour = hour % 12 || 12;
-          const displayMinute = minute === 0 ? '00' : '30';
+          const timeStartStr = minute === 0 ? `${displayHour}${ampm}` : `${displayHour}:${minute}${ampm}`;
+
+          let nextHour = hour;
+          let nextMinute = minute + 30;
+          if (nextMinute === 60) {
+            nextHour++;
+            nextMinute = 0;
+          }
+          const nextAmpm = nextHour >= 12 ? 'PM' : 'AM';
+          const nextDisplayHour = nextHour % 12 || 12;
+          const timeEndStr = nextMinute === 0 ? `${nextDisplayHour}${nextAmpm}` : `${nextDisplayHour}:${nextMinute}${nextAmpm}`;
 
           const valueHour = String(hour).padStart(2, '0');
           const valueMinute = String(minute).padStart(2, '0');
 
           slots.push({
-            formatted: `${displayHour}:${displayMinute} ${ampm}`,
+            formatted: `${timeStartStr} - ${timeEndStr}`,
             value: `${valueHour}:${valueMinute}`,
             isPast: false
           });
@@ -90,7 +100,7 @@ export default function MeetupDateTimePicker({
     setAvailableTimeSlots(slots);
 
     // If selected time is no longer in valid slots (e.g. past), clear it
-    if (selectedTime && !slots.find(s => s.value === selectedTime)) {
+    if (selectedTime && !slots.find((s: any) => s.value === selectedTime)) {
       onDateTimeSelect(selectedDate, '');
     }
   }, [selectedDate, openingTime, closingTime, availableDates]);
@@ -116,37 +126,33 @@ export default function MeetupDateTimePicker({
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Date Selection */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 font-['Arial:Bold',sans-serif] text-[16px] text-slate-800">
-            <Calendar className="w-5 h-5 text-[#8b5943]" />
-            Select Date
+          <label className="text-[11px] font-bold tracking-wider text-slate-500 uppercase">
+            Pick a date
           </label>
-          <span className="text-[12px] bg-[#be9d80]/10 text-[#8b5943] px-2 py-1 rounded-md font-medium">
-            3 days advance booking
+          <span className="text-[10px] font-bold tracking-wider text-[#e87c3e] uppercase cursor-pointer hover:underline">
+            Show all
           </span>
         </div>
 
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x">
           {availableDates.map((d, idx) => {
             const isSelected = selectedDate === d.fullDateStr;
             return (
               <button
                 key={d.fullDateStr}
                 onClick={() => handleDateSelect(d.fullDateStr)}
-                className={`flex-shrink-0 snap-start relative overflow-hidden transition-all duration-300 w-[100px] h-[110px] rounded-2xl flex flex-col items-center justify-center border-2 ${isSelected
-                  ? 'border-[#8b5943] bg-gradient-to-b from-[#8b5943] to-[#be9d80] text-white shadow-md transform scale-105'
-                  : 'border-slate-200 bg-white hover:border-[#be9d80] text-slate-700 hover:bg-[#faf8f6]'
+                className={`flex-shrink-0 snap-start bg-white flex flex-col items-center justify-center transition-all w-[100px] h-[90px] ${isSelected
+                  ? 'border-2 border-[#e87c3e]'
+                  : 'border border-slate-200 hover:border-slate-300'
                   }`}
               >
-                <span className={`text-[13px] uppercase tracking-wider font-semibold mb-1 ${isSelected ? 'text-white/90' : 'text-slate-500'}`}>
+                <span className={`text-[10px] uppercase font-bold tracking-wide mb-1 ${isSelected ? 'text-slate-600' : 'text-slate-400'}`}>
                   {getDayLabel(idx)}
                 </span>
-                <span className="text-[32px] font-bold leading-none mb-1">
+                <span className="text-[32px] font-light text-slate-800 leading-none">
                   {d.dayNum}
-                </span>
-                <span className={`text-[14px] font-medium ${isSelected ? 'text-white/90' : 'text-slate-500'}`}>
-                  {d.monthName}
                 </span>
               </button>
             );
@@ -155,38 +161,37 @@ export default function MeetupDateTimePicker({
       </div>
 
       {/* Time Selection */}
-      <div className="space-y-3" ref={timeSectionRef}>
-        <div className="flex items-center gap-2 mb-3">
-          <Clock className="w-5 h-5 text-[#8b5943]" />
-          <label className="font-['Arial:Bold',sans-serif] text-[16px] text-slate-800">
-            Select Time
+      <div className="space-y-4" ref={timeSectionRef}>
+        <div className="flex items-center justify-between">
+          <label className="text-[11px] font-bold tracking-wider text-slate-500 uppercase mt-2">
+            Pick a time
           </label>
         </div>
 
         {!selectedDate ? (
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 flex flex-col items-center justify-center gap-2">
-            <Calendar className="w-8 h-8 text-slate-300 mb-1" />
-            <p className="text-[14px]">Please select a date first to view available slots</p>
+          <div className="bg-white border border-slate-200 p-6 text-center text-slate-500 flex flex-col items-center justify-center">
+            <p className="text-[14px]">Please select a date first</p>
           </div>
         ) : availableTimeSlots.length === 0 ? (
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-6 text-center text-orange-700">
-            <p className="font-semibold mb-1">Oops! No slots available for today.</p>
-            <p className="text-[14px] opacity-80">Cafe bookings close at {closingTime > 12 ? closingTime - 12 : closingTime} {closingTime >= 12 ? 'PM' : 'AM'}. Please select tomorrow.</p>
+          <div className="bg-white border border-slate-200 p-6 text-center text-slate-500">
+            <p className="font-medium text-[14px]">No slots available for today.</p>
           </div>
         ) : (
-          <div className="flex gap-3 overflow-x-auto pb-4 pt-1 scrollbar-hide snap-x -mx-1 px-1">
-            {availableTimeSlots.map((slot) => {
+          <div className="flex gap-2 overflow-x-auto pb-4 pt-1 scrollbar-hide snap-x">
+            {availableTimeSlots.map((slot: any) => {
               const isSelected = selectedTime === slot.value;
               return (
                 <button
                   key={slot.value}
                   onClick={() => handleTimeSelect(slot.value)}
-                  className={`flex-shrink-0 snap-start min-w-[110px] py-3 px-4 rounded-xl text-[14px] font-semibold transition-all duration-300 border-2 ${isSelected
-                    ? 'border-[#8b5943] bg-gradient-to-r from-[#8b5943] to-[#a06f56] text-white shadow-md transform scale-105'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-[#8b5943] hover:text-[#8b5943] hover:bg-[#faf8f6]'
+                  className={`flex-shrink-0 snap-start bg-white flex items-center justify-center transition-all min-w-[110px] h-[90px] ${isSelected
+                    ? 'border-2 border-[#e87c3e] text-slate-800'
+                    : 'border border-slate-200 text-slate-500 hover:border-slate-300'
                     }`}
                 >
-                  {slot.formatted}
+                  <span className="text-[13px] font-medium whitespace-nowrap px-2">
+                    {slot.formatted}
+                  </span>
                 </button>
               );
             })}
