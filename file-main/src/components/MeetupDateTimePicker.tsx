@@ -174,16 +174,16 @@ export default function MeetupDateTimePicker({
             <p className="text-[14px] opacity-80">Cafe bookings close at {closingTime > 12 ? closingTime - 12 : closingTime} {closingTime >= 12 ? 'PM' : 'AM'}. Please select tomorrow.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+          <div className="flex gap-3 overflow-x-auto pb-4 pt-1 scrollbar-hide snap-x -mx-1 px-1">
             {availableTimeSlots.map((slot) => {
               const isSelected = selectedTime === slot.value;
               return (
                 <button
                   key={slot.value}
                   onClick={() => handleTimeSelect(slot.value)}
-                  className={`py-3 px-2 rounded-xl text-[14px] font-semibold transition-all duration-200 ${isSelected
-                    ? 'bg-[#8b5943] text-white shadow-md border-transparent transform scale-[1.02]'
-                    : 'bg-white text-slate-700 border border-slate-200 hover:border-[#8b5943] hover:text-[#8b5943] hover:shadow-sm'
+                  className={`flex-shrink-0 snap-start min-w-[110px] py-3 px-4 rounded-xl text-[14px] font-semibold transition-all duration-300 border-2 ${isSelected
+                    ? 'border-[#8b5943] bg-gradient-to-r from-[#8b5943] to-[#a06f56] text-white shadow-md transform scale-105'
+                    : 'border-slate-200 bg-white text-slate-700 hover:border-[#8b5943] hover:text-[#8b5943] hover:bg-[#faf8f6]'
                     }`}
                 >
                   {slot.formatted}
