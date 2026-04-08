@@ -134,18 +134,18 @@ export default function MeetupDateTimePicker({
               <button
                 key={d.fullDateStr}
                 onClick={() => handleDateSelect(d.fullDateStr)}
-                className={`flex-shrink-0 snap-start relative overflow-hidden transition-all duration-300 w-[100px] h-[110px] rounded-2xl flex flex-col items-center justify-center border-2 ${isSelected
-                  ? 'border-[#8b5943] bg-gradient-to-b from-[#8b5943] to-[#be9d80] text-white shadow-md transform scale-105'
-                  : 'border-slate-200 bg-white hover:border-[#be9d80] text-slate-700 hover:bg-[#faf8f6]'
+                className={`flex-shrink-0 snap-start relative overflow-hidden transition-all duration-300 w-[100px] h-[115px] rounded-[18px] flex flex-col items-center justify-center border-2 ${isSelected
+                  ? 'border-[#8b5943] bg-gradient-to-br from-[#8b5943] to-[#be9d80] text-white shadow-[0_8px_16px_rgba(139,89,67,0.3)] transform scale-105'
+                  : 'border-[#e2e8f0] bg-white text-slate-700 hover:border-[#be9d80]/50 hover:bg-[#fdfbf9] hover:shadow-sm'
                   }`}
               >
-                <span className={`text-[13px] uppercase tracking-wider font-semibold mb-1 ${isSelected ? 'text-white/90' : 'text-slate-500'}`}>
+                <span className={`text-[12px] uppercase tracking-widest font-bold mb-1 ${isSelected ? 'text-white/90' : 'text-slate-400'}`}>
                   {getDayLabel(idx)}
                 </span>
-                <span className="text-[32px] font-bold leading-none mb-1">
+                <span className={`text-[36px] font-bold leading-none mb-0.5 ${isSelected ? 'text-white' : 'text-[#1a1a1a]'}`}>
                   {d.dayNum}
                 </span>
-                <span className={`text-[14px] font-medium ${isSelected ? 'text-white/90' : 'text-slate-500'}`}>
+                <span className={`text-[13px] font-semibold tracking-wide uppercase ${isSelected ? 'text-white/90' : 'text-slate-500'}`}>
                   {d.monthName}
                 </span>
               </button>
@@ -164,26 +164,28 @@ export default function MeetupDateTimePicker({
         </div>
 
         {!selectedDate ? (
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-500 flex flex-col items-center justify-center gap-2">
-            <Calendar className="w-8 h-8 text-slate-300 mb-1" />
-            <p className="text-[14px]">Please select a date first to view available slots</p>
+          <div className="bg-white border border-slate-200/60 rounded-[16px] py-10 px-6 text-center flex flex-col items-center justify-center gap-3 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+            <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-1">
+              <Calendar className="w-6 h-6 text-slate-400" />
+            </div>
+            <p className="text-[15px] font-medium text-slate-500">Select a date to view available time slots</p>
           </div>
         ) : availableTimeSlots.length === 0 ? (
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-6 text-center text-orange-700">
-            <p className="font-semibold mb-1">Oops! No slots available for today.</p>
+          <div className="bg-orange-50 border border-orange-200 rounded-[16px] p-8 text-center text-orange-700 shadow-sm">
+            <p className="font-bold mb-2">Oops! No slots available for today.</p>
             <p className="text-[14px] opacity-80">Cafe bookings close at {closingTime > 12 ? closingTime - 12 : closingTime} {closingTime >= 12 ? 'PM' : 'AM'}. Please select tomorrow.</p>
           </div>
         ) : (
-          <div className="flex gap-3 overflow-x-auto pb-4 pt-1 scrollbar-hide snap-x -mx-1 px-1">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
             {availableTimeSlots.map((slot) => {
               const isSelected = selectedTime === slot.value;
               return (
                 <button
                   key={slot.value}
                   onClick={() => handleTimeSelect(slot.value)}
-                  className={`flex-shrink-0 snap-start min-w-[110px] py-3 px-4 rounded-xl text-[14px] font-semibold transition-all duration-300 border-2 ${isSelected
-                    ? 'border-[#8b5943] bg-gradient-to-r from-[#8b5943] to-[#a06f56] text-white shadow-md transform scale-105'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-[#8b5943] hover:text-[#8b5943] hover:bg-[#faf8f6]'
+                  className={`py-3.5 px-4 rounded-full text-[14px] font-bold transition-all duration-200 border ${isSelected
+                    ? 'border-[#8b5943] bg-gradient-to-r from-[#8b5943] to-[#be9d80] text-white shadow-[0_4px_12px_rgba(139,89,67,0.3)] transform scale-105'
+                    : 'border-[#e2e8f0] bg-white text-slate-700 hover:border-[#be9d80] hover:shadow-md hover:scale-[1.02]'
                     }`}
                 >
                   {slot.formatted}
@@ -195,24 +197,15 @@ export default function MeetupDateTimePicker({
       </div>
 
       {/* Selection Summary */}
-      {selectedDate && selectedTime && (
-        <div className="mt-6 bg-[#be9d80]/10 border border-[#be9d80]/30 rounded-xl p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-[#8b5943]" />
-            </div>
-            <div>
-              <p className="text-[12px] text-slate-500 font-medium uppercase tracking-wider">Meetup Scheduled For</p>
-              <p className="text-[15px] font-bold text-slate-800">
-                {availableDates.find(d => d.fullDateStr === selectedDate)?.dayNum} {availableDates.find(d => d.fullDateStr === selectedDate)?.monthName} at {availableTimeSlots.find(s => s.value === selectedTime)?.formatted}
-              </p>
-            </div>
-          </div>
-          <div className="w-8 h-8 rounded-full bg-[#8b5943] flex items-center justify-center shadow-md">
-            <ChevronRight className="w-5 h-5 text-white" />
-          </div>
-        </div>
-      )}
+      <div className="h-10 mt-2 flex items-center justify-center">
+        {selectedDate && selectedTime ? (
+          <p className="text-[15px] font-['Arial',sans-serif] text-slate-700 font-medium bg-[#be9d80]/10 px-6 py-2 rounded-full border border-[#be9d80]/20 animate-fade-in-up">
+            Selected: <span className="font-bold text-[#8b5943]">{availableDates.find(d => d.fullDateStr === selectedDate)?.dayNum} {availableDates.find(d => d.fullDateStr === selectedDate)?.monthName}</span> • <span className="font-bold text-[#8b5943]">{availableTimeSlots.find(s => s.value === selectedTime)?.formatted}</span>
+          </p>
+        ) : (
+          <p className="text-[14px] text-slate-400 font-medium">Select a date and time</p>
+        )}
+      </div>
 
       <style>{`
         .scrollbar-hide::-webkit-scrollbar {
