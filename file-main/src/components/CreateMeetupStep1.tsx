@@ -122,38 +122,38 @@ export default function CreateMeetupStep1({ user, onNavigate, onBack }: CreateMe
       </div>
 
       {/* Content */}
-      <div className="max-w-[600px] mx-auto px-4 py-12">
+      <div className="max-w-[680px] mx-auto px-4 py-16">
         {/* Title Section */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-[Arial] font-bold text-[#1a1a1a] mb-2">Create a Café Meetup</h1>
-          <p className="text-neutral-500 text-[16px]">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-neutral-900 mb-3">Create a Café Meetup</h1>
+          <p className="text-neutral-600 text-lg">
             Plan, choose a café, order together, and split bills seamlessly
           </p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-gradient-to-br from-[#fdfbf9] to-[#ffffff] rounded-[20px] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#be9d80]/20">
-          <div className="space-y-6">
+        <div className="bg-gradient-to-br from-[#be9d80] via-[#c9a889] to-[#b08968] rounded-3xl p-8 shadow-2xl">
+          <div className="space-y-7">
             {/* Organizer Name */}
             <div>
-              <label className="block text-[#1a1a1a] font-['Arial:Bold',sans-serif] mb-2 text-[15px]">
+              <label className="block text-neutral-900 font-semibold mb-3 text-[15px]">
                 Organizer Name
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-[#8b5943]" />
-                </div>
                 <input
                   type="text"
                   value={adminName}
                   readOnly
-                  className="w-full pl-11 pr-4 py-3.5 bg-white border border-[#be9d80] rounded-[16px] text-[#1a1a1a] text-[15px] font-medium outline-none shadow-[0_2px_10px_rgba(139,89,67,0.05)] cursor-not-allowed"
+                  className="w-full pl-4 pr-12 py-4 bg-white/95 border-2 border-white/50 rounded-xl text-neutral-900 text-[16px] focus:outline-none focus:border-white transition-all cursor-not-allowed shadow-sm"
                 />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <User className="w-5 h-5 text-neutral-500" />
+                </div>
               </div>
             </div>
 
-            {/* Date & Time Picker */}
-            <div className="bg-white rounded-[20px] p-1">
+            {/* Replaced old native inputs with new premium component */}
+            <div className="bg-white/95 rounded-2xl p-6 shadow-sm border border-white/50">
               <MeetupDateTimePicker 
                 selectedDate={selectedDate} 
                 selectedTime={selectedTime} 
@@ -161,26 +161,34 @@ export default function CreateMeetupStep1({ user, onNavigate, onBack }: CreateMe
               />
             </div>
 
+            {/* Info Box */}
+            <div className="bg-white/40 backdrop-blur-sm border border-white/60 rounded-xl p-4 mt-6">
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-[#8b5943] flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-white text-xs font-bold">i</span>
+                </div>
+                <p className="text-[14px] text-neutral-800 leading-relaxed">
+                  Select your preferred date and time. You'll receive a unique join code to share with friends and family.
+                </p>
+              </div>
+            </div>
+
             {/* Continue Button */}
             <Button
               onClick={handleCreateMeetup}
               disabled={isCreating || !selectedDate || !selectedTime}
-              className={`w-full py-4 text-[16px] font-bold rounded-full transition-all duration-200 mt-4 disabled:opacity-100 flex items-center justify-center gap-2 ${
-                isCreating || !selectedDate || !selectedTime
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none border-0'
-                  : 'bg-gradient-to-r from-[#8b5943] to-[#be9d80] text-white shadow-[0_8px_20px_-4px_rgba(139,89,67,0.5)] hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-4px_rgba(139,89,67,0.6)]'
-              }`}
+              className="w-full bg-[#8b5943] hover:bg-[#6d422e] text-white py-5 text-[17px] font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200 mt-8"
             >
               {isCreating ? (
-                <>
+                <span className="flex items-center justify-center gap-2">
                   <Loader2 className="w-5 h-5 animate-spin" />
                   Creating Meetup...
-                </>
+                </span>
               ) : (
-                <>
+                <span className="flex items-center justify-center gap-2">
                   Continue
-                  <span className="text-xl leading-none ml-1">→</span>
-                </>
+                  <span className="text-xl">→</span>
+                </span>
               )}
             </Button>
           </div>

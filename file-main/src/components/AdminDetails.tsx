@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, Clock, User, ArrowRight, AlertCircle, Coffee, UserPlus, Loader2 } from 'lucide-react';
+import { Calendar, Clock, User, ArrowRight, AlertCircle, Coffee, UserPlus } from 'lucide-react';
 import { Button } from './ui/button';
 import { toast } from 'sonner';
 import MeetupDateTimePicker from './MeetupDateTimePicker';
@@ -151,31 +151,36 @@ export default function AdminDetails({ user, onNavigate, onBack }: AdminDetailsP
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[600px] mx-auto px-4 py-12">
-        {/* Title Section */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[#fdfbf9] to-[#ffffff] shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-[#be9d80]/20 rounded-2xl mb-6">
-            <UserPlus className="w-8 h-8 text-[#8b5943]" />
+      <div className="max-w-3xl mx-auto px-6 pb-20">
+        {/* Hero Section */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[#be9d80] to-[#a88968] rounded-2xl mb-6 shadow-lg">
+            <UserPlus className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-3xl font-[Arial] font-bold text-[#1a1a1a] mb-2">
+          <h2 className="font-['Arial:Bold',sans-serif] text-[30px] leading-[36px] text-[#101828] mb-3">
             Create a Café Meetup
           </h2>
-          <p className="text-neutral-500 text-[16px]">
+          <p className="font-['Arial:Regular',sans-serif] text-[18px] leading-[28px] text-[#101828]">
             Plan, choose a café, order together, and split bills seamlessly
           </p>
         </div>
 
-        {/* Form Card */}
-        <div className="bg-gradient-to-br from-[#fdfbf9] to-[#ffffff] rounded-[20px] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#be9d80]/20">
+        {/* Form Card with Gradient Background */}
+        <div
+          className="rounded-2xl shadow-md p-8 border border-[#e5e7eb]"
+          style={{
+            background: "linear-gradient(55.1783deg, rgb(139, 89, 67) 0.97833%, rgb(217, 191, 157) 51.928%, rgb(139, 89, 67) 99.105%)"
+          }}
+        >
           <div className="space-y-6">
             {/* Organizer Name Field */}
             <div>
-              <label className="block text-[#1a1a1a] font-['Arial:Bold',sans-serif] mb-2 text-[15px]">
+              <label className="block font-['Arial:Bold',sans-serif] text-[14px] leading-[20px] text-[#364153] mb-2">
                 Organizer Name
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-[#8b5943]" />
+                  <User className="h-5 w-5 text-[#101828]" />
                 </div>
                 <input
                   type="text"
@@ -187,22 +192,22 @@ export default function AdminDetails({ user, onNavigate, onBack }: AdminDetailsP
                     }
                   }}
                   placeholder="Enter your name"
-                  className={`w-full pl-11 pr-4 py-3.5 bg-white rounded-[16px] text-[#1a1a1a] text-[15px] font-medium transition-all shadow-[0_2px_10px_rgba(139,89,67,0.05)] focus:ring-2 focus:ring-[#8b5943]/30 outline-none ${errors.adminName
-                      ? 'border-2 border-red-500 bg-red-50'
-                      : 'border border-[#be9d80] focus:border-[#8b5943]'
+                  className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-2xl focus:outline-none transition-all font-['Arial:Regular',sans-serif] text-[16px] text-[#101828] placeholder:text-[#999] ${errors.adminName
+                      ? 'border-red-500 bg-red-50'
+                      : 'border-[#101828] bg-white/80 focus:bg-white'
                     }`}
                 />
               </div>
               {errors.adminName && (
-                <div className="flex items-center gap-2 mt-2 text-red-700 text-[13px] font-medium">
+                <div className="flex items-center gap-2 mt-2 text-red-700 text-sm font-medium">
                   <AlertCircle className="w-4 h-4" />
                   <span>{errors.adminName}</span>
                 </div>
               )}
             </div>
 
-            {/* Date & Time Picker */}
-            <div className="bg-white rounded-[20px] p-1">
+            {/* Replaced old native inputs with new premium component */}
+            <div className="bg-white/95 rounded-2xl p-6 shadow-sm border border-white/50">
               <MeetupDateTimePicker 
                 selectedDate={selectedDate} 
                 selectedTime={selectedTime} 
@@ -215,23 +220,10 @@ export default function AdminDetails({ user, onNavigate, onBack }: AdminDetailsP
               <button
                 onClick={handleNext}
                 disabled={isCreating || !selectedDate || !selectedTime}
-                className={`w-full py-4 text-[16px] font-bold rounded-full transition-all duration-200 mt-4 disabled:opacity-100 flex items-center justify-center gap-2 ${
-                  isCreating || !selectedDate || !selectedTime
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none border-0'
-                    : 'bg-gradient-to-r from-[#8b5943] to-[#be9d80] text-white shadow-[0_8px_20px_-4px_rgba(139,89,67,0.5)] hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-4px_rgba(139,89,67,0.6)]'
-                }`}
+                className={`w-full bg-[#8b5943] hover:bg-[#7a4a35] text-white py-3 rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 font-['Arial:Bold',sans-serif] text-[16px] ${(isCreating || !selectedDate || !selectedTime) ? 'opacity-60 cursor-not-allowed' : ''}`}
               >
-                {isCreating ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Creating Meetup...
-                  </>
-                ) : (
-                  <>
-                    Continue
-                    <span className="text-xl leading-none ml-1">→</span>
-                  </>
-                )}
+                <span>{isCreating ? 'Creating Meetup...' : 'Continue'}</span>
+                {!isCreating && <ArrowRight className="w-4 h-4" />}
               </button>
             </div>
           </div>
