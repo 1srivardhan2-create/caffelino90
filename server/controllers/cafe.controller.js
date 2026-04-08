@@ -94,6 +94,13 @@ const registerCafe = async (req, res) => {
         const parsedUpiIDs = typeof upiIDs === "string" ? JSON.parse(upiIDs) : upiIDs;
         const parsedOpeningHours = typeof opening_hours === "string" ? JSON.parse(opening_hours) : opening_hours;
 
+        // Determine minimum order value
+        let calculatedMinOrderValue = 500;
+        const normalizedName = (Name || "").trim().toLowerCase();
+        if (normalizedName === "livin roof" || normalizedName === "alchemy cafe" || normalizedName === "alkemy cafe") {
+            calculatedMinOrderValue = 300;
+        }
+
         // Create new cafe (status: false — awaiting admin approval)
         const newCafe = await Cafe.create({
             Name,
@@ -115,6 +122,7 @@ const registerCafe = async (req, res) => {
             upi_photo,
             Cafe_photos,
             profilePicture: req.body.profilePicture || "", // Handle profilePicture if sent in body
+            minOrderValue: calculatedMinOrderValue,
         });
 
         // Sign JWT with cafe ID
@@ -719,6 +727,13 @@ const registerCafeSimple = async (req, res) => {
             }
         }
 
+        // Determine minimum order value
+        let calculatedMinOrderValue = 500;
+        const normalizedName = (cafeName || "").trim().toLowerCase();
+        if (normalizedName === "livin roof" || normalizedName === "alchemy cafe" || normalizedName === "alkemy cafe") {
+            calculatedMinOrderValue = 300;
+        }
+
         const newCafe = await Cafe.create({
             ownerId,
             Name: cafeName,
@@ -737,6 +752,7 @@ const registerCafeSimple = async (req, res) => {
             Average_Cost: averageCostPerPerson || "",
             AboutCafe: description || "",
             Cafe_photos: finalCafePhotos,
+            minOrderValue: calculatedMinOrderValue,
         });
 
         console.log("☕ New cafe registered:", { id: newCafe._id, name: cafeName, ownerId });

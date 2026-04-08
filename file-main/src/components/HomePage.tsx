@@ -294,7 +294,7 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
                       Popular Cafes Near You
                     </p>
                     <p className="font-['Arial:Regular',_sans-serif] leading-[18px] text-[13px] text-neutral-500">
-                      {cafesLoading ? 'Loading...' : `${totalCafes} verified partner${totalCafes !== 1 ? 's' : ''}`}
+                      {cafesLoading ? 'Loading...' : `${totalCafes} partner${totalCafes !== 1 ? 's' : ''}`}
                     </p>
                   </div>
                 </div>
@@ -331,7 +331,7 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
               {!cafesLoading && approvedCafes.length === 0 && (
                 <div className="text-center py-10 bg-[#f9f5f0] rounded-[16px] border-2 border-dashed border-[#be9d80]/40">
                   <Coffee className="w-10 h-10 text-[#be9d80] mx-auto mb-3" />
-                  <p className="font-['Arial:Regular',_sans-serif] text-[16px] text-neutral-700 mb-1">No verified cafes yet</p>
+                  <p className="font-['Arial:Regular',_sans-serif] text-[16px] text-neutral-700 mb-1">No cafes yet</p>
                   <p className="font-['Arial:Regular',_sans-serif] text-[13px] text-neutral-500">Partner cafes will appear here once approved</p>
                 </div>
               )}
@@ -372,18 +372,6 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
                             style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '12px 12px 0 0' }}
                             onError={(e: any) => { e.target.src = 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800'; }}
                           />
-                          <div className="absolute top-3 left-3 bg-emerald-500 text-white px-2.5 py-1 rounded-full text-[11px] font-bold shadow-lg flex items-center gap-1 z-10">
-                            <BadgeCheck className="w-3.5 h-3.5" />
-                            Verified
-                          </div>
-                          
-                          {/* Manager Profile Picture Badge */}
-                          {profileSrc && (
-                             <div className="absolute bottom-[-15px] right-4 w-[50px] h-[50px] rounded-full border-4 border-white shadow-md overflow-hidden bg-white z-20">
-                               <img src={profileSrc} alt="Manager" className="w-full h-full object-cover" />
-                             </div>
-                          )}
-
                           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
 

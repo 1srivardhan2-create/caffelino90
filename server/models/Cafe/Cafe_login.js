@@ -82,6 +82,10 @@ const Cafe_log = new mongoose.Schema(
         tables: {
             type: Number,
         },
+        minOrderValue: {
+            type: Number,
+            default: 500, // Meets default threshold
+        },
 
         // ─── Opening Hours ───────────────────────────────────────────
         opening_hours: {

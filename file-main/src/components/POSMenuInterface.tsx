@@ -207,9 +207,24 @@ export default function POSMenuInterface({
   const memberCount = effectiveMembers.length;
   const perPersonAmount = splitEnabled ? parseFloat((total / memberCount).toFixed(2)) : total;
 
+  let minOrderValue = meetupData?.selectedCafe?.minOrderValue;
+  if (!minOrderValue) {
+    const rawName = meetupData?.selectedCafe?.name || meetupData?.selectedCafe?.cafeName || '';
+    const normName = rawName.trim().toLowerCase();
+    if (normName === "livin roof" || normName === "alchemy cafe" || normName === "alkemy cafe") {
+      minOrderValue = 300;
+    } else {
+      minOrderValue = 500;
+    }
+  }
+
   const handleConfirmOrder = () => {
     if (orderItems.length === 0) {
       toast.error('Please add items to your order');
+      return;
+    }
+    if (total < minOrderValue) {
+      toast.error(`Minimum order is ₹${minOrderValue}`);
       return;
     }
 
@@ -510,10 +525,29 @@ export default function POSMenuInterface({
                 </div>
               )}
 
+              {/* Minimum Order Value Enforcement */}
+              {total < minOrderValue && (
+                <div className="mb-4 bg-orange-50 border border-orange-200 rounded-lg p-3 text-center">
+                  <p className="text-sm text-red-600 font-bold mb-1">
+                    Minimum order for this meetup is ₹{minOrderValue}
+                  </p>
+                  <p className="text-xs text-orange-600 font-medium">
+                    Add items worth ₹{(minOrderValue - total).toFixed(2)} more to continue
+                  </p>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2 overflow-hidden">
+                    <div 
+                      className="bg-orange-500 h-2 rounded-full transition-all" 
+                      style={{ width: `${Math.min(100, (total / minOrderValue) * 100)}%` }} 
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1 font-medium">₹{total.toFixed(0)} / ₹{minOrderValue}</p>
+                </div>
+              )}
+
               {/* Confirm Button */}
               <Button
                 onClick={handleConfirmOrder}
-                disabled={isConfirming || !isAdmin}
+                disabled={isConfirming || !isAdmin || total < minOrderValue}
                 className="w-full bg-[#ff6b35] hover:bg-[#e55a2b] text-white py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isConfirming ? (
