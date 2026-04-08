@@ -115,6 +115,15 @@ const MeetupOrderSchema = new mongoose.Schema(
                 avatar: { type: String }
             }
         ],
+        // New fields for meetup scheduling integration
+        meetupDate: {
+            type: String,
+            default: ""
+        },
+        meetupTime: {
+            type: String,
+            default: ""
+        }
     },
     { timestamps: true }
 );

@@ -79,6 +79,15 @@ const cafeOrderSchema = new mongoose.Schema(
             type: String,
             default: "",
         },
+        // New fields for meetup scheduling integration
+        meetupDate: {
+            type: String,
+            default: ""
+        },
+        meetupTime: {
+            type: String,
+            default: ""
+        }
     },
     { timestamps: true }
 );

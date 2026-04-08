@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Calendar, Clock, User, ArrowRight, AlertCircle, Coffee, UserPlus } from 'lucide-react';
 import { Button } from './ui/button';
+import { toast } from 'sonner';
+import MeetupDateTimePicker from './MeetupDateTimePicker';
 
 interface AdminDetailsProps {
   user: any;
@@ -11,41 +13,23 @@ interface AdminDetailsProps {
 export default function AdminDetails({ user, onNavigate, onBack }: AdminDetailsProps) {
   const defaultAdminName = (user?.firstName && user?.lastName) ? `${user.firstName} ${user.lastName}` : (user?.name || user?.firstName || '');
   const [adminName, setAdminName] = useState(defaultAdminName);
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
   const [errors, setErrors] = useState({
-    adminName: '',
-    date: '',
-    time: ''
+    adminName: ''
   });
 
-  // Get today's date in YYYY-MM-DD format for min date validation
-  const today = new Date().toISOString().split('T')[0];
-
   const validateForm = () => {
-    const newErrors = {
-      adminName: '',
-      date: '',
-      time: ''
-    };
-
     let isValid = true;
+    const newErrors = { adminName: '' };
 
     if (!adminName || adminName.trim() === '') {
       newErrors.adminName = 'Organizer name is required';
       isValid = false;
     }
 
-    if (!date) {
-      newErrors.date = 'Date is required';
-      isValid = false;
-    } else if (date < today) {
-      newErrors.date = 'Date cannot be in the past';
-      isValid = false;
-    }
-
-    if (!time) {
-      newErrors.time = 'Time is required';
+    if (!selectedDate || !selectedTime) {
+      toast.error('Please select both date and time');
       isValid = false;
     }
 
@@ -72,15 +56,15 @@ export default function AdminDetails({ user, onNavigate, onBack }: AdminDetailsP
           title: meetupTitle,
           organizerId: userId,
           organizerName: adminName.trim(),
-          date,
-          time,
+          date: selectedDate,
+          time: selectedTime,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        alert(data.message || 'Failed to create meetup');
+        toast.error(data.message || 'Failed to create meetup');
         setIsCreating(false);
         return;
       }
@@ -222,83 +206,21 @@ export default function AdminDetails({ user, onNavigate, onBack }: AdminDetailsP
               )}
             </div>
 
-            {/* Meetup Date Field */}
-            <div>
-              <label className="block font-['Arial:Bold',sans-serif] text-[14px] leading-[20px] text-[#101828] mb-2">
-                Meetup Date
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Calendar className="h-5 w-5 text-[#101828]" />
-                </div>
-                <input
-                  type="date"
-                  value={date}
-                  min={today}
-                  onChange={(e) => {
-                    setDate(e.target.value);
-                    if (errors.date) {
-                      setErrors({ ...errors, date: '' });
-                    }
-                  }}
-                  className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-2xl focus:outline-none transition-all font-['Arial:Regular',sans-serif] text-[16px] text-[#101828] ${errors.date
-                      ? 'border-red-500 bg-red-50'
-                      : 'border-[#1e1e1e] bg-white/80 focus:bg-white'
-                    }`}
-                  style={{
-                    colorScheme: 'light',
-                  }}
-                />
-              </div>
-              {errors.date && (
-                <div className="flex items-center gap-2 mt-2 text-red-700 text-sm font-medium">
-                  <AlertCircle className="w-4 h-4" />
-                  <span>{errors.date}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Meetup Time Field */}
-            <div>
-              <label className="block font-['Arial:Bold',sans-serif] text-[14px] leading-[20px] text-[#101828] mb-2">
-                Meetup Time
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Clock className="h-5 w-5 text-[#1e1e1e]" />
-                </div>
-                <input
-                  type="time"
-                  value={time}
-                  onChange={(e) => {
-                    setTime(e.target.value);
-                    if (errors.time) {
-                      setErrors({ ...errors, time: '' });
-                    }
-                  }}
-                  className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-2xl focus:outline-none transition-all font-['Arial:Regular',sans-serif] text-[16px] text-[#101828] ${errors.time
-                      ? 'border-red-500 bg-red-50'
-                      : 'border-[#1e1e1e] bg-white/80 focus:bg-white'
-                    }`}
-                  style={{
-                    colorScheme: 'light',
-                  }}
-                />
-              </div>
-              {errors.time && (
-                <div className="flex items-center gap-2 mt-2 text-red-700 text-sm font-medium">
-                  <AlertCircle className="w-4 h-4" />
-                  <span>{errors.time}</span>
-                </div>
-              )}
+            {/* Replaced old native inputs with new premium component */}
+            <div className="bg-white/95 rounded-2xl p-6 shadow-sm border border-white/50">
+              <MeetupDateTimePicker 
+                selectedDate={selectedDate} 
+                selectedTime={selectedTime} 
+                onDateTimeSelect={(d, t) => { setSelectedDate(d); setSelectedTime(t); }} 
+              />
             </div>
 
             {/* Continue Button */}
             <div className="pt-2">
               <button
                 onClick={handleNext}
-                disabled={isCreating}
-                className={`w-full bg-[#8b5943] hover:bg-[#7a4a35] text-[#1e1e1e] py-3 rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 font-['Arial:Bold',sans-serif] text-[16px] ${isCreating ? 'opacity-60 cursor-not-allowed' : ''}`}
+                disabled={isCreating || !selectedDate || !selectedTime}
+                className={`w-full bg-[#8b5943] hover:bg-[#7a4a35] text-white py-3 rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 font-['Arial:Bold',sans-serif] text-[16px] ${(isCreating || !selectedDate || !selectedTime) ? 'opacity-60 cursor-not-allowed' : ''}`}
               >
                 <span>{isCreating ? 'Creating Meetup...' : 'Continue'}</span>
                 {!isCreating && <ArrowRight className="w-4 h-4" />}

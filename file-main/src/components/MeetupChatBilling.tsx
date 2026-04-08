@@ -621,7 +621,9 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
           userId: m.id || m.userId || '',
           name: m.name || m.firstName || '',
           avatar: m.avatar || ''
-        }))
+        })),
+        meetupDate: (meetupData as any)?.date || (meetupData as any)?.meetupDate || '',
+        meetupTime: (meetupData as any)?.time || (meetupData as any)?.meetupTime || ''
       };
       await fetch(`${BASE_URL}/api/meetup-orders`, {
         method: 'POST',
@@ -755,7 +757,9 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
           userId: m.id || m.userId || '',
           name: m.name || m.firstName || '',
           avatar: m.avatar || ''
-        }))
+        })),
+        meetupDate: (meetupData as any)?.date || (meetupData as any)?.meetupDate || '',
+        meetupTime: (meetupData as any)?.time || (meetupData as any)?.meetupTime || ''
       };
 
       console.log('💾 Saving order to backend...', orderPayload);

@@ -147,6 +147,18 @@ export default function EnhancedCafeOrderCard({
             </span>
           </div>
 
+          {/* Meetup Date / Time */}
+          {(order.meetupDate || order.meetupTime) && (
+            <div className="flex justify-between items-center mb-4 pb-3 border-b border-blue-200/50">
+              <span className="font-['Arial',sans-serif] text-[15px] text-[#1a1a1a]">
+                Scheduled For:
+              </span>
+              <span className="font-['Arial',sans-serif] text-[15px] text-blue-800 font-bold">
+                {order.meetupDate} {order.meetupTime && `at ${order.meetupTime}`}
+              </span>
+            </div>
+          )}
+
           {/* Order ID */}
           <div className="flex justify-between items-center mb-4 pb-3 border-b border-blue-200/50">
             <span className="font-['Arial',sans-serif] text-[15px] text-[#1a1a1a]">

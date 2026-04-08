@@ -679,7 +679,7 @@ const applyCoupon = async (req, res) => {
 // ─── PLACE ORDER ─────────────────────────────────────────────────
 const placeOrder = async (req, res) => {
     try {
-        const { meetupId, userId, userName, items, total, subtotal, cgst, sgst, status, cafeId, orderId, splitEnabled, perPersonAmount, members, commission, memberCount } = req.body;
+        const { meetupId, userId, userName, items, total, subtotal, cgst, sgst, status, cafeId, orderId, splitEnabled, perPersonAmount, members, commission, memberCount, meetupDate, meetupTime } = req.body;
         
         // Debug logging
         require("fs").appendFileSync("order_debug.log", `[${new Date().toISOString()}] Incoming order: ${userName} for cafe: ${cafeId}, status: ${status}, orderId: ${orderId}\n`);
@@ -768,6 +768,11 @@ const placeOrder = async (req, res) => {
                 order.memberCount = memberCount || 1;
                 order.members = formattedMembers;
                 order.cafeId = cafeId || order.cafeId || "";
+                
+                // Add meetupDate/Time
+                if (meetupDate) order.meetupDate = meetupDate;
+                if (meetupTime) order.meetupTime = meetupTime;
+                
                 await order.save();
                 console.log("✅ Order updated:", order.orderId);
             } else {
@@ -791,7 +796,9 @@ const placeOrder = async (req, res) => {
                         memberCount: memberCount || 1,
                         members: formattedMembers,
                         cafeId: cafeId || "",
-                        paymentStatus: "PENDING"
+                        paymentStatus: "PENDING",
+                        meetupDate: meetupDate || "",
+                        meetupTime: meetupTime || ""
                     });
                     require("fs").appendFileSync("order_debug.log", `[${new Date().toISOString()}] ✅ Order saved: ${order.orderId}\n`);
                     console.log("✅ New order saved:", order.orderId, "ID:", order._id);

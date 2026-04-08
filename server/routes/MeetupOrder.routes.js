@@ -168,6 +168,8 @@ router.patch("/:id/token-paid", async (req, res) => {
                         status: "ACCEPTED",
                         paymentStatus: "PAID",
                         paymentMethod: "online",
+                        meetupDate: order.meetupDate || "",
+                        meetupTime: order.meetupTime || ""
                     }
                 },
                 { upsert: true, new: true }

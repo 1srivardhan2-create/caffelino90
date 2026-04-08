@@ -3,6 +3,7 @@ import { ArrowLeft, Calendar, Clock, User, Loader2, AlertCircle } from 'lucide-r
 import { toast } from 'sonner';
 import { Button } from './ui/button';
 import { BASE_URL } from '../utils/api';
+import MeetupDateTimePicker from './MeetupDateTimePicker';
 
 interface CreateMeetupStep1Props {
   user: any;
@@ -12,83 +13,12 @@ interface CreateMeetupStep1Props {
 
 export default function CreateMeetupStep1({ user, onNavigate, onBack }: CreateMeetupStep1Props) {
   const [isCreating, setIsCreating] = useState(false);
-  const [dateError, setDateError] = useState('');
-  const [timeError, setTimeError] = useState('');
-
-  // Helper functions - defined first before state initialization
-  // Format date to YYYY-MM-DD for storage
-  const formatDateValue = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  // Format time to HH:MM for storage
-  const formatTimeValue = (date: Date) => {
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${hours}:${minutes}`;
-  };
 
   // Auto-set admin name
   const adminName = user?.name || user?.firstName || 'Admin';
 
-  // Initialize with empty values to require user input
-  const currentDate = new Date();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
-
-  // Get formatted display date (without year)
-  const getFormattedDate = (dateStr: string) => {
-    if (!dateStr) return 'Select date';
-    const [year, month, day] = dateStr.split('-');
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
-  // Get formatted display time
-  const getFormattedTime = (timeStr: string) => {
-    if (!timeStr) return 'Select time';
-    const [hours, minutes] = timeStr.split(':');
-    const date = new Date();
-    date.setHours(parseInt(hours), parseInt(minutes));
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
-
-  // Validate date
-  const handleDateChange = (value: string) => {
-    setSelectedDate(value);
-    if (value) {
-      const selected = new Date(value);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (selected < today) {
-        setDateError('Date cannot be in the past');
-      } else {
-        setDateError('');
-      }
-    } else {
-      setDateError('');
-    }
-  };
-
-  // Validate time
-  const handleTimeChange = (value: string) => {
-    setSelectedTime(value);
-    if (!value) {
-      setTimeError('Time is required');
-    } else {
-      setTimeError('');
-    }
-  };
 
   const handleCreateMeetup = async () => {
     // Validation
@@ -97,21 +27,8 @@ export default function CreateMeetupStep1({ user, onNavigate, onBack }: CreateMe
       return;
     }
 
-    // Validate all fields
-    let hasError = false;
-
-    if (!selectedDate) {
-      setDateError('Date is required');
-      hasError = true;
-    }
-
-    if (!selectedTime) {
-      setTimeError('Time is required');
-      hasError = true;
-    }
-
-    if (dateError || hasError) {
-      toast.error('Please fix all errors before continuing');
+    if (!selectedDate || !selectedTime) {
+      toast.error('Please select both date and time');
       return;
     }
 
@@ -235,87 +152,13 @@ export default function CreateMeetupStep1({ user, onNavigate, onBack }: CreateMe
               </div>
             </div>
 
-            {/* Meetup Date */}
-            <div>
-              <label className="block text-neutral-900 font-semibold mb-3 text-[15px]">
-                Meetup Date
-              </label>
-              <div className="relative group">
-                {/* Hidden native date input */}
-                <input
-                  type="date"
-                  id="meetup-date-input"
-                  value={selectedDate}
-                  onChange={(e) => handleDateChange(e.target.value)}
-                  min={formatDateValue(new Date())}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                  style={{
-                    colorScheme: 'light',
-                  }}
-                />
-                {/* Visible display field */}
-                <div className="w-full pl-4 pr-12 py-4 bg-white/95 border-2 border-white/50 rounded-xl text-neutral-900 text-[16px] transition-all shadow-sm hover:shadow-md hover:bg-white cursor-pointer relative z-10 pointer-events-none">
-                  {selectedDate ? getFormattedDate(selectedDate) : 'Select date'}
-                </div>
-                <div
-                  className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer transition-transform group-hover:scale-110 z-30"
-                  onClick={() => document.getElementById('meetup-date-input')?.showPicker()}
-                >
-                  <Calendar className="w-5 h-5 text-[#8b5943] group-hover:text-[#6d422e] transition-colors" />
-                </div>
-              </div>
-              {!selectedDate && (
-                <p className="text-[13px] text-neutral-700 mt-2 ml-1">
-                  Click to select day and month
-                </p>
-              )}
-              {dateError && (
-                <div className="flex items-center gap-2 mt-2 text-red-700 bg-red-50 px-3 py-2 rounded-lg">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  <p className="text-[13px] font-medium">{dateError}</p>
-                </div>
-              )}
-            </div>
-
-            {/* Meetup Time */}
-            <div>
-              <label className="block text-neutral-900 font-semibold mb-3 text-[15px]">
-                Meetup Time
-              </label>
-              <div className="relative group">
-                {/* Hidden native time input */}
-                <input
-                  type="time"
-                  id="meetup-time-input"
-                  value={selectedTime}
-                  onChange={(e) => handleTimeChange(e.target.value)}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                  style={{
-                    colorScheme: 'light',
-                  }}
-                />
-                {/* Visible display field */}
-                <div className="w-full pl-4 pr-12 py-4 bg-white/95 border-2 border-white/50 rounded-xl text-neutral-900 text-[16px] transition-all shadow-sm hover:shadow-md hover:bg-white cursor-pointer relative z-10 pointer-events-none">
-                  {selectedTime ? getFormattedTime(selectedTime) : 'Select time'}
-                </div>
-                <div
-                  className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer transition-transform group-hover:scale-110 z-30"
-                  onClick={() => document.getElementById('meetup-time-input')?.showPicker()}
-                >
-                  <Clock className="w-5 h-5 text-[#8b5943] group-hover:text-[#6d422e] transition-colors" />
-                </div>
-              </div>
-              {!selectedTime && (
-                <p className="text-[13px] text-neutral-700 mt-2 ml-1">
-                  Click to select hours and minutes
-                </p>
-              )}
-              {timeError && (
-                <div className="flex items-center gap-2 mt-2 text-red-700 bg-red-50 px-3 py-2 rounded-lg">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  <p className="text-[13px] font-medium">{timeError}</p>
-                </div>
-              )}
+            {/* Replaced old native inputs with new premium component */}
+            <div className="bg-white/95 rounded-2xl p-6 shadow-sm border border-white/50">
+              <MeetupDateTimePicker 
+                selectedDate={selectedDate} 
+                selectedTime={selectedTime} 
+                onDateTimeSelect={(d, t) => { setSelectedDate(d); setSelectedTime(t); }} 
+              />
             </div>
 
             {/* Info Box */}
@@ -333,7 +176,7 @@ export default function CreateMeetupStep1({ user, onNavigate, onBack }: CreateMe
             {/* Continue Button */}
             <Button
               onClick={handleCreateMeetup}
-              disabled={isCreating}
+              disabled={isCreating || !selectedDate || !selectedTime}
               className="w-full bg-[#8b5943] hover:bg-[#6d422e] text-white py-5 text-[17px] font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200 mt-8"
             >
               {isCreating ? (
