@@ -143,15 +143,17 @@ export default function MeetupDateTimePicker({
               <button
                 key={d.fullDateStr}
                 onClick={() => handleDateSelect(d.fullDateStr)}
-                className={`flex-shrink-0 snap-start bg-white flex flex-col items-center justify-center transition-all w-[100px] h-[90px] ${isSelected
-                  ? 'border-2 border-[#e87c3e]'
-                  : 'border border-slate-200 hover:border-slate-300'
+                className={`anim-btn date-btn flex-shrink-0 snap-start flex flex-col items-center justify-center transition-all bg-white w-[88px] h-[88px] rounded-2xl ${isSelected
+                    ? 'active border-[1px] border-transparent shadow-md'
+                    : 'border border-slate-200 hover:border-slate-300'
                   }`}
               >
-                <span className={`text-[10px] uppercase font-bold tracking-wide mb-1 ${isSelected ? 'text-slate-600' : 'text-slate-400'}`}>
+                <span className={`z-10 text-[10px] uppercase font-bold tracking-wide mb-1 pointer-events-none transition-colors ${isSelected ? 'text-white' : 'text-slate-400'
+                  }`}>
                   {getDayLabel(idx)}
                 </span>
-                <span className="text-[32px] font-light text-slate-800 leading-none">
+                <span className={`z-10 text-[32px] font-semibold leading-none pointer-events-none transition-colors ${isSelected ? 'text-white' : 'text-slate-800'
+                  }`}>
                   {d.dayNum}
                 </span>
               </button>
@@ -178,18 +180,20 @@ export default function MeetupDateTimePicker({
           </div>
         ) : (
           <div className="flex gap-2 overflow-x-auto pb-4 pt-1 scrollbar-hide snap-x">
-            {availableTimeSlots.map((slot: any) => {
+            {availableTimeSlots.map((slot: any, idx: number) => {
               const isSelected = selectedTime === slot.value;
               return (
                 <button
                   key={slot.value}
                   onClick={() => handleTimeSelect(slot.value)}
-                  className={`flex-shrink-0 snap-start bg-white flex items-center justify-center transition-all min-w-[110px] h-[90px] ${isSelected
-                    ? 'border-2 border-[#e87c3e] text-slate-800'
-                    : 'border border-slate-200 text-slate-500 hover:border-slate-300'
+                  style={{ animationDelay: `${idx * 0.05}s` }}
+                  className={`anim-btn time-btn time-btn-animated flex-shrink-0 snap-start flex items-center justify-center transition-all bg-white min-w-[124px] h-[52px] rounded-full px-4 ${isSelected
+                      ? 'active border-[1px] border-transparent shadow-md'
+                      : 'border border-slate-200 hover:border-slate-300'
                     }`}
                 >
-                  <span className="text-[13px] font-medium whitespace-nowrap px-2">
+                  <span className={`z-10 text-[14px] font-semibold whitespace-nowrap pointer-events-none transition-colors ${isSelected ? 'text-white' : 'text-slate-600'
+                    }`}>
                     {slot.formatted}
                   </span>
                 </button>
@@ -226,6 +230,46 @@ export default function MeetupDateTimePicker({
         .scrollbar-hide {
             -ms-overflow-style: none;
             scrollbar-width: none;
+        }
+
+        /* ─── ANIMATION BUTTON BASE ─── */
+        .anim-btn {
+          position: relative;
+          isolation: isolate; /* KEY: Creates stacking context */
+          overflow: hidden;
+        }
+        .anim-btn::before,
+        .anim-btn::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          z-index: -1;
+          transition: clip-path 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s;
+          opacity: 0;
+        }
+        /* Using the exact purple-to-red gradient the user provided previously */
+        .anim-btn::after {
+          background: linear-gradient(135deg, #a855f7, #ef4444); 
+          clip-path: inset(0 50% 0 50%); /* center-out-x hidden */
+        }
+        .anim-btn.active::after {
+          clip-path: inset(0 0 0 0); /* center-out-x revealed */
+          opacity: 1;
+        }
+        
+        .date-btn::before, .date-btn::after { border-radius: 16px; }
+        .time-btn::before, .time-btn::after { border-radius: 9999px; }
+
+        .date-btn:hover { transform: scale(1.03); }
+        .time-btn:hover { transform: scale(1.05); }
+
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .time-btn-animated {
+          opacity: 0;
+          animation: fadeSlideUp 0.35s ease forwards;
         }
       `}</style>
     </div>

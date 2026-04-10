@@ -154,10 +154,10 @@ export default function CreateMeetupStep1({ user, onNavigate, onBack }: CreateMe
 
             {/* Replaced old native inputs with new premium component */}
             <div className="bg-white/95 rounded-2xl p-6 shadow-sm border border-white/50">
-              <MeetupDateTimePicker 
-                selectedDate={selectedDate} 
-                selectedTime={selectedTime} 
-                onDateTimeSelect={(d, t) => { setSelectedDate(d); setSelectedTime(t); }} 
+              <MeetupDateTimePicker
+                selectedDate={selectedDate}
+                selectedTime={selectedTime}
+                onDateTimeSelect={(d, t) => { setSelectedDate(d); setSelectedTime(t); }}
               />
             </div>
 
@@ -174,23 +174,25 @@ export default function CreateMeetupStep1({ user, onNavigate, onBack }: CreateMe
             </div>
 
             {/* Continue Button */}
-            <Button
+            <button
               onClick={handleCreateMeetup}
               disabled={isCreating || !selectedDate || !selectedTime}
-              className="w-full bg-[#8b5943] hover:bg-[#6d422e] text-white py-5 text-[17px] font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200 mt-8"
+              className="anim-btn continue-anim-btn w-full py-5 text-[17px] font-semibold rounded-xl shadow-lg transition-all duration-200 mt-8 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden relative isolate"
             >
-              {isCreating ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Creating Meetup...
-                </span>
-              ) : (
-                <span className="flex items-center justify-center gap-2">
-                  Continue
-                  <span className="text-xl">→</span>
-                </span>
-              )}
-            </Button>
+              <span className="z-10 relative pointer-events-none flex items-center justify-center gap-2 text-white">
+                {isCreating ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    Continue
+                    <span className="text-xl">→</span>
+                  </>
+                )}
+              </span>
+            </button>
           </div>
         </div>
 
@@ -204,6 +206,23 @@ export default function CreateMeetupStep1({ user, onNavigate, onBack }: CreateMe
           </p>
         </div>
       </div>
+
+      {/* Global styles for Continue button animation */}
+      <style>{`
+        .continue-anim-btn::before {
+          background-color: #8b5943;
+        }
+        .continue-anim-btn::after {
+          background: linear-gradient(135deg, #a855f7, #ef4444);
+        }
+        .continue-anim-btn:hover::after {
+          clip-path: inset(0 0 0 0); /* reveal on hover for continue btn */
+          opacity: 1;
+        }
+        .continue-anim-btn:hover {
+          transform: scale(1.02);
+        }
+      `}</style>
     </div>
   );
 }
