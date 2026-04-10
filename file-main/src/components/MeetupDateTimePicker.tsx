@@ -136,24 +136,22 @@ export default function MeetupDateTimePicker({
           </span>
         </div>
 
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x">
+        <div className="grid grid-cols-3 gap-3 w-full">
           {availableDates.map((d, idx) => {
             const isSelected = selectedDate === d.fullDateStr;
             return (
               <button
                 key={d.fullDateStr}
                 onClick={() => handleDateSelect(d.fullDateStr)}
-                className={`anim-btn date-btn flex-shrink-0 snap-start flex flex-col items-center justify-center transition-all bg-white w-[88px] h-[88px] rounded-2xl ${isSelected
-                    ? 'active border-[1px] border-transparent shadow-md'
-                    : 'border border-slate-200 hover:border-slate-300'
+                className={`anim-btn date-btn flex flex-col items-center justify-center transition-all w-full aspect-square rounded-3xl ${isSelected
+                    ? 'active border-none shadow-md'
+                    : 'bg-[#444] border-none shadow-sm hover:scale-[1.02]'
                   }`}
               >
-                <span className={`z-10 text-[10px] uppercase font-bold tracking-wide mb-1 pointer-events-none transition-colors ${isSelected ? 'text-white' : 'text-slate-400'
-                  }`}>
+                <span className="z-10 text-[11px] uppercase font-bold tracking-widest mb-1 pointer-events-none text-white">
                   {getDayLabel(idx)}
                 </span>
-                <span className={`z-10 text-[32px] font-semibold leading-none pointer-events-none transition-colors ${isSelected ? 'text-white' : 'text-slate-800'
-                  }`}>
+                <span className="z-10 text-[36px] font-black leading-none pointer-events-none text-white">
                   {d.dayNum}
                 </span>
               </button>
@@ -188,8 +186,8 @@ export default function MeetupDateTimePicker({
                   onClick={() => handleTimeSelect(slot.value)}
                   style={{ animationDelay: `${idx * 0.05}s` }}
                   className={`anim-btn time-btn time-btn-animated flex-shrink-0 snap-start flex items-center justify-center transition-all bg-white min-w-[124px] h-[52px] rounded-full px-4 ${isSelected
-                      ? 'active border-[1px] border-transparent shadow-md'
-                      : 'border border-slate-200 hover:border-slate-300'
+                    ? 'active border-[1px] border-transparent shadow-md'
+                    : 'border border-slate-200 hover:border-slate-300'
                     }`}
                 >
                   <span className={`z-10 text-[14px] font-semibold whitespace-nowrap pointer-events-none transition-colors ${isSelected ? 'text-white' : 'text-slate-600'
@@ -257,7 +255,7 @@ export default function MeetupDateTimePicker({
           opacity: 1;
         }
         
-        .date-btn::before, .date-btn::after { border-radius: 16px; }
+        .date-btn::before, .date-btn::after { border-radius: 1.5rem; }
         .time-btn::before, .time-btn::after { border-radius: 9999px; }
 
         .date-btn:hover { transform: scale(1.03); }
