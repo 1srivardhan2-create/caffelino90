@@ -143,9 +143,10 @@ export default function MeetupDateTimePicker({
               <button
                 key={d.fullDateStr}
                 onClick={() => handleDateSelect(d.fullDateStr)}
+                style={!isSelected ? { backgroundColor: '#464646' } : {}}
                 className={`anim-btn date-btn flex flex-col items-center justify-center transition-all w-full aspect-square rounded-3xl ${isSelected
-                    ? 'active border-none shadow-md'
-                    : 'bg-[#444] border-none shadow-sm hover:scale-[1.02]'
+                  ? 'active border-none shadow-md'
+                  : 'border-none shadow-sm hover:scale-[1.02]'
                   }`}
               >
                 <span className="z-10 text-[11px] uppercase font-bold tracking-widest mb-1 pointer-events-none text-white">
