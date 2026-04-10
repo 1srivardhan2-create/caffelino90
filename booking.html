@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Booking - Pick a Date & Time</title>
+    <meta name="description" content="Book your slot — pick a date and time with a smooth, modern booking interface." />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #c8a27d, #8b5e44, #6b4330);
+            font-family: 'Poppins', sans-serif;
+            padding: 20px;
+        }
+
+        /* ─── Card ──────────────────────────── */
+        .booking-card {
+            width: 440px;
+            max-width: 100%;
+            background: #f3f3f3;
+            padding: 28px 24px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .booking-card>h3 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #8b5e44;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ─── Input ─────────────────────────── */
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 22px;
+        }
+
+        .input-wrapper .icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            opacity: 0.5;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 14px 16px 14px 46px;
+            border-radius: 30px;
+            border: 2px solid #333;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.3s;
+            background: #fff;
+        }
+
+        .input-box:focus {
+            border-color: #8b5e44;
+        }
+
+        /* ─── Sections ──────────────────────── */
+        .section {
+            background: #fff;
+            padding: 18px;
+            border-radius: 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .header h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #333;
+            letter-spacing: 1px;
+        }
+
+        .header span {
+            font-size: 11px;
+            font-weight: 600;
+            color: #8b5e44;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+        }
+
+        .header span:hover {
+            color: #6b4330;
+        }
+
+        .section>h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #333;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+
+        /* ──────────────────────────────────────
+       ANIMATION BUTTON BASE
+       Uses isolation to guarantee text
+       renders above ::before / ::after
+    ────────────────────────────────────── */
+        .anim-btn {
+            position: relative;
+            isolation: isolate;
+            /* KEY: creates stacking context */
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            transition: transform 0.2s;
+            background: transparent;
+        }
+
+        .anim-btn::before,
+        .anim-btn::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            /* Behind content thanks to isolation */
+            transition: clip-path 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .anim-btn::before {
+            background: #444;
+        }
+
+        .anim-btn::after {
+            background: linear-gradient(135deg, #9b59b6, #e74c3c);
+            clip-path: inset(0 50% 0 50%);
+            /* center-out-x hidden */
+        }
+
+        .anim-btn.active::after {
+            clip-path: inset(0 0 0 0);
+            /* center-out-x revealed */
+        }
+
+        /* ─── Date Buttons (SQUARE) ─────────── */
+        .date-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .date-btn {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+        }
+
+        .date-btn::before,
+        .date-btn::after {
+            border-radius: 16px;
+        }
+
+        .date-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .date-btn .label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .date-btn .number {
+            font-size: 34px;
+            font-weight: 700;
+            line-height: 1;
+            margin-top: 4px;
+        }
+
+        /* ─── Time Box ──────────────────────── */
+        .time-box {
+            padding: 20px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 14px;
+            text-align: center;
+            color: #aaa;
+            font-size: 13px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* ─── Time Buttons (BIGGER) ─────────── */
+        .time-btn {
+            padding: 16px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 30px;
+        }
+
+        .time-btn::before,
+        .time-btn::after {
+            border-radius: 30px;
+        }
+
+        .time-btn::after {
+            background: linear-gradient(90deg, #9b59b6, #e74c3c);
+        }
+
+        .time-btn:hover {
+            transform: scale(1.06);
+        }
+
+        /* ─── Continue Button ───────────────── */
+        .continue-btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 30px;
+        }
+
+        .continue-btn::before {
+            background: #8b5e44;
+        }
+
+        .continue-btn::before,
+        .continue-btn::after {
+            border-radius: 30px;
+        }
+
+        .continue-btn::after {
+            background: linear-gradient(90deg, #9b59b6, #e74c3c);
+        }
+
+        .continue-btn:hover::after {
+            clip-path: inset(0 0 0 0);
+        }
+
+        .continue-btn:hover {
+            transform: scale(1.02);
+        }
+
+        /* ─── Fade-in keyframes ─────────────── */
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .time-btn.animated {
+            animation: fadeSlideUp 0.35s ease forwards;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="booking-card">
+        <h3>Organizer Name</h3>
+
+        <div class="input-wrapper">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+            </svg>
+            <input type="text" value="dxsd1221" class="input-box" />
+        </div>
+
+        <div class="section">
+            <div class="header">
+                <h4>PICK A DATE</h4>
+                <span>SHOW ALL</span>
+            </div>
+            <div class="date-container">
+                <button class="anim-btn date-btn" data-date="10">
+                    <span class="label">TODAY</span>
+                    <span class="number">10</span>
+                </button>
+                <button class="anim-btn date-btn" data-date="11">
+                    <span class="label">TOMORROW</span>
+                    <span class="number">11</span>
+                </button>
+                <button class="anim-btn date-btn" data-date="12">
+                    <span class="label">SUN</span>
+                    <span class="number">12</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h4>PICK A TIME</h4>
+            <div id="timeBox" class="time-box">
+                Please select a date first
+            </div>
+        </div>
+
+        <button class="anim-btn continue-btn">Continue →</button>
+    </div>
+
+    <script>
+        const dateButtons = document.querySelectorAll(".date-btn");
+        const timeBox = document.getElementById("timeBox");
+
+        const timeSlots = {
+            "10": ["10:00 AM", "12:00 PM", "2:00 PM"],
+            "11": ["11:00 AM", "1:00 PM", "3:00 PM"],
+            "12": ["9:00 AM", "12:30 PM", "4:00 PM"]
+        };
+
+        dateButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                dateButtons.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+
+                const selectedDate = btn.dataset.date;
+                timeBox.innerHTML = "";
+
+                timeSlots[selectedDate].forEach((time, i) => {
+                    const tBtn = document.createElement("button");
+                    tBtn.className = "anim-btn time-btn animated";
+                    tBtn.style.animationDelay = `${i * 0.08}s`;
+                    tBtn.textContent = time;
+
+                    tBtn.addEventListener("click", () => {
+                        document.querySelectorAll(".time-btn").forEach(tb => tb.classList.remove("active"));
+                        tBtn.classList.add("active");
+                    });
+
+                    timeBox.appendChild(tBtn);
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>
