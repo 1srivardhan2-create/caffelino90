@@ -169,26 +169,46 @@ export default function POSMenuInterface({
     toast.info('Item removed from cart');
   };
 
-  // ─── COUPON LOGIC (single coupon: CAFFELINO6 = ₹50 off) ──────────
+  // ─── COUPON LOGIC (single coupon: CAFFELINO) ──────────
   const cafeName = meetupData?.selectedCafe?.name || meetupData?.selectedCafe?.cafeName || '';
-  const isCouponDisabled = cafeName === "Olive Bistro & Bar";
-
-  const handleApplyCoupon = () => {
-    if (isCouponDisabled) {
-      toast.error('Coupons are not valid for Olive Bistro & Bar');
-      return;
-    }
+  
+  const handleApplyCoupon = async () => {
     const code = couponInput.toUpperCase().trim();
     if (!code) {
       toast.error('Please enter a coupon code');
       return;
     }
-    if (code === VALID_COUPON.code) {
-      setAppliedCoupon(true);
-      setCouponInput('');
-      toast.success('Coupon LINO9 applied! 6% off 🎉');
-    } else {
-      toast.error('Invalid coupon code');
+
+    try {
+      // Calculate current order total to send to backend
+      const currentSubtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const email = user?.email || user?.id; // fallback if email is not there
+      
+      const res = await fetch(`${BASE_URL}/api/user/apply-coupon`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code,
+          email,
+          orderAmount: currentSubtotal,
+          cafeName
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setAppliedCoupon(true);
+        setCouponInput(code);
+        // Assuming data.discount is returned from server
+        toast.success(`Coupon ${code} applied! ₹${data.discount || 100} off 🎉`);
+      } else {
+        // EXACT backend messages
+        toast.error(data.message || 'Invalid or expired coupon');
+      }
+    } catch (err) {
+      toast.error('Server error: Could not apply coupon');
+      console.error(err);
     }
   };
 
@@ -197,9 +217,9 @@ export default function POSMenuInterface({
     toast.info('Coupon removed');
   };
 
-  // ─── TOTALS: Subtotal → Coupon (6%) → CGST → SGST → Total ──
+  // ─── TOTALS: Subtotal → Coupon (₹100 flat) → CGST → SGST → Total ──
   const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const couponDiscount = (appliedCoupon && !isCouponDisabled) ? parseFloat((subtotal * VALID_COUPON.discountPercent / 100).toFixed(2)) : 0;
+  const couponDiscount = appliedCoupon ? 100 : 0;
   const subtotalAfterCoupon = subtotal - couponDiscount;
   const cgst = parseFloat((subtotalAfterCoupon * 0.025).toFixed(2));
   const sgst = parseFloat((subtotalAfterCoupon * 0.025).toFixed(2));
@@ -420,9 +440,8 @@ export default function POSMenuInterface({
           {orderItems.length > 0 && (
             <div className="border-t border-gray-200 p-4 bg-gray-50">
               {/* Coupon Section — Simple input only */}
-              {!isCouponDisabled && (
-                <div className="mb-4 bg-white rounded-lg p-3 border border-gray-200">
-                  <div className="flex items-center gap-2 mb-2">
+              <div className="mb-4 bg-white rounded-lg p-3 border border-gray-200">
+                <div className="flex items-center gap-2 mb-2">
                     <Tag className="w-4 h-4 text-[#ff6b35]" />
                     <span className="text-sm font-medium text-gray-700">Apply Coupon</span>
                   </div>
@@ -454,9 +473,7 @@ export default function POSMenuInterface({
                         Apply
                       </Button>
                     </div>
-                  )}
                 </div>
-              )}
 
               {/* Totals: Subtotal → Coupon → CGST → SGST → Total */}
               <div className="space-y-2 mb-4">

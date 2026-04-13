@@ -185,6 +185,27 @@ const startServer = async () => {
     // 1. Attempt MongoDB connection (non-blocking — retries in background)
     await connectDB();
 
+    // Auto-seed Coupon if NOT exists
+    try {
+        const Coupon = require("./models/Coupon");
+        const existingCoupon = await Coupon.findOne({ code: "CAFFELINO" });
+        if (!existingCoupon) {
+            await Coupon.create({
+                code: "CAFFELINO",
+                discount: 100,
+                maxUsage: 20,
+                usedCount: 0,
+                minOrder: 700,
+                cafe: "Chocolate Room Cafe",
+                isActive: true,
+                usersUsed: []
+            });
+            console.log("🎟️ Default CAFFELINO coupon seeded successfully!");
+        }
+    } catch (err) {
+        console.error("Coupon seed error:", err.message);
+    }
+
     // 2. Start server regardless — it will serve requests once DB connects
     server.listen(PORT, () => {
         console.log(`🚀 Server running on port ${PORT} (HTTP + Socket.io)`);

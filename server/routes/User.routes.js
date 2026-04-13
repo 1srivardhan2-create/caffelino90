@@ -104,9 +104,78 @@ const getUserOrders = async (req, res) => {
 
 const { updateProfile } = require("../controllers/user.controller");
 
+const Coupon = require("../models/Coupon");
+
 // ─── Route Definitions ──────────────────────────────────────────
 router.post("/orders", placeOrder);
 router.get("/myorders/:userId", getUserOrders);
 router.put("/profile/:userId", updateProfile);
+
+router.post("/apply-coupon", async (req, res) => {
+  try {
+    const { code, email, orderAmount, cafeName } = req.body;
+
+    const coupon = await Coupon.findOne({ code });
+
+    if (!coupon || !coupon.isActive) {
+      return res.status(400).json({ message: "Invalid or expired coupon" });
+    }
+
+    if (cafeName !== coupon.cafe) {
+      return res.status(400).json({ message: "Coupon not valid for this cafe" });
+    }
+
+    if (orderAmount < coupon.minOrder) {
+      return res.status(400).json({ message: "Minimum order value ₹700 required" });
+    }
+
+    if (coupon.usedCount >= coupon.maxUsage) {
+      coupon.isActive = false;
+      await coupon.save();
+      return res.status(400).json({ message: "Offer expired" });
+    }
+
+    const alreadyUsed = coupon.usersUsed.some(u => u.email === email);
+    if (alreadyUsed) {
+      return res.status(400).json({ message: "Coupon already used with this email" });
+    }
+
+    // 🔒 ATOMIC UPDATE (IMPORTANT)
+    const updated = await Coupon.findOneAndUpdate(
+      {
+        code,
+        isActive: true,
+        usedCount: { $lt: coupon.maxUsage },
+        "usersUsed.email": { $ne: email }
+      },
+      {
+        $inc: { usedCount: 1 },
+        $push: {
+          usersUsed: { email, orderAmount }
+        }
+      },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(400).json({ message: "Offer expired" });
+    }
+
+    if (updated.usedCount >= updated.maxUsage) {
+      updated.isActive = false;
+      await updated.save();
+    }
+
+    return res.json({
+      success: true,
+      discount: updated.discount,
+      finalAmount: orderAmount - updated.discount
+    });
+
+  } catch (err) {
+    console.error("Apply Coupon Error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 module.exports = router;
