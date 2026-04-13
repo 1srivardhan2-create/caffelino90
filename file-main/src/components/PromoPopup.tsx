@@ -1,129 +1,278 @@
 import React, { useEffect, useState } from "react";
-import { X } from "lucide-react";
 
-export const PromoPopup = () => {
+const PromoPopup = () => {
   const [show, setShow] = useState(false);
+  const [animateIn, setAnimateIn] = useState(false);
 
   useEffect(() => {
-    // Only show once per local storage
-    const seen = localStorage.getItem("caffelino_popup_seen");
-
+    const seen = localStorage.getItem("promo_seen");
     if (!seen) {
-      setTimeout(() => setShow(true), 500); // Small delay feels more natural
-      localStorage.setItem("caffelino_popup_seen", "true");
+      setTimeout(() => {
+        setShow(true);
+        setTimeout(() => setAnimateIn(true), 50);
+      }, 600);
+      localStorage.setItem("promo_seen", "true");
     }
   }, []);
+
+  const handleClose = () => {
+    setAnimateIn(false);
+    setTimeout(() => setShow(false), 300);
+  };
 
   if (!show) return null;
 
   return (
-    <div style={styles.overlay}>
-      <div style={styles.popup}>
-        
-        {/* CLOSE BUTTON */}
-        <button style={styles.close} onClick={() => setShow(false)}>
-          <X size={24} color="#666" />
-        </button>
+    <>
+      {/* Keyframes injected via style tag */}
+      <style>{`
+        @keyframes popupFadeIn {
+          from { opacity: 0; transform: scale(0.85) translateY(20px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes popupFadeOut {
+          from { opacity: 1; transform: scale(1) translateY(0); }
+          to { opacity: 0; transform: scale(0.85) translateY(20px); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes pulseGlow {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(193, 154, 107, 0.4); }
+          50% { box-shadow: 0 0 0 8px rgba(193, 154, 107, 0); }
+        }
+      `}</style>
 
-        {/* IMAGE */}
-        <img
-          src="https://images.jdmagicbox.com/comp/mathura/dc/9999px565.x565.170531122501.g3dc/catalogue/the-chocolate-room-mathura-tphz3nllj3.jpg" // Used a relevant image for The Chocolate Room Cafe
-          alt="Chocolate Room Offer"
-          style={styles.image}
-        />
-
-        {/* TEXT */}
-        <h2 style={styles.title}>₹100 OFF with CAFFELINO</h2>
-        <p style={styles.subtitle}>Only for Chocolate Room Cafe</p>
-
-        {/* BUTTON */}
-        <button
-          style={styles.button}
-          onClick={() => {
-            setShow(false);
-            // Can be updated for proper routing
-            window.location.href = "/cafe/chocolate-room";
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          background: animateIn ? "rgba(0,0,0,0.7)" : "rgba(0,0,0,0)",
+          backdropFilter: animateIn ? "blur(6px)" : "blur(0px)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 9999,
+          transition: "all 0.3s ease",
+          padding: "16px",
+        }}
+        onClick={handleClose}
+      >
+        <div
+          style={{
+            background: "linear-gradient(145deg, #ffffff 0%, #fdf8f3 100%)",
+            borderRadius: "24px",
+            width: "100%",
+            maxWidth: "380px",
+            textAlign: "center" as const,
+            padding: "0",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(193,154,107,0.2)",
+            position: "relative" as const,
+            overflow: "hidden",
+            animation: animateIn
+              ? "popupFadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards"
+              : "popupFadeOut 0.3s ease forwards",
           }}
+          onClick={(e) => e.stopPropagation()}
         >
-          Order Now
-        </button>
+          {/* Close Button */}
+          <button
+            onClick={handleClose}
+            style={{
+              position: "absolute",
+              top: "12px",
+              right: "12px",
+              background: "rgba(255,255,255,0.9)",
+              backdropFilter: "blur(4px)",
+              border: "none",
+              width: "32px",
+              height: "32px",
+              borderRadius: "50%",
+              fontSize: "18px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              zIndex: 10,
+              color: "#666",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#ff4444";
+              e.currentTarget.style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(255,255,255,0.9)";
+              e.currentTarget.style.color = "#666";
+            }}
+          >
+            ×
+          </button>
 
+          {/* Image Section */}
+          <div style={{ position: "relative", overflow: "hidden" }}>
+            <img
+              src="https://b.zmtcdn.com/data/pictures/chains/1/19418131/23d43914e498e1ba8e78dd2e0e9a990d.jpg"
+              alt="Chocolate Room Cafe"
+              style={{
+                width: "100%",
+                height: "200px",
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
+            {/* Gradient overlay on image */}
+            <div
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: "60px",
+                background: "linear-gradient(transparent, #fdf8f3)",
+              }}
+            />
+            {/* Discount badge */}
+            <div
+              style={{
+                position: "absolute",
+                top: "12px",
+                left: "12px",
+                background: "linear-gradient(135deg, #c19a6b, #8b6914)",
+                color: "#fff",
+                padding: "6px 14px",
+                borderRadius: "20px",
+                fontSize: "12px",
+                fontWeight: "bold",
+                letterSpacing: "0.5px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+              }}
+            >
+              ⚡ LIMITED OFFER
+            </div>
+          </div>
+
+          {/* Content Section */}
+          <div style={{ padding: "16px 24px 24px" }}>
+            {/* Title */}
+            <h2
+              style={{
+                fontSize: "28px",
+                fontWeight: "800",
+                color: "#2d1810",
+                marginBottom: "6px",
+                marginTop: "0",
+                letterSpacing: "-0.5px",
+                lineHeight: "1.2",
+              }}
+            >
+              Flat ₹100 OFF
+            </h2>
+
+            {/* Subtitle */}
+            <p
+              style={{
+                fontSize: "14px",
+                color: "#6b4c3b",
+                marginBottom: "8px",
+                marginTop: "0",
+                lineHeight: "1.5",
+              }}
+            >
+              Use code{" "}
+              <span
+                style={{
+                  background: "linear-gradient(90deg, #c19a6b, #8b6914, #c19a6b)",
+                  backgroundSize: "200% auto",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  fontWeight: "800",
+                  fontSize: "16px",
+                  animation: "shimmer 2s linear infinite",
+                }}
+              >
+                CAFFELINO
+              </span>{" "}
+              at Chocolate Room Cafe
+            </p>
+
+            {/* Offer Description */}
+            <div
+              style={{
+                background: "#fef7ef",
+                border: "1px dashed #c19a6b",
+                borderRadius: "12px",
+                padding: "10px 16px",
+                marginBottom: "16px",
+              }}
+            >
+              <p
+                style={{
+                  fontSize: "13px",
+                  color: "#8b6c56",
+                  margin: "0",
+                  fontWeight: "500",
+                }}
+              >
+                🎉 Get flat <strong>₹100 off</strong> on orders above{" "}
+                <strong>₹700</strong>
+              </p>
+            </div>
+
+            {/* CTA Button */}
+            <button
+              onClick={() => {
+                handleClose();
+                window.location.href = "/cafe/chocolate-room";
+              }}
+              style={{
+                width: "100%",
+                padding: "14px 20px",
+                background: "linear-gradient(135deg, #c19a6b 0%, #a07850 100%)",
+                color: "#fff",
+                border: "none",
+                borderRadius: "14px",
+                fontWeight: "700",
+                fontSize: "16px",
+                cursor: "pointer",
+                letterSpacing: "0.3px",
+                transition: "all 0.2s ease",
+                animation: "pulseGlow 2s ease infinite",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 6px 20px rgba(193,154,107,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              Order Now →
+            </button>
+
+            {/* Terms */}
+            <p
+              style={{
+                fontSize: "11px",
+                color: "#aaa",
+                marginTop: "10px",
+                marginBottom: "0",
+              }}
+            >
+              *Valid for first-time users. Max 20 uses.
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
-};
-
-const styles = {
-  overlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    background: "rgba(0,0,0,0.6)",
-    backdropFilter: "blur(4px)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 9999
-  } as React.CSSProperties,
-  popup: {
-    background: "#fff",
-    padding: "24px",
-    borderRadius: "20px",
-    width: "90%",
-    maxWidth: "400px",
-    textAlign: "center",
-    position: "relative",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-    animation: "popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
-  } as React.CSSProperties,
-  image: {
-    width: "100%",
-    height: "220px",
-    objectFit: "cover",
-    borderRadius: "12px",
-    marginBottom: "16px"
-  } as React.CSSProperties,
-  title: {
-    fontSize: "22px",
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: "4px"
-  } as React.CSSProperties,
-  subtitle: {
-    fontSize: "15px",
-    color: "#666",
-    marginBottom: "20px",
-    fontWeight: "500"
-  } as React.CSSProperties,
-  button: {
-    width: "100%",
-    padding: "14px 20px",
-    background: "#be9d80",
-    color: "#fff",
-    border: "none",
-    borderRadius: "12px",
-    fontSize: "16px",
-    fontWeight: "bold",
-    cursor: "pointer",
-    transition: "background 0.2s"
-  } as React.CSSProperties,
-  close: {
-    position: "absolute",
-    top: "12px",
-    right: "12px",
-    background: "#f1f1f1",
-    border: "none",
-    width: "36px",
-    height: "36px",
-    borderRadius: "50%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
-    zIndex: 10
-  } as React.CSSProperties
 };
 
 export default PromoPopup;
