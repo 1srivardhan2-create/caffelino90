@@ -118,7 +118,7 @@ const PromoPopup = () => {
           {/* Image Section */}
           <div style={{ position: "relative", overflow: "hidden" }}>
             <img
-              src="https://b.zmtcdn.com/data/pictures/chains/1/19418131/23d43914e498e1ba8e78dd2e0e9a990d.jpg"
+              src="https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=800&q=80"
               alt="Chocolate Room Cafe"
               style={{
                 width: "100%",
@@ -224,38 +224,6 @@ const PromoPopup = () => {
                 <strong>₹700</strong>
               </p>
             </div>
-
-            {/* CTA Button */}
-            <button
-              onClick={() => {
-                handleClose();
-                window.location.href = "/cafe/chocolate-room";
-              }}
-              style={{
-                width: "100%",
-                padding: "14px 20px",
-                background: "linear-gradient(135deg, #c19a6b 0%, #a07850 100%)",
-                color: "#fff",
-                border: "none",
-                borderRadius: "14px",
-                fontWeight: "700",
-                fontSize: "16px",
-                cursor: "pointer",
-                letterSpacing: "0.3px",
-                transition: "all 0.2s ease",
-                animation: "pulseGlow 2s ease infinite",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow = "0 6px 20px rgba(193,154,107,0.4)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
-              Order Now →
-            </button>
 
             {/* Terms */}
             <p
