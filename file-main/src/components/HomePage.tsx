@@ -4,6 +4,7 @@ import { getApprovedCafes } from '../services/cafeService';
 import { getActiveMeetups, getMyMeetups } from '../services/meetupService';
 import { Badge } from './ui/badge';
 import Footer from './Footer';
+import PromoPopup from './PromoPopup';
 import MyGroupCard from './MyGroupCard';
 import { getUserGroups, clearOldTestGroups, removeGroup, removeAllUserGroups, saveGroupState, getNavigationPageFromStage, GroupState } from '../utils/groupStateManager';
 import { getActiveGroupId } from '../utils/sessionManager';
@@ -195,6 +196,7 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
 
   return (
     <div className="bg-[#fffbf5] box-border flex flex-col pb-0 pt-[0.8px] px-0 relative w-full overflow-x-hidden" data-name="Caffélino App">
+      <PromoPopup />
       {/* Main Content */}
       <div className="relative w-full" data-name="HomePage">
         {/* Hero Section - Legendary Brown Gradient */}

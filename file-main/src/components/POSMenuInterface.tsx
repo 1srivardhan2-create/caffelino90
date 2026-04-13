@@ -170,7 +170,7 @@ export default function POSMenuInterface({
   };
 
   // ─── COUPON LOGIC (single coupon: CAFFELINO) ──────────
-  const cafeName = meetupData?.selectedCafe?.name || meetupData?.selectedCafe?.cafeName || '';
+  const cafeName = (meetupData?.selectedCafe?.name || meetupData?.selectedCafe?.cafeName || '').trim();
   
   const handleApplyCoupon = async () => {
     const code = couponInput.toUpperCase().trim();

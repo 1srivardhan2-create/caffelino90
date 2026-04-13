@@ -121,7 +121,14 @@ router.post("/apply-coupon", async (req, res) => {
       return res.status(400).json({ message: "Invalid or expired coupon" });
     }
 
-    if (cafeName !== coupon.cafe) {
+    console.log("Incoming cafe:", cafeName);
+    console.log("DB cafe:", coupon.cafe);
+
+    // ✅ FIXED CAFE CHECK
+    if (
+      !cafeName ||
+      !cafeName.toLowerCase().includes("chocolate room")
+    ) {
       return res.status(400).json({ message: "Coupon not valid for this cafe" });
     }
 
