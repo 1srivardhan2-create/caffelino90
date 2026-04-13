@@ -50,8 +50,8 @@ interface MenuItem {
   isVeg: boolean;
 }
 
-// Single valid coupon
-const VALID_COUPON = { code: 'LINO9', discountPercent: 6 };
+// Coupon code used for display
+const COUPON_CODE = 'CAFFELINO';
 
 const DEFAULT_ITEM_IMAGE = 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400';
 
@@ -253,7 +253,7 @@ export default function POSMenuInterface({
       onConfirmOrder({
         items: orderItems,
         subtotal,
-        couponCode: appliedCoupon ? VALID_COUPON.code : '',
+        couponCode: appliedCoupon ? COUPON_CODE : '',
         couponDiscount,
         cgst,
         sgst,
@@ -449,7 +449,7 @@ export default function POSMenuInterface({
                   {appliedCoupon ? (
                     <div className="flex items-center justify-between bg-green-50 border border-green-300 rounded-lg px-3 py-2">
                       <div>
-                        <span className="font-bold text-green-700 text-sm">{VALID_COUPON.code}</span>
+                        <span className="font-bold text-green-700 text-sm">{COUPON_CODE}</span>
                         <p className="text-xs text-green-600">-₹{couponDiscount.toFixed(2)} off</p>
                       </div>
                       <button onClick={handleRemoveCoupon} className="text-red-500 hover:text-red-700">
@@ -473,6 +473,7 @@ export default function POSMenuInterface({
                         Apply
                       </Button>
                     </div>
+                  )}
                 </div>
 
               {/* Totals: Subtotal → Coupon → CGST → SGST → Total */}
