@@ -274,6 +274,15 @@ function AppContent() {
     const handlePopState = (event: PopStateEvent) => {
       if (event.state && event.state.page) {
         isPopStateNav.current = true;
+        // If backing out of chat/billing pages, skip intermediate steps and go home
+        const chatPages = ['meetup-chat-billing', 'meetup-chat-billing-completed'];
+        const skipPages = ['meetup-code', 'cafe-selection-create', 'cafe-voting-create', 'create-meetup-step3', 'create-meetup-step5', 'admin-details'];
+        if (chatPages.includes(currentPage) || skipPages.includes(event.state.page)) {
+          setCurrentPage('home' as Page);
+          setPageHistory(['home'] as Page[]);
+          window.history.replaceState({ page: 'home' }, '');
+          return;
+        }
         setCurrentPage(event.state.page);
         setPageHistory((prev: Page[]) => {
           if (prev.length > 1) {
@@ -287,7 +296,7 @@ function AppContent() {
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [currentPage]);
 
   useEffect(() => {
     if (isPopStateNav.current) {
@@ -637,9 +646,9 @@ function AppContent() {
       case "create-meetup-step5":
         return <CafeVotingCreate user={user} meetupData={selectedGroup} onNavigate={navigateTo} onBack={handleBack} />;
       case "meetup-chat-billing":
-        return <MeetupChatBilling user={user} meetupData={selectedGroup} onNavigate={navigateTo} onBack={handleBack} onNotificationUpdate={updateNotificationCount} />;
+        return <MeetupChatBilling user={user} meetupData={selectedGroup} onNavigate={navigateTo} onBack={() => navigateTo('home')} onNotificationUpdate={updateNotificationCount} />;
       case "meetup-chat-billing-completed":
-        return <MeetupChatBilling user={user} meetupData={selectedGroup} onNavigate={navigateTo} onBack={handleBack} onNotificationUpdate={updateNotificationCount} />;
+        return <MeetupChatBilling user={user} meetupData={selectedGroup} onNavigate={navigateTo} onBack={() => navigateTo('home')} onNotificationUpdate={updateNotificationCount} />;
       case "payment-online":
         return <PaymentOnline user={user} meetupData={selectedGroup} onNavigate={navigateTo} onBack={handleBack} onNotificationUpdate={updateNotificationCount} />;
       case "join-meetup":

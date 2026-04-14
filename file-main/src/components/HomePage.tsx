@@ -497,18 +497,6 @@ export default function HomePage({ user, onNavigate, onShowAuth, userJustLoggedI
                 </div>
               </div>
 
-              {/* Feature 2 - Vote on Café */}
-              <div className="bg-white rounded-[16px] p-6 shadow-md">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[rgba(139,89,67,0.2)] flex items-center justify-center flex-shrink-0">
-                    <Coffee className="w-6 h-6 text-[#8b5943]" />
-                  </div>
-                  <div>
-                    <p className="font-['Arial:Regular',_sans-serif] leading-[24px] text-[18px] text-[#0a0a0a] mb-2">Vote on Café Together</p>
-                    <p className="font-['Arial:Regular',_sans-serif] leading-[20px] text-[14px] text-[#525252]">Choose from up to 3 cafés and let everyone vote on their favorite spot.</p>
-                  </div>
-                </div>
-              </div>
 
               {/* Feature 3 - Bill Splitting */}
               <div className="bg-white rounded-[16px] p-6 shadow-md">
