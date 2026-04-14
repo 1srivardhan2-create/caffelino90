@@ -4,6 +4,12 @@ import { Button } from './ui/button';
 import { toast } from 'sonner';
 import { BASE_URL } from '../utils/api';
 
+interface AppliedCoupon {
+  code: string;
+  discount: number;
+  type: 'flat' | 'percent';
+}
+
 interface POSMenuInterfaceProps {
   user: any;
   meetupData: any;
@@ -14,8 +20,7 @@ interface POSMenuInterfaceProps {
   membersList: any[];
   initialOrderItems?: OrderItem[];
   initialSplitEnabled?: boolean;
-  initialCouponCode?: string;
-  initialCouponDiscount?: number;
+  initialCoupons?: AppliedCoupon[];
 }
 
 export interface POSConfirmData {
@@ -23,6 +28,7 @@ export interface POSConfirmData {
   subtotal: number;
   couponCode: string;
   couponDiscount: number;
+  appliedCoupons: AppliedCoupon[];
   cgst: number;
   sgst: number;
   commission: number;
@@ -52,8 +58,8 @@ interface MenuItem {
   isVeg: boolean;
 }
 
-// Coupon code used for display
-const COUPON_CODE = 'CAFFELINO';
+// Valid coupon codes
+const VALID_COUPONS = ['CAFFELINO', 'LINO9'];
 
 const DEFAULT_ITEM_IMAGE = 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400';
 
@@ -67,16 +73,15 @@ export default function POSMenuInterface({
   membersList,
   initialOrderItems,
   initialSplitEnabled,
-  initialCouponCode,
-  initialCouponDiscount,
+  initialCoupons,
 }: POSMenuInterfaceProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Show All');
   const [orderItems, setOrderItems] = useState<OrderItem[]>(initialOrderItems || []);
   const [isConfirming, setIsConfirming] = useState(false);
   const [splitEnabled, setSplitEnabled] = useState(initialSplitEnabled || false);
-  const [couponInput, setCouponInput] = useState(initialCouponCode || '');
-  const [appliedCoupon, setAppliedCoupon] = useState(!!initialCouponCode && (initialCouponDiscount ?? 0) > 0);
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupons, setAppliedCoupons] = useState<AppliedCoupon[]>(initialCoupons || []);
   const cartSectionRef = useRef<HTMLDivElement>(null);
 
   const scrollToCart = () => {
@@ -173,7 +178,7 @@ export default function POSMenuInterface({
     toast.info('Item removed from cart');
   };
 
-  // ─── COUPON LOGIC (single coupon: CAFFELINO) ──────────
+  // ─── MULTI-COUPON LOGIC (CAFFELINO + LINO9) ──────────
   const cafeName = (meetupData?.selectedCafe?.name || meetupData?.selectedCafe?.cafeName || '').trim();
   
   const handleApplyCoupon = async () => {
@@ -183,10 +188,21 @@ export default function POSMenuInterface({
       return;
     }
 
+    // ❌ Client-side duplicate check
+    if (appliedCoupons.find(c => c.code === code)) {
+      toast.error('This coupon is already applied');
+      return;
+    }
+
+    // ❌ Max 2 coupons
+    if (appliedCoupons.length >= 2) {
+      toast.error('Maximum 2 coupons allowed');
+      return;
+    }
+
     try {
-      // Calculate current order total to send to backend
       const currentSubtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const email = user?.email || user?.id; // fallback if email is not there
+      const email = user?.email || user?.id;
       
       const res = await fetch(`${BASE_URL}/api/user/apply-coupon`, {
         method: 'POST',
@@ -195,19 +211,23 @@ export default function POSMenuInterface({
           code,
           email,
           orderAmount: currentSubtotal,
-          cafeName
+          cafeName,
+          alreadyAppliedCoupons: appliedCoupons.map(c => c.code)
         })
       });
 
       const data = await res.json();
 
       if (res.ok && data.success) {
-        setAppliedCoupon(true);
-        setCouponInput(code);
-        // Assuming data.discount is returned from server
-        toast.success(`Coupon ${code} applied! ₹${data.discount || 100} off 🎉`);
+        const newCoupon: AppliedCoupon = {
+          code: data.code || code,
+          discount: data.discount,
+          type: (data.type || 'flat') as 'flat' | 'percent',
+        };
+        setAppliedCoupons(prev => [...prev, newCoupon]);
+        setCouponInput('');
+        toast.success(`Coupon ${code} applied! ₹${data.discount} off 🎉`);
       } else {
-        // EXACT backend messages
         toast.error(data.message || 'Invalid or expired coupon');
       }
     } catch (err) {
@@ -216,20 +236,41 @@ export default function POSMenuInterface({
     }
   };
 
-  const handleRemoveCoupon = () => {
-    setAppliedCoupon(false);
-    toast.info('Coupon removed');
+  const handleRemoveCoupon = (code: string) => {
+    setAppliedCoupons(prev => prev.filter(c => c.code !== code));
+    toast.info(`Coupon ${code} removed`);
   };
 
-  // ─── TOTALS: Subtotal → Coupon (₹100 flat) → CGST → SGST → Total ──
+  // ─── TOTALS: Subtotal → Coupons (flat first) → CGST → SGST → Total ──
   const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const couponDiscount = appliedCoupon ? 100 : 0;
-  const subtotalAfterCoupon = subtotal - couponDiscount;
+
+  // Apply coupons in order: flat first, then percentage
+  let totalCouponDiscount = 0;
+  let runningAmount = subtotal;
+  // Sort: flat coupons first, then percent
+  const sortedCoupons = [...appliedCoupons].sort((a, b) => (a.type === 'flat' ? -1 : 1));
+  sortedCoupons.forEach(coupon => {
+    if (coupon.type === 'percent') {
+      const disc = (runningAmount * coupon.discount) / 100;
+      totalCouponDiscount += disc;
+      runningAmount -= disc;
+    } else {
+      totalCouponDiscount += coupon.discount;
+      runningAmount -= coupon.discount;
+    }
+  });
+  totalCouponDiscount = Math.max(0, totalCouponDiscount);
+  const subtotalAfterCoupon = Math.max(0, subtotal - totalCouponDiscount);
+
   const cgst = parseFloat((subtotalAfterCoupon * 0.025).toFixed(2));
   const sgst = parseFloat((subtotalAfterCoupon * 0.025).toFixed(2));
   const total = parseFloat((subtotalAfterCoupon + cgst + sgst).toFixed(2));
   const memberCount = effectiveMembers.length;
   const perPersonAmount = splitEnabled ? parseFloat((total / memberCount).toFixed(2)) : total;
+
+  // Backward-compatible: combined coupon code string
+  const couponCodeStr = appliedCoupons.map(c => c.code).join('+');
+  const couponDiscount = totalCouponDiscount;
 
   let minOrderValue = meetupData?.selectedCafe?.minOrderValue;
   if (!minOrderValue) {
@@ -257,11 +298,12 @@ export default function POSMenuInterface({
       onConfirmOrder({
         items: orderItems,
         subtotal,
-        couponCode: appliedCoupon ? COUPON_CODE : '',
+        couponCode: couponCodeStr,
         couponDiscount,
+        appliedCoupons: [...appliedCoupons],
         cgst,
         sgst,
-        commission: 0, // No platform fee
+        commission: 0,
         total,
         splitEnabled,
         members: effectiveMembers,
@@ -443,42 +485,57 @@ export default function POSMenuInterface({
           {/* Order Summary & Actions */}
           {orderItems.length > 0 && (
             <div className="border-t border-gray-200 p-4 bg-gray-50">
-              {/* Coupon Section — Simple input only */}
+              {/* Multi-Coupon Section */}
               <div className="mb-4 bg-white rounded-lg p-3 border border-gray-200">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
                     <Tag className="w-4 h-4 text-[#ff6b35]" />
-                    <span className="text-sm font-medium text-gray-700">Apply Coupon</span>
+                    <span className="text-sm font-medium text-gray-700">Apply Coupons</span>
                   </div>
-
-                  {appliedCoupon ? (
-                    <div className="flex items-center justify-between bg-green-50 border border-green-300 rounded-lg px-3 py-2">
-                      <div>
-                        <span className="font-bold text-green-700 text-sm">{COUPON_CODE}</span>
-                        <p className="text-xs text-green-600">-₹{couponDiscount.toFixed(2)} off</p>
-                      </div>
-                      <button onClick={handleRemoveCoupon} className="text-red-500 hover:text-red-700">
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={couponInput}
-                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                        placeholder="Enter coupon code"
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#ff6b35]"
-                        onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
-                      />
-                      <Button
-                        onClick={handleApplyCoupon}
-                        className="bg-[#ff6b35] hover:bg-[#e55a2b] text-white text-sm px-4"
-                      >
-                        Apply
-                      </Button>
-                    </div>
+                  {appliedCoupons.length > 0 && (
+                    <span className="text-xs text-green-600 font-medium">{appliedCoupons.length}/2 applied</span>
                   )}
                 </div>
+
+                {/* Applied coupons list */}
+                {appliedCoupons.length > 0 && (
+                  <div className="space-y-2 mb-2">
+                    {appliedCoupons.map(coupon => (
+                      <div key={coupon.code} className="flex items-center justify-between bg-green-50 border border-green-300 rounded-lg px-3 py-2">
+                        <div>
+                          <span className="font-bold text-green-700 text-sm">{coupon.code}</span>
+                          <p className="text-xs text-green-600">
+                            -{coupon.type === 'percent' ? `${coupon.discount}%` : `₹${coupon.discount}`} off
+                          </p>
+                        </div>
+                        <button onClick={() => handleRemoveCoupon(coupon.code)} className="text-red-500 hover:text-red-700">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Input to add another coupon (max 2) */}
+                {appliedCoupons.length < 2 && (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                      placeholder={appliedCoupons.length === 0 ? 'Enter coupon code' : 'Add another coupon'}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#ff6b35]"
+                      onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                    />
+                    <Button
+                      onClick={handleApplyCoupon}
+                      className="bg-[#ff6b35] hover:bg-[#e55a2b] text-white text-sm px-4"
+                    >
+                      Apply
+                    </Button>
+                  </div>
+                )}
+              </div>
 
               {/* Totals: Subtotal → Coupon → CGST → SGST → Total */}
               <div className="space-y-2 mb-4">
@@ -487,10 +544,10 @@ export default function POSMenuInterface({
                   <span className="font-medium text-gray-800">₹{subtotal.toFixed(2)}</span>
                 </div>
 
-                {couponDiscount > 0 && (
+                {totalCouponDiscount > 0 && (
                   <div className="flex justify-between text-sm text-green-600">
-                    <span>Coupon Discount:</span>
-                    <span className="font-bold">-₹{couponDiscount.toFixed(2)}</span>
+                    <span>Coupon Discount ({couponCodeStr}):</span>
+                    <span className="font-bold">-₹{totalCouponDiscount.toFixed(2)}</span>
                   </div>
                 )}
 

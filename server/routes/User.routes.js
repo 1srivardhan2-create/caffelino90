@@ -112,9 +112,10 @@ router.get("/myorders/:userId", getUserOrders);
 router.put("/profile/:userId", updateProfile);
 
 // ─── APPLY COUPON (VALIDATION ONLY — no DB usage update) ─────────
+// Supports: CAFFELINO (₹100 off, min ₹700) + LINO9 (₹50 off, min ₹500)
 router.post("/apply-coupon", async (req, res) => {
   try {
-    const { code, email, orderAmount, cafeName } = req.body;
+    const { code, email, orderAmount, cafeName, alreadyAppliedCoupons } = req.body;
 
     const coupon = await Coupon.findOne({ code });
 
@@ -124,8 +125,9 @@ router.post("/apply-coupon", async (req, res) => {
 
     console.log("Incoming cafe:", cafeName);
     console.log("DB cafe:", coupon.cafe);
+    console.log("Coupon code:", code, "Discount:", coupon.discount, "MinOrder:", coupon.minOrder);
 
-    // ✅ CAFE CHECK
+    // ✅ CAFE CHECK — both coupons are for Chocolate Room only
     if (
       !cafeName ||
       !cafeName.toLowerCase().includes("chocolate room")
@@ -133,8 +135,13 @@ router.post("/apply-coupon", async (req, res) => {
       return res.status(400).json({ message: "Coupon not valid for this cafe" });
     }
 
+    // ✅ DUPLICATE CHECK — can't apply same coupon twice
+    if (alreadyAppliedCoupons && alreadyAppliedCoupons.includes(code)) {
+      return res.status(400).json({ message: "This coupon is already applied" });
+    }
+
     if (orderAmount < coupon.minOrder) {
-      return res.status(400).json({ message: "Minimum order value ₹700 required" });
+      return res.status(400).json({ message: `Minimum order value ₹${coupon.minOrder} required` });
     }
 
     if (coupon.usedCount >= coupon.maxUsage) {
@@ -151,7 +158,9 @@ router.post("/apply-coupon", async (req, res) => {
     // ✅ VALIDATION ONLY — do NOT update usedCount or usersUsed here
     return res.json({
       success: true,
+      code: coupon.code,
       discount: coupon.discount,
+      type: "flat",
       finalAmount: orderAmount - coupon.discount
     });
 

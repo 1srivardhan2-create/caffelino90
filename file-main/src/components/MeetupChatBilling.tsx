@@ -69,6 +69,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
   const [sgstAmount, setSgstAmount] = useState(0);
   const [couponCode, setCouponCode] = useState('');
   const [couponDiscount, setCouponDiscount] = useState(0);
+  const [appliedCoupons, setAppliedCoupons] = useState<{code: string; discount: number; type: 'flat' | 'percent'}[]>([]);
   const [numberOfPeople, setNumberOfPeople] = useState(meetupData?.members?.length || 1);
   const [membersList, setMembersList] = useState<any[]>(meetupData?.members || []);
   const [tokenPaid, setTokenPaid] = useState(false);
@@ -703,6 +704,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
     setSgstAmount(posData.sgst);
     setCouponCode(posData.couponCode || '');
     setCouponDiscount(posData.couponDiscount || 0);
+    setAppliedCoupons(posData.appliedCoupons || []);
     setSplitBill(posData.splitEnabled);
     setSplitMembers(posData.members);
     setPerPersonAmount(posData.perPersonAmount);
@@ -1111,26 +1113,28 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                 setTokenPaid(true);
                 setOrderConfirmed(true);
 
-                // ✅ Confirm coupon usage ONLY after successful payment
-                if (couponCode) {
-                  try {
-                    const couponRes = await fetch(`${BASE_URL}/api/user/confirm-coupon-usage`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        code: couponCode,
-                        email: user?.email || user?.id,
-                        orderAmount: calculateBill().total
-                      })
-                    });
-                    const couponData = await couponRes.json();
-                    if (couponData.success) {
-                      console.log('🎫 Coupon usage confirmed after payment');
-                    } else {
-                      console.warn('⚠️ Coupon confirmation failed:', couponData.message);
+                // ✅ Confirm ALL coupon usages ONLY after successful payment
+                if (appliedCoupons.length > 0) {
+                  for (const coupon of appliedCoupons) {
+                    try {
+                      const couponRes = await fetch(`${BASE_URL}/api/user/confirm-coupon-usage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          code: coupon.code,
+                          email: user?.email || user?.id,
+                          orderAmount: calculateBill().total
+                        })
+                      });
+                      const couponData = await couponRes.json();
+                      if (couponData.success) {
+                        console.log(`🎫 Coupon ${coupon.code} usage confirmed after payment`);
+                      } else {
+                        console.warn(`⚠️ Coupon ${coupon.code} confirmation failed:`, couponData.message);
+                      }
+                    } catch (couponErr) {
+                      console.error(`Failed to confirm coupon ${coupon.code} usage:`, couponErr);
                     }
-                  } catch (couponErr) {
-                    console.error('Failed to confirm coupon usage:', couponErr);
                   }
                 }
 
@@ -1259,8 +1263,7 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         isAdmin={isAdmin}
         initialOrderItems={orderItems.length > 0 ? orderItems : undefined}
         initialSplitEnabled={splitBill}
-        initialCouponCode={couponCode}
-        initialCouponDiscount={couponDiscount}
+        initialCoupons={appliedCoupons.length > 0 ? appliedCoupons : undefined}
       />
     );
   }
