@@ -238,6 +238,7 @@ function AppContent() {
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [userMode, setUserMode] = useState<"go" | "partner" | null>(getPersistedMode());
   const [deepLinkCode, setDeepLinkCode] = useState<string | null>(null);
+  const [userJustLoggedIn, setUserJustLoggedIn] = useState(false);
 
   useEffect(() => { safeStorage.setItem('caffelino_currentPage', currentPage); }, [currentPage]);
   useEffect(() => { safeStorage.setItem('caffelino_pageHistory', JSON.stringify(pageHistory)); }, [pageHistory]);
@@ -365,6 +366,11 @@ function AppContent() {
     initializeNotifications();
     setUnreadNotifications(getUnreadCount());
     setShowAuthModal(false);
+
+    // ✅ Trigger promo popup on login/signup
+    localStorage.removeItem('promo_seen');
+    setUserJustLoggedIn(true);
+    setTimeout(() => setUserJustLoggedIn(false), 6000); // Reset after 6s
 
     const isPartnerFlow = userMode === "partner" || (userMode === null && userData.role === "cafe");
 
@@ -578,7 +584,7 @@ function AppContent() {
       case "landing":
         return <LandingPage onSelectMode={handleModeSelection} />;
       case "home":
-        return <HomePage user={user} onNavigate={navigateTo} onShowAuth={() => setShowAuthModal(true)} />;
+        return <HomePage user={user} onNavigate={navigateTo} onShowAuth={() => setShowAuthModal(true)} userJustLoggedIn={userJustLoggedIn} />;
       case "complete-profile":
         return <CompleteProfile user={user} onComplete={handleCompleteProfile} />;
       case "onboarding":

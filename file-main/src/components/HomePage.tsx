@@ -15,9 +15,10 @@ interface HomePageProps {
   user: any;
   onNavigate: (page: string, data?: any) => void;
   onShowAuth: () => void;
+  userJustLoggedIn?: boolean;
 }
 
-export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps) {
+export default function HomePage({ user, onNavigate, onShowAuth, userJustLoggedIn }: HomePageProps) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [approvedCafes, setApprovedCafes] = useState<any[]>([]);
   const [totalCafes, setTotalCafes] = useState<number>(0);
@@ -196,7 +197,11 @@ export default function HomePage({ user, onNavigate, onShowAuth }: HomePageProps
 
   return (
     <div className="bg-[#fffbf5] box-border flex flex-col pb-0 pt-[0.8px] px-0 relative w-full overflow-x-hidden" data-name="Caffélino App">
-      <PromoPopup />
+      <PromoPopup
+        user={user}
+        onNavigate={onNavigate}
+        userJustLoggedIn={userJustLoggedIn}
+      />
       {/* Main Content */}
       <div className="relative w-full" data-name="HomePage">
         {/* Hero Section - Legendary Brown Gradient */}

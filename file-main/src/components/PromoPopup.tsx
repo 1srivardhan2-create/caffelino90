@@ -1,30 +1,116 @@
 import React, { useEffect, useState } from "react";
+import { BASE_URL } from "../utils/api";
 
-const PromoPopup = () => {
+interface PromoPopupProps {
+  user?: any;
+  selectedCafeName?: string;
+  userJustLoggedIn?: boolean;
+  onNavigate?: (page: string, data?: any) => void;
+}
+
+const PROMO_STORAGE_KEY = "promo_seen";
+const PROMO_TIME_KEY = "promo_time";
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+
+const PromoPopup: React.FC<PromoPopupProps> = ({
+  user,
+  selectedCafeName,
+  userJustLoggedIn,
+  onNavigate,
+}) => {
   const [show, setShow] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
+  const [couponAlreadyUsed, setCouponAlreadyUsed] = useState(false);
 
+  // ─── Check if coupon is already used by this user ─────────────
   useEffect(() => {
-    const seen = localStorage.getItem("promo_seen");
-    if (!seen) {
-      setTimeout(() => {
+    if (!user?.email) return;
+
+    const checkCouponUsage = async () => {
+      try {
+        // Quick validation check — send a dummy apply to see if already used
+        const res = await fetch(`${BASE_URL}/api/user/apply-coupon`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            code: "CAFFELINO",
+            email: user.email,
+            orderAmount: 9999, // high value so min-order check passes
+            cafeName: "Chocolate Room Cafe",
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok && data.message === "Coupon already used with this email") {
+          setCouponAlreadyUsed(true);
+        }
+      } catch {
+        // Silently fail — don't block popup
+      }
+    };
+    checkCouponUsage();
+  }, [user?.email]);
+
+  // ─── Smart popup display logic ────────────────────────────────
+  useEffect(() => {
+    // ❌ Don't show if coupon already used by user
+    if (couponAlreadyUsed) return;
+
+    const promoSeen = localStorage.getItem(PROMO_STORAGE_KEY);
+    const lastSeenTime = localStorage.getItem(PROMO_TIME_KEY);
+    const now = Date.now();
+
+    // 24h re-show: allow popup again after 24 hours
+    const expiredCooldown =
+      !lastSeenTime || now - parseInt(lastSeenTime, 10) > TWENTY_FOUR_HOURS;
+
+    // Determine if popup not seen in this cooldown window
+    const notSeenRecently = !promoSeen || expiredCooldown;
+
+    // If cooldown expired, clear the flag so popup can show again
+    if (expiredCooldown && promoSeen) {
+      localStorage.removeItem(PROMO_STORAGE_KEY);
+    }
+
+    const isChocolateRoom =
+      selectedCafeName &&
+      selectedCafeName.toLowerCase().includes("chocolate room");
+
+    const shouldShow =
+      notSeenRecently &&
+      (
+        !user ||               // First time visitor (not logged in)
+        userJustLoggedIn ||    // Just logged in / signed up
+        isChocolateRoom        // Opened Chocolate Room page
+      );
+
+    // 🔥 HIGH CONVERSION: Always show when Chocolate Room is selected
+    //    regardless of localStorage (unless coupon is used)
+    const forceShow = isChocolateRoom && !couponAlreadyUsed;
+
+    if (shouldShow || forceShow) {
+      const timer = setTimeout(() => {
         setShow(true);
         setTimeout(() => setAnimateIn(true), 50);
-      }, 600);
-      localStorage.setItem("promo_seen", "true");
-    }
-  }, []);
+      }, 2000);
 
+      return () => clearTimeout(timer);
+    }
+  }, [user, userJustLoggedIn, selectedCafeName, couponAlreadyUsed]);
+
+  // ─── Close handler ────────────────────────────────────────────
   const handleClose = () => {
     setAnimateIn(false);
     setTimeout(() => setShow(false), 300);
+    // Mark as seen + store timestamp
+    localStorage.setItem(PROMO_STORAGE_KEY, "true");
+    localStorage.setItem(PROMO_TIME_KEY, Date.now().toString());
   };
 
   if (!show) return null;
 
   return (
     <>
-      {/* Keyframes injected via style tag */}
+      {/* Keyframes */}
       <style>{`
         @keyframes popupFadeIn {
           from { opacity: 0; transform: scale(0.85) translateY(20px); }
@@ -41,6 +127,10 @@ const PromoPopup = () => {
         @keyframes pulseGlow {
           0%, 100% { box-shadow: 0 0 0 0 rgba(193, 154, 107, 0.4); }
           50% { box-shadow: 0 0 0 8px rgba(193, 154, 107, 0); }
+        }
+        @keyframes confettiBurst {
+          0% { opacity: 1; transform: translateY(0) scale(1); }
+          100% { opacity: 0; transform: translateY(-30px) scale(0.5); }
         }
       `}</style>
 
@@ -70,7 +160,8 @@ const PromoPopup = () => {
             maxWidth: "380px",
             textAlign: "center" as const,
             padding: "0",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(193,154,107,0.2)",
+            boxShadow:
+              "0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(193,154,107,0.2)",
             position: "relative" as const,
             overflow: "hidden",
             animation: animateIn
@@ -188,7 +279,8 @@ const PromoPopup = () => {
               Use code{" "}
               <span
                 style={{
-                  background: "linear-gradient(90deg, #c19a6b, #8b6914, #c19a6b)",
+                  background:
+                    "linear-gradient(90deg, #c19a6b, #8b6914, #c19a6b)",
                   backgroundSize: "200% auto",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
@@ -224,6 +316,43 @@ const PromoPopup = () => {
                 <strong>₹700</strong>
               </p>
             </div>
+
+            {/* CTA Button — only show if onNavigate is available */}
+            {onNavigate && (
+              <button
+                onClick={() => {
+                  handleClose();
+                  onNavigate("all-cafes");
+                }}
+                style={{
+                  width: "100%",
+                  padding: "12px 20px",
+                  background: "linear-gradient(135deg, #8b5943, #c19a6b)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "14px",
+                  fontSize: "15px",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 15px rgba(139,89,67,0.3)",
+                  transition: "all 0.2s ease",
+                  animation: "pulseGlow 2s infinite",
+                  marginBottom: "10px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.03)";
+                  e.currentTarget.style.boxShadow =
+                    "0 6px 20px rgba(139,89,67,0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 15px rgba(139,89,67,0.3)";
+                }}
+              >
+                Order Now →
+              </button>
+            )}
 
             {/* Terms */}
             <p

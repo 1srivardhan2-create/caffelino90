@@ -2,6 +2,7 @@ import { ArrowLeft, Star, MapPin, Clock, DollarSign, Phone, Share2, Store, Badge
 import { useState } from 'react';
 import { Cafe } from '../utils/cafesData';
 import POSMenuInterface from './POSMenuInterface';
+import PromoPopup from './PromoPopup';
 
 // Helper to resolve image URLs (prepend server base for /uploads/ paths)
 const resolveImageUrl = (url: string) => {
@@ -67,6 +68,12 @@ export default function CafeDetailsPage({ cafe, user, onBack, onNavigate }: Cafe
 
   return (
     <div className="min-h-screen bg-[#fffbf5] pb-20">
+      {/* Smart Promo Popup — triggers for Chocolate Room */}
+      <PromoPopup
+        user={user}
+        selectedCafeName={cafeName}
+        onNavigate={onNavigate}
+      />
       {/* Header */}
       <div className="sticky top-0 z-50 bg-[#be9d80] border-b border-black shadow-md">
         <div className="flex items-center justify-between px-4 py-3 h-[56px]">
