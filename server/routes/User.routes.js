@@ -156,12 +156,24 @@ router.post("/apply-coupon", async (req, res) => {
     }
 
     // ✅ VALIDATION ONLY — do NOT update usedCount or usersUsed here
+    const couponType = coupon.discountType || "flat";
+    let discountAmount = coupon.discount;
+    let finalAmount = orderAmount;
+
+    if (couponType === "percent") {
+      discountAmount = parseFloat(((orderAmount * coupon.discount) / 100).toFixed(2));
+      finalAmount = orderAmount - discountAmount;
+    } else {
+      finalAmount = orderAmount - coupon.discount;
+    }
+
     return res.json({
       success: true,
       code: coupon.code,
       discount: coupon.discount,
-      type: "flat",
-      finalAmount: orderAmount - coupon.discount
+      discountAmount,
+      type: couponType,
+      finalAmount
     });
 
   } catch (err) {

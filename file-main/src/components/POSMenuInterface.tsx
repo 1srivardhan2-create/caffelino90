@@ -226,7 +226,7 @@ export default function POSMenuInterface({
         };
         setAppliedCoupons(prev => [...prev, newCoupon]);
         setCouponInput('');
-        toast.success(`Coupon ${code} applied! ₹${data.discount} off 🎉`);
+        toast.success(`Coupon ${code} applied! ${data.type === 'percent' ? `${data.discount}% off (₹${data.discountAmount})` : `₹${data.discount} off`} 🎉`);
       } else {
         toast.error(data.message || 'Invalid or expired coupon');
       }
