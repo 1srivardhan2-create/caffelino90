@@ -315,56 +315,6 @@ const PromoPopup: React.FC<PromoPopupProps> = ({
                 🎉 Get flat <strong>₹100 off</strong> on orders above{" "}
                 <strong>₹700</strong>
               </p>
-            </div>
-
-            {/* CTA Button — only show if onNavigate is available */}
-            {onNavigate && (
-              <button
-                onClick={() => {
-                  handleClose();
-                  onNavigate("all-cafes");
-                }}
-                style={{
-                  width: "100%",
-                  padding: "12px 20px",
-                  background: "linear-gradient(135deg, #8b5943, #c19a6b)",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "14px",
-                  fontSize: "15px",
-                  fontWeight: "700",
-                  cursor: "pointer",
-                  boxShadow: "0 4px 15px rgba(139,89,67,0.3)",
-                  transition: "all 0.2s ease",
-                  animation: "pulseGlow 2s infinite",
-                  marginBottom: "10px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.03)";
-                  e.currentTarget.style.boxShadow =
-                    "0 6px 20px rgba(139,89,67,0.4)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "scale(1)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 15px rgba(139,89,67,0.3)";
-                }}
-              >
-                Order Now →
-              </button>
-            )}
-
-            {/* Terms */}
-            <p
-              style={{
-                fontSize: "11px",
-                color: "#aaa",
-                marginTop: "10px",
-                marginBottom: "0",
-              }}
-            >
-              *Valid for first-time users. Max 20 uses.
-            </p>
           </div>
         </div>
       </div>
