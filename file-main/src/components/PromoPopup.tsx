@@ -315,6 +315,7 @@ const PromoPopup: React.FC<PromoPopupProps> = ({
                 🎉 Get flat <strong>₹100 off</strong> on orders above{" "}
                 <strong>₹700</strong>
               </p>
+            </div>
           </div>
         </div>
       </div>
