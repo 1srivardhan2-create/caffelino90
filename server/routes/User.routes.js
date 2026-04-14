@@ -111,6 +111,7 @@ router.post("/orders", placeOrder);
 router.get("/myorders/:userId", getUserOrders);
 router.put("/profile/:userId", updateProfile);
 
+// ─── APPLY COUPON (VALIDATION ONLY — no DB usage update) ─────────
 router.post("/apply-coupon", async (req, res) => {
   try {
     const { code, email, orderAmount, cafeName } = req.body;
@@ -124,7 +125,7 @@ router.post("/apply-coupon", async (req, res) => {
     console.log("Incoming cafe:", cafeName);
     console.log("DB cafe:", coupon.cafe);
 
-    // ✅ FIXED CAFE CHECK
+    // ✅ CAFE CHECK
     if (
       !cafeName ||
       !cafeName.toLowerCase().includes("chocolate room")
@@ -147,12 +148,34 @@ router.post("/apply-coupon", async (req, res) => {
       return res.status(400).json({ message: "Coupon already used with this email" });
     }
 
-    // 🔒 ATOMIC UPDATE (IMPORTANT)
+    // ✅ VALIDATION ONLY — do NOT update usedCount or usersUsed here
+    return res.json({
+      success: true,
+      discount: coupon.discount,
+      finalAmount: orderAmount - coupon.discount
+    });
+
+  } catch (err) {
+    console.error("Apply Coupon Error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ─── CONFIRM COUPON USAGE (called ONLY after ₹20 token payment) ──
+router.post("/confirm-coupon-usage", async (req, res) => {
+  try {
+    const { code, email, orderAmount } = req.body;
+
+    if (!code || !email) {
+      return res.status(400).json({ message: "Coupon code and email are required" });
+    }
+
+    // 🔒 ATOMIC UPDATE — only now do we count usage
     const updated = await Coupon.findOneAndUpdate(
       {
         code,
         isActive: true,
-        usedCount: { $lt: coupon.maxUsage },
+        usedCount: { $lt: 20 },
         "usersUsed.email": { $ne: email }
       },
       {
@@ -165,23 +188,22 @@ router.post("/apply-coupon", async (req, res) => {
     );
 
     if (!updated) {
-      return res.status(400).json({ message: "Offer expired" });
+      return res.status(400).json({ message: "Coupon expired or already used" });
     }
 
+    // Deactivate coupon if max usage reached
     if (updated.usedCount >= updated.maxUsage) {
       updated.isActive = false;
       await updated.save();
     }
 
-    return res.json({
-      success: true,
-      discount: updated.discount,
-      finalAmount: orderAmount - updated.discount
-    });
+    console.log(`🎫 Coupon ${code} usage confirmed for ${email}. Count: ${updated.usedCount}/${updated.maxUsage}`);
+
+    res.json({ success: true });
 
   } catch (err) {
-    console.error("Apply Coupon Error:", err);
-    res.status(500).json({ message: "Server error" });
+    console.error("Confirm Coupon Usage Error:", err);
+    res.status(500).json({ message: "Error confirming coupon usage" });
   }
 });
 

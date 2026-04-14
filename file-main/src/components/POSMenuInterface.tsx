@@ -14,6 +14,8 @@ interface POSMenuInterfaceProps {
   membersList: any[];
   initialOrderItems?: OrderItem[];
   initialSplitEnabled?: boolean;
+  initialCouponCode?: string;
+  initialCouponDiscount?: number;
 }
 
 export interface POSConfirmData {
@@ -65,14 +67,16 @@ export default function POSMenuInterface({
   membersList,
   initialOrderItems,
   initialSplitEnabled,
+  initialCouponCode,
+  initialCouponDiscount,
 }: POSMenuInterfaceProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Show All');
   const [orderItems, setOrderItems] = useState<OrderItem[]>(initialOrderItems || []);
   const [isConfirming, setIsConfirming] = useState(false);
   const [splitEnabled, setSplitEnabled] = useState(initialSplitEnabled || false);
-  const [couponInput, setCouponInput] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState(false);
+  const [couponInput, setCouponInput] = useState(initialCouponCode || '');
+  const [appliedCoupon, setAppliedCoupon] = useState(!!initialCouponCode && (initialCouponDiscount ?? 0) > 0);
   const cartSectionRef = useRef<HTMLDivElement>(null);
 
   const scrollToCart = () => {

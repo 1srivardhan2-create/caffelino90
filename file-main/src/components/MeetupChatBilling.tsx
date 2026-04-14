@@ -1111,6 +1111,29 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
                 setTokenPaid(true);
                 setOrderConfirmed(true);
 
+                // ✅ Confirm coupon usage ONLY after successful payment
+                if (couponCode) {
+                  try {
+                    const couponRes = await fetch(`${BASE_URL}/api/user/confirm-coupon-usage`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        code: couponCode,
+                        email: user?.email || user?.id,
+                        orderAmount: calculateBill().total
+                      })
+                    });
+                    const couponData = await couponRes.json();
+                    if (couponData.success) {
+                      console.log('🎫 Coupon usage confirmed after payment');
+                    } else {
+                      console.warn('⚠️ Coupon confirmation failed:', couponData.message);
+                    }
+                  } catch (couponErr) {
+                    console.error('Failed to confirm coupon usage:', couponErr);
+                  }
+                }
+
                 // Emit order to cafe now that token is paid
                 const billData = calculateBill();
                 const emitId = effectiveOrderId || orderId;
@@ -1236,6 +1259,8 @@ export default function MeetupChatBilling({ user, meetupData, onNavigate, onBack
         isAdmin={isAdmin}
         initialOrderItems={orderItems.length > 0 ? orderItems : undefined}
         initialSplitEnabled={splitBill}
+        initialCouponCode={couponCode}
+        initialCouponDiscount={couponDiscount}
       />
     );
   }
