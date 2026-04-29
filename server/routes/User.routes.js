@@ -127,12 +127,16 @@ router.post("/apply-coupon", async (req, res) => {
     console.log("DB cafe:", coupon.cafe);
     console.log("Coupon code:", code, "Discount:", coupon.discount, "MinOrder:", coupon.minOrder);
 
-    // ✅ CAFE CHECK — both coupons are for Chocolate Room only
-    if (
-      !cafeName ||
-      !cafeName.toLowerCase().includes("chocolate room")
-    ) {
-      return res.status(400).json({ message: "Coupon not valid for this cafe" });
+    // ✅ CAFE CHECK — if coupon.cafe is "all", allow for every cafe; otherwise match cafe name
+    const couponCafe = (coupon.cafe || "").trim().toLowerCase();
+    if (couponCafe && couponCafe !== "all") {
+      // Coupon is restricted to a specific cafe — check name match
+      if (
+        !cafeName ||
+        !cafeName.toLowerCase().includes(couponCafe.replace(/\s*cafe\s*/gi, "").trim())
+      ) {
+        return res.status(400).json({ message: "Coupon not valid for this cafe" });
+      }
     }
 
     // ✅ DUPLICATE CHECK — can't apply same coupon twice
