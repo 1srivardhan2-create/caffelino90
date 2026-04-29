@@ -15,7 +15,7 @@ export default function MeetupDateTimePicker({
   selectedDate,
   selectedTime,
   className = '',
-  openingTime = 8, // 8:00 AM
+  openingTime = 10, // 10:00 AM
   closingTime = 22, // 10:00 PM
 }: MeetupDateTimePickerProps) {
   const [availableDates, setAvailableDates] = useState([] as { date: Date; fullDateStr: string; dayName: string; dayNum: string; monthName: string }[]);

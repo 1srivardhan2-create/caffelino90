@@ -10,7 +10,7 @@ async function checkSpecificOrder() {
         const fs = require('fs');
         fs.writeFileSync('specific_order.txt', JSON.stringify(order, null, 2));
         await mongoose.disconnect();
-    } catch(e) {
+    } catch (e) {
         console.error(e);
     }
 }
