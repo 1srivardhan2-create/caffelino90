@@ -24,7 +24,7 @@ async function seedLino9() {
           discount: 50,
           maxUsage: 20,
           usedCount: 0,
-          minOrder: 500,
+          minOrder: 300,
           cafe: "all",
           isActive: true,
           usersUsed: []

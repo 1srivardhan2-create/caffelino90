@@ -21,7 +21,8 @@ async function updateLino9() {
       { code: "LINO9" },
       {
         $set: {
-          cafe: "all"
+          cafe: "all",
+          minOrder: 300
         }
       }
     );
