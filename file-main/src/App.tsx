@@ -157,8 +157,7 @@ function AppContent() {
     if (savedProfile) return true;
 
     // Check if essential fields are present
-    // Check if essential fields are present
-    return !!(user.gender || user.city);
+    return !!(user.gender || user.city || user.mobileNumber);
   };
 
   const getPersistedPage = (): Page => {
@@ -526,13 +525,13 @@ function AppContent() {
         ...profileData,
         name: profileData.firstName + (profileData.lastName ? " " + profileData.lastName : ""),
         firstName: profileData.firstName,
-        age: profileData.age ? parseInt(profileData.age) : user.age || 0,
+        age: parseInt(profileData.age),
         gender: profileData.gender,
-        city: profileData.city || user.city || '',
-        interests: profileData.hobbies || user.interests || [],
+        city: profileData.city,
+        interests: profileData.hobbies || [],
         photo: profileData.profilePhoto || user.photo,
         avatarId: profileData.avatarId || '',
-        mobileNumber: profileData.mobileNumber || user.mobileNumber || '',
+        mobileNumber: profileData.mobileNumber,
       };
 
       try {
@@ -543,9 +542,9 @@ function AppContent() {
             firstName: profileData.firstName,
             lastName: profileData.lastName,
             gender: profileData.gender,
-            city: profileData.city || user.city,
-            age: profileData.age || user.age,
-            mobileNumber: profileData.mobileNumber || user.mobileNumber,
+            city: profileData.city,
+            age: profileData.age,
+            mobileNumber: profileData.mobileNumber,
           })
         });
         if (response.ok) {
@@ -564,9 +563,9 @@ function AppContent() {
         name: updatedUser.name,
         email: updatedUser.email,
         gender: profileData.gender,
-        age: profileData.age || user.age || '',
+        age: profileData.age,
         avatarId: profileData.avatarId || '',
-        mobileNumber: profileData.mobileNumber || user.mobileNumber || '',
+        mobileNumber: profileData.mobileNumber,
       }));
     }
     await navigateTo("home");
