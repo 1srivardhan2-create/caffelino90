@@ -157,7 +157,8 @@ function AppContent() {
     if (savedProfile) return true;
 
     // Check if essential fields are present
-    return !!(user.gender || user.city || user.mobileNumber);
+    // Check if essential fields are present
+    return !!(user.gender || user.city);
   };
 
   const getPersistedPage = (): Page => {
@@ -525,13 +526,13 @@ function AppContent() {
         ...profileData,
         name: profileData.firstName + (profileData.lastName ? " " + profileData.lastName : ""),
         firstName: profileData.firstName,
-        age: parseInt(profileData.age),
+        age: profileData.age ? parseInt(profileData.age) : user.age || 0,
         gender: profileData.gender,
-        city: profileData.city,
-        interests: profileData.hobbies || [],
+        city: profileData.city || user.city || '',
+        interests: profileData.hobbies || user.interests || [],
         photo: profileData.profilePhoto || user.photo,
         avatarId: profileData.avatarId || '',
-        mobileNumber: profileData.mobileNumber,
+        mobileNumber: profileData.mobileNumber || user.mobileNumber || '',
       };
 
       try {
@@ -542,9 +543,9 @@ function AppContent() {
             firstName: profileData.firstName,
             lastName: profileData.lastName,
             gender: profileData.gender,
-            city: profileData.city,
-            age: profileData.age,
-            mobileNumber: profileData.mobileNumber,
+            city: profileData.city || user.city,
+            age: profileData.age || user.age,
+            mobileNumber: profileData.mobileNumber || user.mobileNumber,
           })
         });
         if (response.ok) {
@@ -563,9 +564,9 @@ function AppContent() {
         name: updatedUser.name,
         email: updatedUser.email,
         gender: profileData.gender,
-        age: profileData.age,
+        age: profileData.age || user.age || '',
         avatarId: profileData.avatarId || '',
-        mobileNumber: profileData.mobileNumber,
+        mobileNumber: profileData.mobileNumber || user.mobileNumber || '',
       }));
     }
     await navigateTo("home");
