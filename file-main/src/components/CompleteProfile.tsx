@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import GenderAvatar from './GenderAvatar';
-import { Hash, Check, Phone } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { getAvatarsByGender, getCategoriesByGender, getAvatarsByCategory, getAvatarById, type AvatarOption } from '../utils/avatarData';
 
 interface CompleteProfileProps {
@@ -12,14 +12,10 @@ interface CompleteProfileProps {
 export default function CompleteProfile({ user, onComplete }: CompleteProfileProps) {
   const [profileData, setProfileData] = useState({
     firstName: '',
-    age: '',
     gender: '',
     avatarId: '',
-    mobileNumber: '',
   });
 
-  const [ageError, setAgeError] = useState(false);
-  const [mobileError, setMobileError] = useState('');
   const [showAvatarModal, setShowAvatarModal] = useState(false);
 
   // Auto-select default avatar when gender changes
@@ -32,53 +28,13 @@ export default function CompleteProfile({ user, onComplete }: CompleteProfilePro
     }
   }, [profileData.gender]);
 
-  const validateMobileNumber = (mobile: string): boolean => {
-    const mobileRegex = /^\+91[0-9]{10}$/;
-    return mobileRegex.test(mobile);
-  };
-
   const updateField = (field: string, value: any) => {
-    if (field === 'age') {
-      const ageValue = value.replace(/\D/g, '').slice(0, 2);
-      setProfileData(prev => ({ ...prev, [field]: ageValue }));
-      setAgeError(ageValue.length > 0 && ageValue.length !== 2);
-    } else if (field === 'mobileNumber') {
-      let mobileValue = value;
-      
-      if (!mobileValue.startsWith('+91') && mobileValue.length > 0) {
-        mobileValue = '+91' + mobileValue.replace(/\D/g, '');
-      }
-      
-      if (mobileValue.startsWith('+91')) {
-        const digitsAfter = mobileValue.slice(3).replace(/\D/g, '').slice(0, 10);
-        mobileValue = '+91' + digitsAfter;
-      }
-      
-      setProfileData(prev => ({ ...prev, [field]: mobileValue }));
-      
-      if (mobileValue.length > 0 && !validateMobileNumber(mobileValue)) {
-        setMobileError(mobileValue.length < 13 ? 'Must be 13 characters' : 'Invalid format');
-      } else {
-        setMobileError('');
-      }
-    } else {
-      setProfileData(prev => ({ ...prev, [field]: value }));
-    }
+    setProfileData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleComplete = () => {
-    if (!profileData.firstName || !profileData.age || !profileData.gender || !profileData.avatarId || !profileData.mobileNumber) {
+    if (!profileData.firstName || !profileData.gender || !profileData.avatarId) {
       toast.error('Please fill in all fields');
-      return;
-    }
-    
-    if (!validateMobileNumber(profileData.mobileNumber)) {
-      toast.error('Please enter a valid mobile number');
-      return;
-    }
-    
-    if (ageError) {
-      toast.error('Age must be 2 digits');
       return;
     }
     
@@ -140,48 +96,24 @@ export default function CompleteProfile({ user, onComplete }: CompleteProfilePro
                 />
               </div>
 
-              {/* Age & Gender Row */}
-              <div className="grid grid-cols-2 gap-4 w-full">
-                {/* Age */}
-                <div className="content-stretch flex flex-col gap-[6px] items-start">
-                  <p className="font-['Arial',sans-serif] leading-[14px] text-[#2c1810] text-[14px]">Age *</p>
-                  <div className="relative w-full">
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={profileData.age}
-                      onChange={(e) => updateField('age', e.target.value)}
-                      placeholder="25"
-                      maxLength={2}
-                      className={`bg-[#fff8f0] h-[40px] rounded-[10px] w-full px-[14px] pr-[36px] py-[4px] font-['Arial',sans-serif] text-[14px] text-[#2c1810] placeholder:text-[#6b4423] border-[0.8px] focus:outline-none ${
-                        ageError ? 'border-red-500' : 'border-[rgba(0,0,0,0)] focus:border-[#be9d80]'
-                      }`}
-                    />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                      <Hash className="w-4 h-4 text-[#6b4423]" opacity={0.5} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Gender */}
-                <div className="content-stretch flex flex-col gap-[6px] items-start">
-                  <p className="font-['Arial',sans-serif] leading-[14px] text-[#2c1810] text-[14px]">Gender *</p>
-                  <div className="relative w-full">
-                    <select
-                      value={profileData.gender}
-                      onChange={(e) => updateField('gender', e.target.value)}
-                      className="bg-[#fff8f0] h-[40px] rounded-[10px] w-full px-[14px] py-[4px] font-['Arial',sans-serif] text-[14px] text-[#2c1810] border-[0.8px] border-[rgba(0,0,0,0)] appearance-none focus:outline-none focus:border-[#be9d80]"
-                    >
-                      <option value="">Select</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                    </select>
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M4 6L8 10L12 6" stroke="#6B4423" strokeOpacity="0.5" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </div>
+              {/* Gender */}
+              <div className="content-stretch flex flex-col gap-[6px] items-start w-full">
+                <p className="font-['Arial',sans-serif] leading-[14px] text-[#2c1810] text-[14px]">Gender *</p>
+                <div className="relative w-full">
+                  <select
+                    value={profileData.gender}
+                    onChange={(e) => updateField('gender', e.target.value)}
+                    className="bg-[#fff8f0] h-[40px] rounded-[10px] w-full px-[14px] py-[4px] font-['Arial',sans-serif] text-[14px] text-[#2c1810] border-[0.8px] border-[rgba(0,0,0,0)] appearance-none focus:outline-none focus:border-[#be9d80]"
+                  >
+                    <option value="">Select</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M4 6L8 10L12 6" stroke="#6B4423" strokeOpacity="0.5" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                   </div>
                 </div>
               </div>
@@ -245,29 +177,7 @@ export default function CompleteProfile({ user, onComplete }: CompleteProfilePro
                 </div>
               </div>
 
-              {/* Mobile Number */}
-              <div className="content-stretch flex flex-col gap-[6px] items-start w-full">
-                <p className="font-['Arial',sans-serif] leading-[14px] text-[#2c1810] text-[14px]">Mobile *</p>
-                <div className="relative w-full">
-                  <input
-                    type="tel"
-                    inputMode="tel"
-                    value={profileData.mobileNumber}
-                    onChange={(e) => updateField('mobileNumber', e.target.value)}
-                    placeholder="+919876543210"
-                    maxLength={13}
-                    className={`bg-[#fff8f0] h-[40px] rounded-[10px] w-full px-[14px] pr-[36px] py-[4px] font-['Arial',sans-serif] text-[14px] text-[#2c1810] placeholder:text-[#6b4423] border-[0.8px] focus:outline-none ${
-                      mobileError ? 'border-red-500' : 'border-[rgba(0,0,0,0)] focus:border-[#be9d80]'
-                    }`}
-                  />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <Phone className="w-4 h-4 text-[#6b4423]" opacity={0.5} />
-                  </div>
-                </div>
-                {mobileError && (
-                  <p className="font-['Arial',sans-serif] text-[11px] text-red-500">{mobileError}</p>
-                )}
-              </div>
+
 
               {/* Save Button */}
               <button 

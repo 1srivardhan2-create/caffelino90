@@ -26,7 +26,7 @@ async function migrate() {
     try {
         await mongoose.connect(process.env.MONGO_URI);
         const Cafe = require("./models/Cafe/Cafe_login");
-        
+
         const concu = await Cafe.findOne({ Name: "concu" });
         if (concu && concu.profilePicture && concu.profilePicture.startsWith("data:")) {
             console.log("Migrating 'concu' profile picture...");

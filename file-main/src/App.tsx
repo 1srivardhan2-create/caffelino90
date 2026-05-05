@@ -88,7 +88,6 @@ type Page =
 interface User {
   id: string;
   name: string;
-  age: number;
   email: string;
   city: string;
   photo?: string;
@@ -96,7 +95,7 @@ interface User {
   verified: boolean;
   isAdmin?: boolean;
   avatarId?: string;
-  mobileNumber?: string;
+
   firstName?: string;
   lastName?: string;
   gender?: string;
@@ -157,7 +156,7 @@ function AppContent() {
     if (savedProfile) return true;
 
     // Check if essential fields are present
-    return !!(user.gender || user.city || user.mobileNumber);
+    return !!(user.gender || user.city);
   };
 
   const getPersistedPage = (): Page => {
@@ -525,13 +524,11 @@ function AppContent() {
         ...profileData,
         name: profileData.firstName + (profileData.lastName ? " " + profileData.lastName : ""),
         firstName: profileData.firstName,
-        age: parseInt(profileData.age),
         gender: profileData.gender,
         city: profileData.city,
         interests: profileData.hobbies || [],
         photo: profileData.profilePhoto || user.photo,
         avatarId: profileData.avatarId || '',
-        mobileNumber: profileData.mobileNumber,
       };
 
       try {
@@ -543,8 +540,6 @@ function AppContent() {
             lastName: profileData.lastName,
             gender: profileData.gender,
             city: profileData.city,
-            age: profileData.age,
-            mobileNumber: profileData.mobileNumber,
           })
         });
         if (response.ok) {
@@ -563,9 +558,7 @@ function AppContent() {
         name: updatedUser.name,
         email: updatedUser.email,
         gender: profileData.gender,
-        age: profileData.age,
         avatarId: profileData.avatarId || '',
-        mobileNumber: profileData.mobileNumber,
       }));
     }
     await navigateTo("home");
