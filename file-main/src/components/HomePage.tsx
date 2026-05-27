@@ -231,6 +231,16 @@ export default function HomePage({ user, onNavigate, onShowAuth, userJustLoggedI
                 Join Meetup
               </button>
             </div>
+            {/* Premium "Loved by Users" Button */}
+            <div className="mt-[20px] md:mt-[25px]">
+              <button
+                className="bg-[#6F4E37] h-[44px] md:h-[48px] rounded-full px-6 md:px-8 cursor-pointer hover:bg-[#8B5A42] transition-all shadow-md hover:shadow-lg w-full md:w-auto font-semibold text-[14px] md:text-[15px] text-white hover:scale-[1.05] active:scale-[0.98] flex items-center justify-center gap-2"
+                onClick={() => onNavigate('reviews')}
+              >
+                <span className="text-lg">⭐</span>
+                Loved by Users
+              </button>
+            </div>
           </div>
         </div>
 
