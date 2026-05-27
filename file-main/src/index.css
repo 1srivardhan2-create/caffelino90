@@ -7183,3 +7183,77 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0) scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1)) rotate(var(--tw-exit-rotate, 0));
   }
 }
+
+.premium-coffee-button {
+  position: relative;
+  overflow: visible;
+  background: linear-gradient(135deg, #4B2E2B 0%, #6F4E37 48%, #8B5E3C 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 40px rgba(79, 46, 40, 0.32);
+  backdrop-filter: blur(10px);
+  background-size: 240% 240%;
+  transition: transform .25s ease, box-shadow .25s ease, background-position .25s ease;
+}
+
+.premium-coffee-button:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 24px 54px rgba(79, 46, 40, 0.42);
+  background-position: 100% 0;
+}
+
+.premium-coffee-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.16), transparent 40%);
+  pointer-events: none;
+}
+
+.premium-coffee-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 30%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.coffee-steam {
+  display: inline-block;
+  width: 5px;
+  height: 18px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0));
+  filter: blur(0.75px);
+  animation: steam-rise 1.6s ease-in-out infinite;
+}
+
+.coffee-steam-1 {
+  animation-delay: 0s;
+  transform: translateX(-3px);
+}
+
+.coffee-steam-2 {
+  animation-delay: 0.18s;
+  transform: translateX(3px);
+}
+
+@keyframes steam-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.92);
+  }
+
+  20% {
+    opacity: 0.65;
+    transform: translateY(0px) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-18px) scale(1.05);
+  }
+}
+

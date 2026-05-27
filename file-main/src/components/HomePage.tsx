@@ -231,13 +231,18 @@ export default function HomePage({ user, onNavigate, onShowAuth, userJustLoggedI
                 Join Meetup
               </button>
             </div>
-            {/* Premium "Loved by Users" Button */}
-            <div className="mt-[20px] md:mt-[25px]">
+            <div className="w-full flex justify-center mt-[22px]">
               <button
-                className="bg-[#6F4E37] h-[44px] md:h-[48px] rounded-full px-6 md:px-8 cursor-pointer hover:bg-[#8B5A42] transition-all shadow-md hover:shadow-lg w-full md:w-auto font-semibold text-[14px] md:text-[15px] text-white hover:scale-[1.05] active:scale-[0.98] flex items-center justify-center gap-2"
+                className="group relative overflow-visible inline-flex items-center justify-center gap-2 rounded-full px-7 md:px-9 h-[46px] md:h-[50px] max-w-[300px] premium-coffee-button text-white font-semibold text-[14px] md:text-[15px] transition-all duration-300 ease-out active:scale-[0.99]"
                 onClick={() => onNavigate('reviews')}
               >
-                <span className="text-lg">⭐</span>
+                <span className="absolute -top-10 left-1/2 flex -translate-x-1/2 flex-col items-center gap-[4px] opacity-0 transition-all duration-300 ease-out group-hover:opacity-100 pointer-events-none">
+                  <span className="coffee-steam coffee-steam-1" />
+                  <span className="coffee-steam coffee-steam-2" />
+                </span>
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/12 text-[16px]">
+                  ☕
+                </span>
                 Loved by Users
               </button>
             </div>
