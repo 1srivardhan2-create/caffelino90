@@ -234,16 +234,14 @@ export default function HomePage({ user, onNavigate, onShowAuth, userJustLoggedI
             <div className="w-full flex justify-center mt-[22px]">
               <button
                 className="group relative overflow-visible inline-flex items-center justify-center gap-2 rounded-full px-7 md:px-9 h-[46px] md:h-[50px] max-w-[300px] premium-coffee-button text-white font-semibold text-[14px] md:text-[15px] transition-all duration-300 ease-out active:scale-[0.99]"
-                onClick={() => onNavigate('reviews')}
+                onClick={() => onNavigate('loved-by-users')}
               >
                 <span className="absolute -top-10 left-1/2 flex -translate-x-1/2 flex-col items-center gap-[4px] opacity-0 transition-all duration-300 ease-out group-hover:opacity-100 pointer-events-none">
                   <span className="coffee-steam coffee-steam-1" />
                   <span className="coffee-steam coffee-steam-2" />
                 </span>
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/12 text-[16px]">
-                  ☕
-                </span>
-                Loved by Users
+                <Coffee className="h-5 w-5 text-white" />
+                ☕ Loved by Users
               </button>
             </div>
           </div>

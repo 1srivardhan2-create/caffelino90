@@ -6,6 +6,7 @@ import { Toaster } from './components/ui/sonner';
 import { AnimatePresence } from 'framer-motion';
 import LandingPage from './components/LandingPage';
 import HomePage from './components/HomePage';
+import LovedByUsersPage from './components/LovedByUsersPage';
 import LoginSignup from './components/LoginSignup';
 import CompleteProfile from './components/CompleteProfile';
 import OnboardingPreferences from './components/OnboardingPreferences';
@@ -53,6 +54,7 @@ type Page =
   | "complete-profile"
   | "onboarding"
   | "profile"
+  | "loved-by-users"
   | "group-detail"
   | "cafe-menu"
   | "payment"
@@ -160,6 +162,9 @@ function AppContent() {
   };
 
   const getPersistedPage = (): Page => {
+    const pathPage = getPageFromPath(typeof window !== 'undefined' ? window.location.pathname : '');
+    if (pathPage) return pathPage;
+
     const user = getPersistedUser();
     const savedCurrentPage = safeStorage.getItem('caffelino_currentPage') as Page;
     const userMode = safeStorage.getItem('caffelino_userMode');
@@ -220,6 +225,16 @@ function AppContent() {
     return null;
   };
 
+  const getPageFromPath = (path: string): Page | null => {
+    if (path === '/loved-by-users') return 'loved-by-users';
+    return null;
+  };
+
+  const getUrlFromPage = (page: Page): string => {
+    if (page === 'loved-by-users') return '/loved-by-users';
+    return '/';
+  };
+
   const getPersistedMode = (): "go" | "partner" | null => {
     try {
       const saved = safeStorage.getItem('caffelino_userMode');
@@ -265,7 +280,8 @@ function AppContent() {
     if (typeof history !== 'undefined' && 'scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
     }
-    window.history.replaceState({ page: getPersistedPage() }, '');
+    const initialPage = getPersistedPage();
+    window.history.replaceState({ page: initialPage }, '', getUrlFromPage(initialPage));
     safeWindow.scrollTo(0, 0);
   }, []);
 
@@ -279,7 +295,7 @@ function AppContent() {
         if (chatPages.includes(currentPage) || skipPages.includes(event.state.page)) {
           setCurrentPage('home' as Page);
           setPageHistory(['home'] as Page[]);
-          window.history.replaceState({ page: 'home' }, '');
+          window.history.replaceState({ page: 'home' }, '', getUrlFromPage('home'));
           return;
         }
         setCurrentPage(event.state.page);
@@ -291,6 +307,10 @@ function AppContent() {
           }
           return ['landing'];
         });
+      } else if (pathPage) {
+        isPopStateNav.current = true;
+        setCurrentPage(pathPage);
+        setPageHistory([pathPage]);
       }
     };
     window.addEventListener('popstate', handlePopState);
@@ -301,8 +321,9 @@ function AppContent() {
     if (isPopStateNav.current) {
       isPopStateNav.current = false;
     } else {
-      window.history.pushState({ page: currentPage }, '', '');
+      window.history.pushState({ page: currentPage }, '', getUrlFromPage(currentPage));
     }
+
     safeWindow.scrollTo(0, 0);
     safeDocument.scrollTop.set(0);
   }, [currentPage]);
@@ -576,7 +597,7 @@ function AppContent() {
     "cafe-verification-pending", "group-home", "voting-complete", "admin-details",
     "meetup-code", "create-meetup-step3", "cafe-selection-create", "cafe-voting-create",
     "meetup-chat-billing", "meetup-chat-billing-completed", "payment-online",
-    "join-meetup", "join-voting", "meetup-group-page"
+    "join-meetup", "join-voting", "meetup-group-page", "loved-by-users"
   ];
 
   const showHeader = !noHeaderPages.includes(currentPage);
@@ -627,6 +648,8 @@ function AppContent() {
         return <HowItWorks onNavigate={navigateTo} />;
       case "safety-guidelines":
         return <SafetyGuidelines onNavigate={navigateTo} />;
+      case "loved-by-users":
+        return <LovedByUsersPage onNavigate={navigateTo} />;
       case "admin-details":
         return <AdminDetails user={user} onNavigate={navigateTo} onBack={handleBack} />;
       case "meetup-code":
