@@ -13,33 +13,11 @@ interface FeedbackComment {
   stars: number;
 }
 
-const sampleComments: FeedbackComment[] = [
-  {
-    id: 1,
-    name: 'Avery',
-    text: 'The vibe is premium and warm—like coffee in a luxe lounge.',
-    stars: 5,
-  },
-  {
-    id: 2,
-    name: 'Jules',
-    text: 'Feels like a cinematic café experience with every review.',
-    stars: 5,
-  },
-];
-
-const floatingOffsets = [
-  { x: [0, 18, 0], y: [0, -10, 0] },
-  { x: [0, -20, 0], y: [0, 14, 0] },
-  { x: [0, 16, 0], y: [0, 8, 0] },
-  { x: [0, -14, 0], y: [0, -16, 0] },
-];
-
 export default function LovedByUsersPage({ onNavigate }: LovedByUsersPageProps) {
   const [name, setName] = useState('');
   const [text, setText] = useState('');
   const [stars, setStars] = useState(5);
-  const [comments, setComments] = useState<FeedbackComment[]>(sampleComments);
+  const [comments, setComments] = useState<FeedbackComment[]>([]);
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = () => {
@@ -99,7 +77,7 @@ export default function LovedByUsersPage({ onNavigate }: LovedByUsersPageProps) 
           Back to Home
         </button>
 
-        <section className="grid gap-8 xl:grid-cols-[1.05fr_0.95fr]">
+        <section className="grid gap-8">
           <div className="rounded-[38px] border border-white/15 bg-white/10 p-8 shadow-[0_30px_90px_rgba(0,0,0,0.25)] backdrop-blur-xl">
             <div className="mx-auto max-w-3xl text-center">
               <p className="mb-4 text-sm uppercase tracking-[0.3em] text-[#d7b9a0]">Loved by Real People</p>
@@ -111,7 +89,7 @@ export default function LovedByUsersPage({ onNavigate }: LovedByUsersPageProps) 
               </p>
             </div>
 
-            <div className="mt-10 grid gap-6 md:grid-cols-[1.1fr_0.9fr]">
+            <div className="mt-10">
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -188,78 +166,6 @@ export default function LovedByUsersPage({ onNavigate }: LovedByUsersPageProps) 
                   )}
                 </div>
               </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: 'easeOut', delay: 0.12 }}
-                className="rounded-[30px] border border-white/20 bg-white/10 p-6 shadow-[0_18px_50px_rgba(0,0,0,0.24)] backdrop-blur-xl"
-              >
-                <p className="text-sm uppercase tracking-[0.24em] text-[#d7b9a0]">Live preview</p>
-                <div className="mt-5 grid gap-4">
-                  {comments.slice(0, 3).map((comment) => (
-                    <div key={comment.id} className="rounded-[26px] border border-white/10 bg-[#3b1f14]/85 p-4 shadow-[inset_0_1px_3px_rgba(255,255,255,0.06)]">
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="font-semibold text-[#f7efe8]">{comment.name}</p>
-                          <div className="flex gap-1 text-[#f5d48d]">{Array.from({ length: 5 }).map((_, index) => <span key={index}>{index < comment.stars ? '★' : '☆'}</span>)}</div>
-                        </div>
-                        <div className="h-10 w-10 rounded-full bg-[#ffe8c7]/20 ring-1 ring-white/10" />
-                      </div>
-                      <p className="mt-4 text-sm leading-6 text-[#e6d0bd]">“{comment.text}”</p>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            </div>
-          </div>
-
-          <div className="relative flex flex-col gap-6">
-            <div className="overflow-hidden rounded-[38px] border border-white/15 bg-white/10 p-6 shadow-[0_32px_95px_rgba(0,0,0,0.28)] backdrop-blur-xl">
-              <div className="absolute -right-8 top-12 h-28 w-28 rounded-full bg-[#c89a75]/20 blur-3xl opacity-80" />
-              <div className="relative z-10">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm uppercase tracking-[0.28em] text-[#d7b9a0]">Floating review wall</p>
-                    <h2 className="mt-2 text-2xl font-semibold text-[#fbf7f0]">Cinematic drift cards</h2>
-                  </div>
-                  <span className="rounded-full border border-[#f5d48d]/20 bg-[#f5d48d]/10 px-3 py-1 text-xs uppercase tracking-[0.24em] text-[#d7b9a0]">
-                    premium
-                  </span>
-                </div>
-
-                <div className="mt-6 grid gap-4">
-                  {comments.map((comment, index) => (
-                    <motion.div
-                      key={comment.id}
-                      animate={floatingOffsets[index % floatingOffsets.length]}
-                      transition={{ duration: 9 + index * 0.8, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' }}
-                      className="rounded-[32px] border border-white/15 bg-[#321d16]/90 p-5 shadow-[0_20px_55px_rgba(0,0,0,0.24)] backdrop-blur-xl"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="font-semibold text-[#f8ebe1]">{comment.name}</p>
-                          <div className="flex gap-1 text-[#f5d48d]">{Array.from({ length: 5 }).map((_, starIndex) => <span key={starIndex}>{starIndex < comment.stars ? '★' : '☆'}</span>)}</div>
-                        </div>
-                        <div className="h-11 w-11 rounded-full bg-[#e6c9ad]/20 ring-1 ring-white/10" />
-                      </div>
-                      <p className="mt-4 text-sm leading-7 text-[#dcc4ae]">“{comment.text}”</p>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="overflow-hidden rounded-[32px] border border-white/15 bg-white/10 p-6 shadow-[0_26px_75px_rgba(0,0,0,0.25)] backdrop-blur-xl">
-              <p className="text-sm uppercase tracking-[0.28em] text-[#d7b9a0]">Ambient mood</p>
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-[28px] border border-white/10 bg-[#3a2117]/85 p-4 text-sm text-[#e6d0bd]">
-                  Warm brown glass surfaces, soft glow borders, and cinematic blur layers.
-                </div>
-                <div className="rounded-[28px] border border-white/10 bg-[#3a2117]/85 p-4 text-sm text-[#e6d0bd]">
-                  Floating review cards drift like memories, giving the page a premium café lounge feel.
-                </div>
-              </div>
             </div>
           </div>
         </section>
