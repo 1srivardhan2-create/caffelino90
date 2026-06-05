@@ -32,6 +32,7 @@ const userRoutes = require("./routes/User.routes");
 const chatRoutes = require("./routes/Chat.route");
 const authRoutes = require("./routes/Auth.routes");
 const meetupRoutes = require("./routes/Meetup.routes");
+const eventRoutes = require("./routes/Event.routes");
 
 // ─── Middleware Setup ────────────────────────────────────────────
 app.use(cors());
@@ -55,6 +56,16 @@ app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/meetups", meetupRoutes);
+app.use("/api/events", eventRoutes);
+
+const favoriteRoutes = require("./routes/Favorite.routes");
+app.use("/api/favorites", favoriteRoutes);
+
+const reviewRoutes = require("./routes/Review.routes");
+app.use("/api/reviews", reviewRoutes);
+
+const feedbackRoutes = require("./routes/Feedback.routes");
+app.use("/api/feedback", feedbackRoutes);
 
 // Meetup Order management (accept, cash-collected, delete, earnings)
 const meetupOrderRoutes = require("./routes/MeetupOrder.routes");
@@ -106,9 +117,23 @@ io.on("connection", (socket) => {
         io.to(data.meetupId).emit("receive_message", data);
     });
 
+    // Typing indicator
+    socket.on("typing", (data) => {
+        socket.to(data.meetupId).emit("typing", data);
+    });
+
     // Member joined notification
     socket.on("member_joined", (data) => {
         io.to(data.meetupId).emit("member_joined", data);
+    });
+
+    // Presence / Online status
+    socket.on("presence", (data) => {
+        io.to(data.meetupId).emit("presence", data);
+    });
+
+    socket.on("request_presence", (meetupId) => {
+        socket.to(meetupId).emit("request_presence");
     });
 
     // Vote update notification

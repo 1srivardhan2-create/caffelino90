@@ -23,7 +23,7 @@ function generateMeetupCode() {
 // ─── CREATE MEETUP ───────────────────────────────────────────────
 const createMeetup = async (req, res) => {
     try {
-        const { title, organizerId, organizerName, date, time } = req.body;
+        const { title, organizerId, organizerName, organizerAvatarId, date, time } = req.body;
 
         if (!title || !organizerId || !organizerName) {
             return res.status(400).json({ message: "title, organizerId, and organizerName are required" });
@@ -41,7 +41,7 @@ const createMeetup = async (req, res) => {
         const meetup = await Meetup.create({
             meetupCode,
             title,
-            organizerId,
+            organizerId: String(organizerId),
             organizerName,
             date: date || "",
             time: time || "",
@@ -49,6 +49,7 @@ const createMeetup = async (req, res) => {
                 {
                     userId: organizerId,
                     name: organizerName,
+                    avatarId: organizerAvatarId || undefined,
                     joinedAt: new Date(),
                 },
             ],
@@ -81,7 +82,7 @@ const createMeetup = async (req, res) => {
 // ─── JOIN MEETUP ─────────────────────────────────────────────────
 const joinMeetup = async (req, res) => {
     try {
-        const { meetupCode, userId, name } = req.body;
+        const { meetupCode, userId, name, avatarId } = req.body;
 
         if (!meetupCode || !userId || !name) {
             return res.status(400).json({ message: "meetupCode, userId, and name are required" });
@@ -104,7 +105,7 @@ const joinMeetup = async (req, res) => {
         }
 
         // Use standard MongoDB push + save as per standard pattern
-        meetup.members.push({ userId, name, joinedAt: new Date() });
+        meetup.members.push({ userId, name, avatarId: avatarId || undefined, joinedAt: new Date() });
         await meetup.save();
 
         console.log(`👤 ${name} joined meetup ${meetupCode}`);
@@ -270,7 +271,7 @@ const countMeetups = async (req, res) => {
 //       duplicate messages.
 const sendMessage = async (req, res) => {
     try {
-        const { meetupId, userId, userName, message, type, billData, paymentData } = req.body;
+        const { meetupId, userId, userName, avatarId, message, type, billData, paymentData } = req.body;
 
         if (!meetupId || !userId || !userName) {
             return res.status(400).json({ message: "meetupId, userId, and userName are required" });
@@ -293,6 +294,7 @@ const sendMessage = async (req, res) => {
             meetupId,
             userId,
             userName,
+            avatarId: avatarId || undefined,
             message: message || '',
             type: msgType,
             billData: billData || undefined,
@@ -634,14 +636,45 @@ const getCafeMenu = async (req, res) => {
     }
 };
 
-// ─── VALID COUPONS (static map) ──────────────────────────────────
+// ─── VALID COUPONS (official: LINO9 only) ────────────────────────
 const VALID_COUPONS = {
-    'WELCOME50': 50,
-    'FLAT100': 100,
-    'CAFE20': 20,
-    'MEETUP75': 75,
-    'FIRST25': 25,
+    LINO9: { type: "percent", value: 9, minOrder: 0 },
 };
+
+const PREMIUM_CAFE_MIN_ORDER = 500;
+const STANDARD_CAFE_MIN_ORDER = 300;
+
+function getMinimumOrderForCafe(cafeName = "") {
+    const name = String(cafeName).trim().toLowerCase();
+    if (
+        name.includes("chocolate room") ||
+        name.includes("kaapiya")
+    ) {
+        return PREMIUM_CAFE_MIN_ORDER;
+    }
+    if (
+        name.includes("living room") ||
+        name.includes("alkemy")
+    ) {
+        return STANDARD_CAFE_MIN_ORDER;
+    }
+    return STANDARD_CAFE_MIN_ORDER;
+}
+
+function computeCouponDiscount(code, subtotal) {
+    const upperCode = code.trim().toUpperCase();
+    const rule = VALID_COUPONS[upperCode];
+    if (!rule) return null;
+    if (subtotal < (rule.minOrder || 0)) {
+        return { error: `Minimum order ₹${rule.minOrder} required for this coupon` };
+    }
+    let discount =
+        rule.type === "percent"
+            ? parseFloat(((subtotal * rule.value) / 100).toFixed(2))
+            : rule.value;
+    discount = Math.min(discount, subtotal);
+    return { code: upperCode, discount, rule };
+}
 
 // ─── APPLY COUPON ────────────────────────────────────────────────
 const applyCoupon = async (req, res) => {
@@ -652,23 +685,22 @@ const applyCoupon = async (req, res) => {
             return res.status(400).json({ message: "Coupon code is required" });
         }
 
-        const upperCode = code.trim().toUpperCase();
-        const discount = VALID_COUPONS[upperCode];
-
-        if (discount === undefined) {
+        const result = computeCouponDiscount(code, subtotal || 0);
+        if (!result) {
             return res.status(400).json({ success: false, message: "Invalid coupon code" });
         }
+        if (result.error) {
+            return res.status(400).json({ success: false, message: result.error });
+        }
 
-        // Cap discount at the subtotal
-        const actualDiscount = Math.min(discount, subtotal || Infinity);
-
-        console.log(`🎫 Coupon ${upperCode} validated: ₹${actualDiscount} off`);
+        console.log(`🎫 Coupon ${result.code} validated: ₹${result.discount} off`);
 
         res.json({
             success: true,
-            code: upperCode,
-            discount: actualDiscount,
-            message: `Coupon applied! ₹${actualDiscount} off`,
+            code: result.code,
+            discount: result.discount,
+            discountType: result.rule.type,
+            message: `Coupon applied! ₹${result.discount} off`,
         });
     } catch (error) {
         console.error("Apply Coupon Error:", error);
@@ -676,10 +708,220 @@ const applyCoupon = async (req, res) => {
     }
 };
 
+// ─── TABLE RESERVATION (₹20 — host only) ─────────────────────────
+const confirmTableReservation = async (req, res) => {
+    try {
+        const { meetupId, userId, userName, demo } = req.body;
+
+        if (!meetupId || !userId) {
+            return res.status(400).json({ message: "meetupId and userId are required" });
+        }
+
+        const meetup = await Meetup.findById(meetupId);
+        if (!meetup) {
+            return res.status(404).json({ message: "Meetup not found" });
+        }
+
+        if (String(meetup.organizerId) !== String(userId)) {
+            return res.status(403).json({ message: "Only the meetup host can pay the reservation fee" });
+        }
+
+        if (meetup.reservationFeePaid) {
+            return res.json({
+                success: true,
+                alreadyPaid: true,
+                tableNumber: meetup.tableNumber,
+                meetup,
+            });
+        }
+
+        const tableNumber =
+            meetup.tableNumber ||
+            `T-${Math.floor(Math.random() * 12) + 1}`;
+
+        meetup.reservationFeePaid = true;
+        meetup.reservationFeeAmount = 20;
+        meetup.tableNumber = tableNumber;
+        meetup.status = "confirmed";
+        meetup.billLocked = true;
+        await meetup.save();
+
+        const cafeName =
+            meetup.selectedCafe?.cafeName ||
+            meetup.selectedCafe?.name ||
+            "Café";
+        const cafeId = meetup.selectedCafe?.cafeId;
+
+        await MeetupMessage.updateMany(
+            { meetupId, type: "bill", "billData.cardType": { $in: ["meetup_bill", "order_placed"] } },
+            { $set: { "billData.locked": true, "billData.billStatus": "locked" } },
+        );
+
+        const pendingOrders = await MeetupOrder.find({
+            meetupId,
+            status: { $in: ["BILL_PENDING", "PENDING", "PLACED"] },
+        });
+
+        for (const order of pendingOrders) {
+            order.status = "CONFIRMED";
+            order.orderStatus = "CONFIRMED";
+            await order.save();
+
+            if (req.io && cafeId) {
+                req.io.to(`cafe_${cafeId}`).emit("order-created", {
+                    orderId: order.orderId,
+                    meetupId: String(meetupId),
+                    cafeId,
+                    memberCount: meetup.members?.length || 1,
+                    items: (order.items || []).map((i) => ({
+                        name: i.name,
+                        quantity: i.quantity || 1,
+                        price: i.price || 0,
+                    })),
+                    totalAmount: order.total,
+                    subtotal: order.subtotal,
+                    cgst: order.cgst,
+                    sgst: order.sgst,
+                    tableNumber,
+                    reservationFeePaid: true,
+                    adminName: meetup.organizerName,
+                });
+            }
+        }
+
+        const confirmMsg = await MeetupMessage.create({
+            meetupId,
+            userId: String(userId),
+            userName: userName || meetup.organizerName || "Host",
+            message: "Meetup confirmed",
+            type: "bill",
+            billData: {
+                cardType: "meetup_confirmed",
+                cafeName,
+                tableNumber,
+                reservationFee: 20,
+            },
+        });
+
+        const lockMsg = await MeetupMessage.create({
+            meetupId,
+            userId: String(userId),
+            userName: userName || meetup.organizerName || "Host",
+            message: "Order locked",
+            type: "bill",
+            billData: {
+                cardType: "order_locked",
+                tableNumber,
+            },
+        });
+
+        if (req.io) {
+            req.io.to(meetupId).emit("receive_message", confirmMsg);
+            req.io.to(meetupId).emit("receive_message", lockMsg);
+            if (cafeId) {
+                req.io.to(`cafe_${cafeId}`).emit("meetup_booking", {
+                    meetupId,
+                    meetupCode: meetup.meetupCode,
+                    title: meetup.title,
+                    host: meetup.organizerName,
+                    memberCount: meetup.members?.length || 1,
+                    date: meetup.date,
+                    time: meetup.time,
+                    reservationFeePaid: true,
+                    tableNumber,
+                    status: "confirmed",
+                });
+            }
+        }
+
+        console.log(
+            `☕ Table reserved for meetup ${meetup.meetupCode}: ${tableNumber}${demo ? " (demo)" : ""}`,
+        );
+
+        res.json({
+            success: true,
+            tableNumber,
+            reservationFeeAmount: 20,
+            meetup,
+            message: confirmMsg,
+        });
+    } catch (error) {
+        console.error("Confirm Table Reservation Error:", error);
+        res.status(500).json({
+            message: "Failed to confirm table reservation",
+            error: error.message,
+        });
+    }
+};
+
+function formatDisplayOrderId(orderId = "") {
+    const digits = String(orderId).replace(/\D/g, "");
+    if (digits.length >= 6) return digits.slice(-6);
+    return String(orderId).slice(-6).toUpperCase() || "------";
+}
+
+async function postOrderBillMessage(meetupId, userId, userName, order, extras = {}) {
+    require("fs").appendFileSync("order_debug.log", `[${new Date().toISOString()}] 🛠️ inside postOrderBillMessage... orderId: ${order.orderId}\n`);
+    try {
+        const cgst = order.cgst || 0;
+        const sgst = order.sgst || 0;
+        const memberCount = extras.memberCount || 1;
+        const finalAmount = order.total || 0;
+        const splitEnabled = extras.splitEnabled === true;
+        const perPerson = splitEnabled
+            ? extras.perPersonAmount ||
+              (memberCount > 0
+                  ? Math.round((finalAmount / memberCount) * 100) / 100
+                  : finalAmount)
+            : finalAmount;
+
+        require("fs").appendFileSync("order_debug.log", `[${new Date().toISOString()}] 🛠️ Calling MeetupMessage.create...\n`);
+        const billMsg = await MeetupMessage.create({
+            meetupId,
+            userId: String(userId),
+        userName,
+        message: "Bill generated",
+        type: "bill",
+        billData: {
+            cardType: "meetup_bill",
+            orderId: order.orderId,
+            displayOrderId: formatDisplayOrderId(order.orderId),
+            cafeName: extras.cafeName || "",
+            orderedBy: userName,
+            billCreatorId: String(userId),
+            items: (order.items || []).map((i) => ({
+                name: i.name,
+                quantity: i.quantity || 1,
+                price: i.price,
+            })),
+            subtotal: order.subtotal,
+            cgst,
+            sgst,
+            gstTotal: parseFloat((cgst + sgst).toFixed(2)),
+            coupon: extras.couponCode || "",
+            couponDiscount: extras.couponDiscount || 0,
+            totalPayable: finalAmount,
+            finalAmount,
+            splitEnabled,
+            perPersonAmount: perPerson,
+            hostPaysAmount: splitEnabled ? undefined : finalAmount,
+            memberCount,
+            locked: false,
+            billStatus: "awaiting_table_confirmation",
+        }
+    });
+        require("fs").appendFileSync("order_debug.log", `[${new Date().toISOString()}] ✅ MeetupMessage.create SUCCEEDED!\n`);
+        return billMsg;
+    } catch (err) {
+        require("fs").appendFileSync("order_debug.log", `[${new Date().toISOString()}] ❌ MeetupMessage.create FAILED: ${err.message}\n`);
+        throw err;
+    }
+}
+
 // ─── PLACE ORDER ─────────────────────────────────────────────────
 const placeOrder = async (req, res) => {
     try {
-        const { meetupId, userId, userName, items, total, subtotal, cgst, sgst, status, cafeId, orderId, splitEnabled, perPersonAmount, members, commission, memberCount, meetupDate, meetupTime } = req.body;
+        const { meetupId, userId, userName, items, total, subtotal, cgst, sgst, status, cafeId, orderId, splitEnabled, perPersonAmount, members, commission, memberCount, meetupDate, meetupTime, couponCode, couponDiscount, splitType, finalAmount, postBillToChat } = req.body;
         
         // Debug logging
         require("fs").appendFileSync("order_debug.log", `[${new Date().toISOString()}] Incoming order: ${userName} for cafe: ${cafeId}, status: ${status}, orderId: ${orderId}\n`);
@@ -699,10 +941,60 @@ const placeOrder = async (req, res) => {
                 return res.status(400).json({ message: "Invalid meetupId format" });
             }
 
+            const meetupRow = await Meetup.findById(meetupId)
+                .select("billLocked organizerId reservationFeePaid selectedCafe tableNumber members")
+                .lean();
+
+            if (meetupRow?.billLocked) {
+                return res.status(403).json({
+                    success: false,
+                    message: "Bill is locked and cannot be changed after meetup confirmation.",
+                });
+            }
+
+            let order = null;
+            if (orderId) {
+                order = await MeetupOrder.findOne({ orderId });
+            }
+
+            if (order) {
+                if (String(order.userId) !== String(userId)) {
+                    return res.status(403).json({
+                        success: false,
+                        message: "Only the bill creator can edit this order.",
+                    });
+                }
+            } else if (String(meetupRow?.organizerId) !== String(userId)) {
+                return res.status(403).json({
+                    success: false,
+                    message: "Only the meetup host can create the bill.",
+                });
+            }
+
+            const cafeNameForMin =
+                meetupRow?.selectedCafe?.cafeName ||
+                meetupRow?.selectedCafe?.name ||
+                "";
+            const minOrder = getMinimumOrderForCafe(cafeNameForMin);
+            const strictSubtotalCheck = items.reduce(
+                (sum, item) => sum + item.price * (item.quantity || 1),
+                0,
+            );
+            if (strictSubtotalCheck < minOrder) {
+                const need = parseFloat((minOrder - strictSubtotalCheck).toFixed(2));
+                return res.status(400).json({
+                    success: false,
+                    message: `Minimum order for this meetup is ₹${minOrder}. Add items worth ₹${need} more to continue.`,
+                    minimumOrder: minOrder,
+                    currentSubtotal: strictSubtotalCheck,
+                    amountNeeded: need,
+                });
+            }
+
             // --- STRICT COUPON VALIDATION ---
             let isOliveBistro = false;
             try {
-                const meetupInfo = await Meetup.findById(meetupId).select("selectedCafe").lean();
+                const meetupInfo = meetupRow;
                 if (meetupInfo && meetupInfo.selectedCafe && 
                    (meetupInfo.selectedCafe.name === "Olive Bistro & Bar" || meetupInfo.selectedCafe.cafeName === "Olive Bistro & Bar")) {
                     isOliveBistro = true;
@@ -712,16 +1004,18 @@ const placeOrder = async (req, res) => {
             }
 
             const strictSubtotal = items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
-            const strictCgst = parseFloat((strictSubtotal * 0.025).toFixed(2));
-            const strictSgst = parseFloat((strictSubtotal * 0.025).toFixed(2));
+            const appliedCoupon = Math.min(couponDiscount || 0, strictSubtotal);
+            const taxableBase = parseFloat((strictSubtotal - appliedCoupon).toFixed(2));
+            const strictCgst = parseFloat((taxableBase * 0.025).toFixed(2));
+            const strictSgst = parseFloat((taxableBase * 0.025).toFixed(2));
             const strictCommission = commission || parseFloat((strictSubtotal * 0.06).toFixed(2));
-            const strictTotal = parseFloat((strictSubtotal + strictCgst + strictSgst).toFixed(2));
+            const strictTotal = parseFloat((taxableBase + strictCgst + strictSgst).toFixed(2));
 
             let calculatedSubtotal = subtotal || strictSubtotal;
             let calculatedCgst = cgst || strictCgst;
             let calculatedSgst = sgst || strictSgst;
             let calculatedCommission = commission || strictCommission;
-            let calculatedTotal = total || strictTotal;
+            let calculatedTotal = finalAmount || total || strictTotal;
 
             // 🚨 Override and strictly calculate total if Olive Bistro & Bar
             if (isOliveBistro) {
@@ -740,12 +1034,12 @@ const placeOrder = async (req, res) => {
                 ? members.map(m => typeof m === 'string' ? { name: m, userId: userId || '' } : m)
                 : [{ name: userName || 'Guest', userId: userId || '' }];
 
-            let order = null;
-            if (orderId) {
-                order = await MeetupOrder.findOne({ orderId });
-            }
-
-            const finalStatus = status ? status.toUpperCase() : "PENDING";
+            const finalStatus = status ? status.toUpperCase() : "BILL_PENDING";
+            const effectiveMemberCount =
+                memberCount || meetupRow?.members?.length || 1;
+            const equalPerPerson = Math.ceil(
+                (calculatedTotal / effectiveMemberCount) * 100,
+            ) / 100;
 
             if (order) {
                 // 🔒 LOCK CHECK: Prevent editing if order is already locked/paid
@@ -812,9 +1106,15 @@ const placeOrder = async (req, res) => {
             // Only emit order-created to cafe dashboard if the order has been paid
             // Draft/PLACED/PENDING orders should NOT be sent to the dashboard
             const paidStatuses = ["TOKEN_PAID", "ACCEPTED", "CONFIRMED", "PREPARING", "READY", "COMPLETED", "CASH_COLLECTED"];
+            const meetupForOrder = meetupRow;
+
             if (paidStatuses.includes(finalStatus)) {
                 const cafeRoom = cafeId || order.cafeId || "";
-                if (cafeRoom) {
+                if (!meetupForOrder?.reservationFeePaid) {
+                    console.log(
+                        `⏳ Order ${order.orderId} saved — NOT sent to cafe until ₹20 reservation fee is paid`,
+                    );
+                } else if (cafeRoom) {
                     // Fetch meetup info for enriched order
                     let meetupInfo = null;
                     try {
@@ -848,10 +1148,42 @@ const placeOrder = async (req, res) => {
                         splitEnabled: splitEnabled || false,
                         perPersonAmount: perPersonAmount || calculatedTotal,
                         members: members || [],
+                        tableNumber: meetupForOrder?.tableNumber || "",
+                        reservationFeePaid: true,
                     });
                 }
             } else {
                 console.log(`⏳ Order ${order.orderId} NOT emitted to dashboard (status: ${finalStatus} — payment required first)`);
+            }
+
+            const draftStatuses = ["BILL_PENDING", "PENDING", "PLACED"];
+            const shouldPostBill =
+                postBillToChat !== false && draftStatuses.includes(finalStatus);
+
+            require("fs").appendFileSync("order_debug.log", `[${new Date().toISOString()}] 🛠️ shouldPostBill evaluates to: ${shouldPostBill} (postBillToChat: ${postBillToChat}, finalStatus: ${finalStatus})\n`);
+
+            if (shouldPostBill) {
+                const splitOn = splitEnabled === true;
+                const billMsg = await postOrderBillMessage(meetupId, userId, userName, order, {
+                    cafeName:
+                        meetupForOrder?.selectedCafe?.cafeName ||
+                        meetupForOrder?.selectedCafe?.name ||
+                        "",
+                    couponCode: couponCode || "",
+                    couponDiscount: appliedCoupon,
+                    splitEnabled: splitOn,
+                    perPersonAmount: splitOn
+                        ? perPersonAmount || equalPerPerson
+                        : calculatedTotal,
+                    memberCount: effectiveMemberCount,
+                });
+                require("fs").appendFileSync("order_debug.log", `[${new Date().toISOString()}] 🛠️ About to emit receive_message...\n`);
+                if (req.io) {
+                    req.io.to(meetupId).emit("receive_message", billMsg);
+                    require("fs").appendFileSync("order_debug.log", `[${new Date().toISOString()}] ✅ receive_message emitted!\n`);
+                } else {
+                    require("fs").appendFileSync("order_debug.log", `[${new Date().toISOString()}] ⚠️ req.io is undefined!\n`);
+                }
             }
 
             console.log(`🍔 ${userName} ordered ₹${calculatedTotal} in meetup ${meetupId}`);
@@ -1024,6 +1356,77 @@ const getMyMeetups = async (req, res) => {
     }
 };
 
+/** GET /api/meetups/hosted/:userId — Meetups created by user (organizerId) */
+const getHostedMeetups = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
+        const meetups = await Meetup.find({
+            $or: [{ organizerId: userId }, { organizerId: String(userId) }],
+        })
+            .sort({ createdAt: -1 })
+            .lean();
+
+        const enriched = meetups.map((m) => ({
+            ...m,
+            memberCount: m.members?.length ?? 0,
+            meetupName: m.title,
+            cafeName: extractCafeName(m.selectedCafe),
+        }));
+
+        res.json({
+            success: true,
+            meetups: enriched,
+            count: enriched.length,
+        });
+    } catch (error) {
+        console.error("Get Hosted Meetups Error:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+function extractCafeName(selectedCafe) {
+    if (!selectedCafe) return null;
+    if (typeof selectedCafe === "string") return selectedCafe;
+    return selectedCafe.cafeName || selectedCafe.name || null;
+}
+
+/** POST /api/meetups/end — Host ends an active meetup */
+const endMeetup = async (req, res) => {
+    try {
+        const { meetupId, userId } = req.body;
+        if (!meetupId || !userId) {
+            return res.status(400).json({ message: "meetupId and userId are required" });
+        }
+
+        const meetup = await Meetup.findById(meetupId);
+        if (!meetup) {
+            return res.status(404).json({ message: "Meetup not found" });
+        }
+
+        if (meetup.organizerId !== userId) {
+            return res.status(403).json({ message: "Only the host can end this meetup" });
+        }
+
+        if (meetup.status === "completed") {
+            return res.json({ success: true, message: "Meetup already ended", meetup });
+        }
+
+        meetup.status = "completed";
+        await meetup.save();
+
+        console.log(`🏁 Meetup ended: ${meetup.meetupCode} by host ${userId}`);
+
+        res.json({ success: true, message: "Meetup ended", meetup });
+    } catch (error) {
+        console.error("End Meetup Error:", error);
+        res.status(500).json({ message: "Failed to end meetup", error: error.message });
+    }
+};
+
 // ─── RAZORPAY: CREATE 20 PKR/INR TOKEN ORDER ─────────────────────
 const createRazorpayOrder = async (req, res) => {
     try {
@@ -1093,10 +1496,15 @@ const verifyRazorpayPayment = async (req, res) => {
                 await o.save();
             }
 
-            // Also mark meetup as completed or at least advance it
             const meetup = await Meetup.findById(meetupId);
             if (meetup) {
-                meetup.status = "completed";
+                meetup.reservationFeePaid = true;
+                meetup.reservationFeeAmount = 20;
+                meetup.billLocked = true;
+                if (!meetup.tableNumber) {
+                    meetup.tableNumber = `T-${Math.floor(Math.random() * 12) + 1}`;
+                }
+                meetup.status = "confirmed";
                 await meetup.save();
                 
                 // Get totals to share with users
@@ -1154,6 +1562,9 @@ module.exports = {
     applyCoupon,
     getActiveMeetups,
     getMyMeetups,
+    getHostedMeetups,
+    endMeetup,
     createRazorpayOrder,
     verifyRazorpayPayment,
+    confirmTableReservation,
 };
