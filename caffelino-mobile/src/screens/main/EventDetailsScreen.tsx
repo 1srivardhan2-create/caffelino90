@@ -177,12 +177,13 @@ export function EventDetailsScreen() {
         }
       };
 
-      console.log('Opening Razorpay Checkout with options:', options);
+      console.log('--- OPEN RAZORPAY ---', options);
       
       RazorpayCheckout.open(options).then(async (data: any) => {
         // Success handler
-        console.log('Payment Successful:', data);
+        console.log('--- PAYMENT SUCCESS ---', data);
         try {
+          console.log('--- VERIFY PAYMENT API CALL ---');
           const verifyRes = await axios.post(`${API_BASE_URL}/api/payments/verify`, {
             razorpay_order_id: data.razorpay_order_id,
             razorpay_payment_id: data.razorpay_payment_id,
@@ -193,21 +194,25 @@ export function EventDetailsScreen() {
           });
 
           if (verifyRes.data.success) {
+            console.log('--- PAYMENT VERIFIED SUCCESSFULLY ---');
             alert('Ticket Purchased Successfully!');
             navigation.navigate('MyTickets');
           } else {
+            console.error('--- PAYMENT VERIFICATION FAILED ---', verifyRes.data);
             alert('Payment verification failed');
           }
         } catch (error) {
-          console.error('Verification Error:', error);
+          console.error('--- VERIFY PAYMENT CATCH BLOCK ERROR ---', error);
           alert('Payment verified but there was an error updating your ticket. Please contact support.');
         } finally {
+          console.log('--- CLEARING LOADING STATE ---');
           setRegistering(false);
         }
       }).catch((error: any) => {
         // Failure handler
-        console.error('Payment Failed:', error);
+        console.error('--- PAYMENT FAILURE ---', error);
         alert(`Error: ${error.description || 'Payment cancelled'}`);
+        console.log('--- CLEARING LOADING STATE (FAILED) ---');
         setRegistering(false);
       });
 

@@ -48,7 +48,7 @@ export function EventsScreen() {
   };
 
   const featuredEvents = events.slice(0, 2); // First 2
-  const upcomingEvents = events.slice(2);
+  const upcomingEvents = events; // Show all events in Upcoming
   const freeEvents = events.filter(e => e.ticketPrice === 0);
   const paidEvents = events.filter(e => e.ticketPrice > 0);
 

@@ -50,6 +50,7 @@ exports.createOrder = async (req, res) => {
         }
 
         // Initialize Payment record
+        console.log('--- INITIALIZING PAYMENT RECORD ---');
         const payment = new Payment({
             eventId: event._id,
             userId: userObj ? userObj._id : new mongoose.Types.ObjectId(), // Just to satisfy schema if firebaseUid
@@ -59,6 +60,7 @@ exports.createOrder = async (req, res) => {
             status: "created"
         });
         await payment.save();
+        console.log('--- PAYMENT RECORD CREATED ---', payment._id);
 
         res.status(200).json({
             success: true,
@@ -97,13 +99,17 @@ exports.webhook = async (req, res) => {
             const paymentId = paymentEntity.id;
             const { eventId, userId, quantity } = paymentEntity.notes;
 
-            // Update Payment Record
-            const payment = await Payment.findOne({ razorpayOrderId: orderId });
-            if (payment && payment.status !== "captured") {
-                payment.status = "captured";
-                payment.razorpayPaymentId = paymentId;
-                await payment.save();
+            console.log('--- WEBHOOK: PAYMENT CAPTURED ---', { orderId, paymentId });
 
+            // Atomic update to prevent race condition with verifyOrder
+            const payment = await Payment.findOneAndUpdate(
+                { razorpayOrderId: orderId, status: { $ne: "captured" } },
+                { status: "captured", razorpayPaymentId: paymentId },
+                { returnDocument: 'after' }
+            );
+
+            if (payment) {
+                console.log('--- WEBHOOK: ATOMIC LOCK ACQUIRED. PROCESSING TICKET ---');
                 // Process Event Registration
                 const event = await Event.findById(eventId);
                 if (event) {
@@ -122,27 +128,31 @@ exports.webhook = async (req, res) => {
                     event.availableSeats = Math.max(0, event.availableSeats - numTickets);
                     event.ticketsSold = (event.ticketsSold || 0) + numTickets;
                     await event.save();
+                    console.log('--- REVENUE UPDATED ---', event.revenue);
 
                     // Update organizer revenue
                     if (event.organizerId) {
                         await User.findByIdAndUpdate(event.organizerId, {
                             $inc: { revenue: payment.amount }
                         });
+                        console.log('--- SETTLEMENT UPDATED FOR ORGANIZER ---');
                     }
 
                     // Generate registrations
                     for(let i = 0; i < numTickets; i++) {
                         const year = new Date().getFullYear();
                         const counter = await Counter.findByIdAndUpdate(
-                            { _id: 'ticketId' },
+                            'ticketId',
                             { $inc: { seq: 1 } },
                             { returnDocument: 'after', upsert: true }
                         );
                         const seqFormatted = String(counter.seq).padStart(4, '0');
                         const ticketNumber = `CAF-${year}-${seqFormatted}`;
+                        console.log('--- TICKET NUMBER GENERATED ---', ticketNumber);
                         
                         const qrCodeData = JSON.stringify({ ticketNumber, eventId, userId });
                         const qrCodeUrl = await generateAndUploadQRCode(ticketNumber);
+                        console.log('--- QR CODE UPLOADED ---', qrCodeUrl);
 
                         const registration = new EventRegistration({
                             eventId,
@@ -163,8 +173,11 @@ exports.webhook = async (req, res) => {
                             amountPaid: event.ticketPrice,
                         });
                         await registration.save();
+                        console.log('--- REGISTRATION CREATED ---', registration._id);
                     }
                 }
+            } else {
+                console.log('--- WEBHOOK: PAYMENT ALREADY PROCESSED BY VERIFY ENDPOINT ---');
             }
         } else if (eventReceived === "payment.failed") {
             const paymentEntity = payload.payment.entity;
@@ -219,16 +232,25 @@ exports.verifyOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: "Payment verification failed" });
         }
 
-        const payment = await Payment.findOne({ razorpayOrderId: razorpay_order_id });
-        if (!payment) return res.status(404).json({ success: false, message: "Payment record not found" });
+        console.log('--- VERIFY ORDER HIT ---', { razorpay_order_id, razorpay_payment_id });
 
-        // If webhook hasn't processed it yet
-        if (payment.status !== "captured") {
-            payment.status = "captured";
-            payment.razorpayPaymentId = razorpay_payment_id;
-            payment.razorpaySignature = razorpay_signature;
-            await payment.save();
+        const paymentCheck = await Payment.findOne({ razorpayOrderId: razorpay_order_id });
+        if (!paymentCheck) return res.status(404).json({ success: false, message: "Payment record not found" });
 
+        // Atomic update to ensure only ONE endpoint generates the ticket
+        const payment = await Payment.findOneAndUpdate(
+            { razorpayOrderId: razorpay_order_id, status: { $ne: "captured" } },
+            { 
+                status: "captured", 
+                razorpayPaymentId: razorpay_payment_id,
+                razorpaySignature: razorpay_signature
+            },
+            { returnDocument: 'after' }
+        );
+
+        // If payment is NOT null, it means WE successfully acquired the lock to process it!
+        if (payment) {
+            console.log('--- VERIFY ORDER: ATOMIC LOCK ACQUIRED. PROCESSING TICKET ---');
             const event = await Event.findById(eventId);
             if (event) {
                 const numTickets = parseInt(quantity) || 1;
@@ -244,25 +266,29 @@ exports.verifyOrder = async (req, res) => {
                 event.availableSeats = Math.max(0, event.availableSeats - numTickets);
                 event.ticketsSold = (event.ticketsSold || 0) + numTickets;
                 await event.save();
+                console.log('--- REVENUE UPDATED ---', event.revenue);
 
                 if (event.organizerId) {
                     await User.findByIdAndUpdate(event.organizerId, {
                         $inc: { revenue: payment.amount }
                     });
+                    console.log('--- SETTLEMENT UPDATED FOR ORGANIZER ---');
                 }
 
                 for(let i = 0; i < numTickets; i++) {
                     const year = new Date().getFullYear();
                     const counter = await Counter.findByIdAndUpdate(
-                        { _id: 'ticketId' },
+                        'ticketId',
                         { $inc: { seq: 1 } },
                         { returnDocument: 'after', upsert: true }
                     );
                     const seqFormatted = String(counter.seq).padStart(4, '0');
                     const ticketNumber = `CAF-${year}-${seqFormatted}`;
+                    console.log('--- TICKET NUMBER GENERATED ---', ticketNumber);
                     
                     const qrCodeData = JSON.stringify({ ticketNumber, eventId, userId });
                     const qrCodeUrl = await generateAndUploadQRCode(ticketNumber);
+                    console.log('--- QR CODE UPLOADED ---', qrCodeUrl);
 
                     const registration = new EventRegistration({
                         eventId,
@@ -283,8 +309,11 @@ exports.verifyOrder = async (req, res) => {
                         amountPaid: event.ticketPrice,
                     });
                     await registration.save();
+                    console.log('--- REGISTRATION CREATED ---', registration._id);
                 }
             }
+        } else {
+            console.log('--- VERIFY ORDER: PAYMENT ALREADY PROCESSED BY WEBHOOK ---');
         }
         res.status(200).json({ success: true, message: "Payment verified successfully" });
     } catch (error) {
