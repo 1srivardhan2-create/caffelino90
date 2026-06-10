@@ -30,6 +30,7 @@ const {
     updateCafePhotos,
     getMeetupOrders,
     getPublicMenu,
+    getPublicCafeDetail,
 } = require("../controllers/cafe.controller");
 
 // ─── Simplified Routes (Google-authenticated users) ──────────
@@ -99,6 +100,9 @@ router.patch(
 // ─── Menu Management ──────────────────────────────────────────
 // GET /api/cafe/public/menu/:cafeId — Public menu access
 router.get("/public/menu/:cafeId", getPublicMenu);
+
+// GET /api/cafe/public/detail/:cafeId — Full cafe detail (mobile)
+router.get("/public/detail/:cafeId", getPublicCafeDetail);
 
 // DELETE /api/cafe/delete/item/:itemid — Delete a menu item
 router.delete("/delete/item/:itemid", authCafe, cafeExists, deleteItem);

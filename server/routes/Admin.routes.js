@@ -1,14 +1,30 @@
 const express = require("express");
 const router = express.Router();
-const { approveCafe, getPendingCafes, getCouponStats } = require("../controllers/admin.controller");
+const { 
+    approveCafe, 
+    getPendingCafes, 
+    getCouponStats,
+    getAdminStats,
+    getAdminUsers,
+    blockUser,
+    deleteFeedback,
+    deleteMeetup
+} = require("../controllers/admin.controller");
 
-// PUT /api/admin/approve-cafe/:id — Approve a pending cafe by ID
+// Approve a pending cafe by ID
 router.put("/approve-cafe/:id", approveCafe);
 
-// GET /api/admin/get/cafe — Get list of unapproved cafes
+// Get list of unapproved cafes
 router.get("/get/cafe", getPendingCafes);
 
-// GET /api/admin/coupon-stats — Get coupon statistics
+// Get coupon statistics
 router.get("/coupon-stats", getCouponStats);
+
+// Expose Stats & Management endpoints
+router.get("/stats", getAdminStats);
+router.get("/users", getAdminUsers);
+router.delete("/users/:id", blockUser);
+router.delete("/feedback/:id", deleteFeedback);
+router.delete("/meetups/:id", deleteMeetup);
 
 module.exports = router;

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Caffelino</string>
+    <string name="title_activity_main">Caffelino</string>
+    <string name="package_name">com.caffelino.app</string>
+    <string name="custom_url_scheme">com.caffelino.app</string>
+</resources>

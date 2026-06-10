@@ -7,10 +7,17 @@ const EventRegistrationSchema = new mongoose.Schema(
             ref: "Event",
             required: true,
         },
+        eventName: {
+            type: String,
+        },
         userId: {
             type: String, // String to support Firebase UIDs or existing user IDs
             required: true,
         },
+        userName: { type: String },
+        email: { type: String },
+        mobileNumber: { type: String },
+        profileImage: { type: String },
         status: {
             type: String,
             enum: ["pending", "confirmed", "cancelled"],
@@ -25,6 +32,12 @@ const EventRegistrationSchema = new mongoose.Schema(
             type: String, // Backend generated QR code hosted on Cloudinary
             required: true,
         },
+        qrCodeData: {
+            type: String, // JSON payload string
+        },
+        ticketType: {
+            type: String, // "FREE" or "PAID"
+        },
         paymentId: {
             type: String, // Razorpay Payment ID or "FREE"
         },
@@ -35,6 +48,22 @@ const EventRegistrationSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
+        ticketPrice: {
+            type: Number,
+            default: 0,
+        },
+        checkedIn: {
+            type: Boolean,
+            default: false,
+        },
+        checkedInAt: {
+            type: Date,
+            default: null,
+        },
+        registrationDate: {
+            type: Date,
+            default: Date.now,
+        }
     },
     { timestamps: true }
 );

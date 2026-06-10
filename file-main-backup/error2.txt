@@ -1,0 +1,1108 @@
+2026-03-07T19:50:31.610Z vite:config config file loaded in 34.68ms
+2026-03-07T19:50:31.611Z vite:env loading env files: [
+  'C:/Users/1sriv/Downloads/file-main/file-main/.env',
+  'C:/Users/1sriv/Downloads/file-main/file-main/.env.local',
+  'C:/Users/1sriv/Downloads/file-main/file-main/.env.development',
+  'C:/Users/1sriv/Downloads/file-main/file-main/.env.development.local'
+]
+2026-03-07T19:50:31.612Z vite:env env files loaded in 0.40ms
+2026-03-07T19:50:31.612Z vite:env using resolved env: {}
+2026-03-07T19:50:31.622Z vite:config using resolved config: {
+  plugins: [
+    'vite:optimized-deps',
+    'vite:watch-package-data',
+    'vite:pre-alias',
+    'alias',
+    'vite:react-swc:resolve-runtime',
+    'vite:modulepreload-polyfill',
+    'vite:resolve',
+    'vite:html-inline-proxy',
+    'vite:css',
+    'vite:json',
+    'vite:wasm-helper',
+    'vite:worker',
+    'vite:asset',
+    'vite:react-swc',
+    'vite:wasm-fallback',
+    'vite:define',
+    'vite:css-post',
+    'vite:worker-import-meta-url',
+    'vite:asset-import-meta-url',
+    'vite:dynamic-import-vars',
+    'vite:import-glob',
+    'vite:client-inject',
+    'vite:css-analysis',
+    'vite:import-analysis'
+  ],
+  resolve: {
+    externalConditions: [ 'node' ],
+    extensions: [ '.js', '.jsx', '.ts', '.tsx', '.json' ],
+    dedupe: [],
+    noExternal: [],
+    external: [],
+    preserveSymlinks: false,
+    alias: [
+      { find: 'vaul@1.1.2', replacement: 'vaul' },
+      { find: 'sonner@2.0.3', replacement: 'sonner' },
+      { find: 'recharts@2.15.2', replacement: 'recharts' },
+      {
+        find: 'react-resizable-panels@2.1.7',
+        replacement: 'react-resizable-panels'
+      },
+      {
+        find: 'react-hook-form@7.55.0',
+        replacement: 'react-hook-form'
+      },
+      {
+        find: 'react-day-picker@8.10.1',
+        replacement: 'react-day-picker'
+      },
+      { find: 'next-themes@0.4.6', replacement: 'next-themes' },
+      { find: 'lucide-react@0.487.0', replacement: 'lucide-react' },
+      { find: 'input-otp@1.4.2', replacement: 'input-otp' },
+      {
+        find: 'figma:asset/fad44129806a88be5d99e884e96319be206cdba9.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\fad44129806a88be5d99e884e96319be206cdba9.png'
+      },
+      {
+        find: 'figma:asset/ea8edc7a5e80446726722176201d332f9359a7a2.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\ea8edc7a5e80446726722176201d332f9359a7a2.png'
+      },
+      {
+        find: 'figma:asset/c70ff4b507874d64c60a2a2a803b94f4a81262ab.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\c70ff4b507874d64c60a2a2a803b94f4a81262ab.png'
+      },
+      {
+        find: 'figma:asset/c4806e9637d84069edccb37d86ec78c7334aeb44.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\c4806e9637d84069edccb37d86ec78c7334aeb44.png'
+      },
+      {
+        find: 'figma:asset/b88a8ef1e96c6bec8532bc45e1965770c3c90b00.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\b88a8ef1e96c6bec8532bc45e1965770c3c90b00.png'
+      },
+      {
+        find: 'figma:asset/b4f2f423b3c301ca9189b4c18c7bb06b363f7583.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\b4f2f423b3c301ca9189b4c18c7bb06b363f7583.png'
+      },
+      {
+        find: 'figma:asset/ade7c17ca7134b9a9ed8c5fc98a2a5fcb317ebe3.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\ade7c17ca7134b9a9ed8c5fc98a2a5fcb317ebe3.png'
+      },
+      {
+        find: 'figma:asset/a5b6d9e26488894c07b58e2a055a3a130a345cf5.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\a5b6d9e26488894c07b58e2a055a3a130a345cf5.png'
+      },
+      {
+        find: 'figma:asset/99bab43317c91e9339d8206aed7bfe8c1e9d7ff6.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\99bab43317c91e9339d8206aed7bfe8c1e9d7ff6.png'
+      },
+      {
+        find: 'figma:asset/849709757a691f0e0782bc36044166439bcbd6db.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\849709757a691f0e0782bc36044166439bcbd6db.png'
+      },
+      {
+        find: 'figma:asset/7d0528e8a39187bd5c82dc5af4c22d4ed96c2f09.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\7d0528e8a39187bd5c82dc5af4c22d4ed96c2f09.png'
+      },
+      {
+        find: 'figma:asset/75472a56891d782a6aebdf5671d3e38f8d2afea2.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\75472a56891d782a6aebdf5671d3e38f8d2afea2.png'
+      },
+      {
+        find: 'figma:asset/6acfd9d6c8ee7fd0ee085b43918ec67ad605c2de.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\6acfd9d6c8ee7fd0ee085b43918ec67ad605c2de.png'
+      },
+      {
+        find: 'figma:asset/3d26e5f5c5bf70cbc455ccbea5e89ad8f9725cdb.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\3d26e5f5c5bf70cbc455ccbea5e89ad8f9725cdb.png'
+      },
+      {
+        find: 'figma:asset/1ed482f202076846ed215ead8f44f3ba6ab86d94.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\1ed482f202076846ed215ead8f44f3ba6ab86d94.png'
+      },
+      {
+        find: 'figma:asset/17cd23f12fb1885b006cb3fd1bdda399c967f02c.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\17cd23f12fb1885b006cb3fd1bdda399c967f02c.png'
+      },
+      {
+        find: 'figma:asset/15d5ccb4b8b2ff1e32155ef83c9c9535a383bfea.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\15d5ccb4b8b2ff1e32155ef83c9c9535a383bfea.png'
+      },
+      {
+        find: 'figma:asset/0fa55507ab7f40d20bc4c57ed2605cdd88245c9a.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\0fa55507ab7f40d20bc4c57ed2605cdd88245c9a.png'
+      },
+      {
+        find: 'figma:asset/059ef2f82d9a724ad4291ec5fe0e7a6f1bdd7782.png',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\059ef2f82d9a724ad4291ec5fe0e7a6f1bdd7782.png'
+      },
+      {
+        find: 'embla-carousel-react@8.6.0',
+        replacement: 'embla-carousel-react'
+      },
+      { find: 'cmdk@1.1.1', replacement: 'cmdk' },
+      {
+        find: 'class-variance-authority@0.7.1',
+        replacement: 'class-variance-authority'
+      },
+      {
+        find: '@radix-ui/react-tooltip@1.1.8',
+        replacement: '@radix-ui/react-tooltip'
+      },
+      {
+        find: '@radix-ui/react-toggle@1.1.2',
+        replacement: '@radix-ui/react-toggle'
+      },
+      {
+        find: '@radix-ui/react-toggle-group@1.1.2',
+        replacement: '@radix-ui/react-toggle-group'
+      },
+      {
+        find: '@radix-ui/react-tabs@1.1.3',
+        replacement: '@radix-ui/react-tabs'
+      },
+      {
+        find: '@radix-ui/react-switch@1.1.3',
+        replacement: '@radix-ui/react-switch'
+      },
+      {
+        find: '@radix-ui/react-slot@1.1.2',
+        replacement: '@radix-ui/react-slot'
+      },
+      {
+        find: '@radix-ui/react-slider@1.2.3',
+        replacement: '@radix-ui/react-slider'
+      },
+      {
+        find: '@radix-ui/react-separator@1.1.2',
+        replacement: '@radix-ui/react-separator'
+      },
+      {
+        find: '@radix-ui/react-select@2.1.6',
+        replacement: '@radix-ui/react-select'
+      },
+      {
+        find: '@radix-ui/react-scroll-area@1.2.3',
+        replacement: '@radix-ui/react-scroll-area'
+      },
+      {
+        find: '@radix-ui/react-radio-group@1.2.3',
+        replacement: '@radix-ui/react-radio-group'
+      },
+      {
+        find: '@radix-ui/react-progress@1.1.2',
+        replacement: '@radix-ui/react-progress'
+      },
+      {
+        find: '@radix-ui/react-popover@1.1.6',
+        replacement: '@radix-ui/react-popover'
+      },
+      {
+        find: '@radix-ui/react-navigation-menu@1.2.5',
+        replacement: '@radix-ui/react-navigation-menu'
+      },
+      {
+        find: '@radix-ui/react-menubar@1.1.6',
+        replacement: '@radix-ui/react-menubar'
+      },
+      {
+        find: '@radix-ui/react-label@2.1.2',
+        replacement: '@radix-ui/react-label'
+      },
+      {
+        find: '@radix-ui/react-hover-card@1.1.6',
+        replacement: '@radix-ui/react-hover-card'
+      },
+      {
+        find: '@radix-ui/react-dropdown-menu@2.1.6',
+        replacement: '@radix-ui/react-dropdown-menu'
+      },
+      {
+        find: '@radix-ui/react-dialog@1.1.6',
+        replacement: '@radix-ui/react-dialog'
+      },
+      {
+        find: '@radix-ui/react-context-menu@2.2.6',
+        replacement: '@radix-ui/react-context-menu'
+      },
+      {
+        find: '@radix-ui/react-collapsible@1.1.3',
+        replacement: '@radix-ui/react-collapsible'
+      },
+      {
+        find: '@radix-ui/react-checkbox@1.1.4',
+        replacement: '@radix-ui/react-checkbox'
+      },
+      {
+        find: '@radix-ui/react-avatar@1.1.3',
+        replacement: '@radix-ui/react-avatar'
+      },
+      {
+        find: '@radix-ui/react-aspect-ratio@1.1.2',
+        replacement: '@radix-ui/react-aspect-ratio'
+      },
+      {
+        find: '@radix-ui/react-alert-dialog@1.1.6',
+        replacement: '@radix-ui/react-alert-dialog'
+      },
+      {
+        find: '@radix-ui/react-accordion@1.2.3',
+        replacement: '@radix-ui/react-accordion'
+      },
+      {
+        find: '@',
+        replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src'
+      },
+      {
+        find: /^\/?@vite\/env/,
+        replacement: '/@fs/C:/Users/1sriv/Downloads/file-main/file-main/node_modules/vite/dist/client/env.mjs'
+      },
+      {
+        find: /^\/?@vite\/client/,
+        replacement: '/@fs/C:/Users/1sriv/Downloads/file-main/file-main/node_modules/vite/dist/client/client.mjs'
+      }
+    ],
+    mainFields: [ 'browser', 'module', 'jsnext:main', 'jsnext' ],
+    conditions: [ 'module', 'browser', 'development|production' ],
+    builtins: []
+  },
+  build: {
+    target: 'esnext',
+    polyfillModulePreload: true,
+    modulePreload: { polyfill: true },
+    outDir: 'build',
+    assetsDir: 'assets',
+    assetsInlineLimit: 4096,
+    sourcemap: false,
+    terserOptions: {},
+    rollupOptions: {},
+    commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+    dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+    write: true,
+    emptyOutDir: null,
+    copyPublicDir: true,
+    manifest: false,
+    lib: false,
+    ssrManifest: false,
+    ssrEmitAssets: false,
+    reportCompressedSize: true,
+    chunkSizeWarningLimit: 500,
+    watch: null,
+    cssCodeSplit: true,
+    minify: 'esbuild',
+    ssr: false,
+    emitAssets: false,
+    createEnvironment: [Function: createEnvironment],
+    cssTarget: 'esnext',
+    cssMinify: true
+  },
+  server: {
+    port: 5173,
+    strictPort: true,
+    host: undefined,
+    allowedHosts: [],
+    https: undefined,
+    open: true,
+    proxy: undefined,
+    cors: {
+      origin: /^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/
+    },
+    headers: {},
+    warmup: { clientFiles: [], ssrFiles: [] },
+    middlewareMode: false,
+    fs: {
+      strict: true,
+      deny: [ '.env', '.env.*', '*.{crt,pem}', '**/.git/**' ],
+      allow: [ 'C:/Users/1sriv/Downloads/file-main/file-main' ]
+    },
+    preTransformRequests: true,
+    perEnvironmentStartEndDuringDev: false,
+    sourcemapIgnoreList: [Function: isInNodeModules$1]
+  },
+  esbuild: false,
+  oxc: false,
+  optimizeDeps: {
+    include: [ 'react/jsx-dev-runtime' ],
+    exclude: [],
+    needsInterop: [],
+    extensions: [],
+    disabled: undefined,
+    holdUntilCrawlEnd: true,
+    force: false,
+    noDiscovery: false,
+    esbuildOptions: { preserveSymlinks: false, jsx: 'automatic' }
+  },
+  environments: {
+    client: {
+      define: undefined,
+      resolve: {
+        externalConditions: [ 'node' ],
+        extensions: [ '.js', '.jsx', '.ts', '.tsx', '.json' ],
+        dedupe: [],
+        noExternal: [],
+        external: [],
+        preserveSymlinks: false,
+        alias: [
+          { find: 'vaul@1.1.2', replacement: 'vaul' },
+          { find: 'sonner@2.0.3', replacement: 'sonner' },
+          { find: 'recharts@2.15.2', replacement: 'recharts' },
+          {
+            find: 'react-resizable-panels@2.1.7',
+            replacement: 'react-resizable-panels'
+          },
+          {
+            find: 'react-hook-form@7.55.0',
+            replacement: 'react-hook-form'
+          },
+          {
+            find: 'react-day-picker@8.10.1',
+            replacement: 'react-day-picker'
+          },
+          { find: 'next-themes@0.4.6', replacement: 'next-themes' },
+          { find: 'lucide-react@0.487.0', replacement: 'lucide-react' },
+          { find: 'input-otp@1.4.2', replacement: 'input-otp' },
+          {
+            find: 'figma:asset/fad44129806a88be5d99e884e96319be206cdba9.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\fad44129806a88be5d99e884e96319be206cdba9.png'
+          },
+          {
+            find: 'figma:asset/ea8edc7a5e80446726722176201d332f9359a7a2.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\ea8edc7a5e80446726722176201d332f9359a7a2.png'
+          },
+          {
+            find: 'figma:asset/c70ff4b507874d64c60a2a2a803b94f4a81262ab.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\c70ff4b507874d64c60a2a2a803b94f4a81262ab.png'
+          },
+          {
+            find: 'figma:asset/c4806e9637d84069edccb37d86ec78c7334aeb44.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\c4806e9637d84069edccb37d86ec78c7334aeb44.png'
+          },
+          {
+            find: 'figma:asset/b88a8ef1e96c6bec8532bc45e1965770c3c90b00.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\b88a8ef1e96c6bec8532bc45e1965770c3c90b00.png'
+          },
+          {
+            find: 'figma:asset/b4f2f423b3c301ca9189b4c18c7bb06b363f7583.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\b4f2f423b3c301ca9189b4c18c7bb06b363f7583.png'
+          },
+          {
+            find: 'figma:asset/ade7c17ca7134b9a9ed8c5fc98a2a5fcb317ebe3.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\ade7c17ca7134b9a9ed8c5fc98a2a5fcb317ebe3.png'
+          },
+          {
+            find: 'figma:asset/a5b6d9e26488894c07b58e2a055a3a130a345cf5.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\a5b6d9e26488894c07b58e2a055a3a130a345cf5.png'
+          },
+          {
+            find: 'figma:asset/99bab43317c91e9339d8206aed7bfe8c1e9d7ff6.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\99bab43317c91e9339d8206aed7bfe8c1e9d7ff6.png'
+          },
+          {
+            find: 'figma:asset/849709757a691f0e0782bc36044166439bcbd6db.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\849709757a691f0e0782bc36044166439bcbd6db.png'
+          },
+          {
+            find: 'figma:asset/7d0528e8a39187bd5c82dc5af4c22d4ed96c2f09.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\7d0528e8a39187bd5c82dc5af4c22d4ed96c2f09.png'
+          },
+          {
+            find: 'figma:asset/75472a56891d782a6aebdf5671d3e38f8d2afea2.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\75472a56891d782a6aebdf5671d3e38f8d2afea2.png'
+          },
+          {
+            find: 'figma:asset/6acfd9d6c8ee7fd0ee085b43918ec67ad605c2de.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\6acfd9d6c8ee7fd0ee085b43918ec67ad605c2de.png'
+          },
+          {
+            find: 'figma:asset/3d26e5f5c5bf70cbc455ccbea5e89ad8f9725cdb.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\3d26e5f5c5bf70cbc455ccbea5e89ad8f9725cdb.png'
+          },
+          {
+            find: 'figma:asset/1ed482f202076846ed215ead8f44f3ba6ab86d94.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\1ed482f202076846ed215ead8f44f3ba6ab86d94.png'
+          },
+          {
+            find: 'figma:asset/17cd23f12fb1885b006cb3fd1bdda399c967f02c.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\17cd23f12fb1885b006cb3fd1bdda399c967f02c.png'
+          },
+          {
+            find: 'figma:asset/15d5ccb4b8b2ff1e32155ef83c9c9535a383bfea.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\15d5ccb4b8b2ff1e32155ef83c9c9535a383bfea.png'
+          },
+          {
+            find: 'figma:asset/0fa55507ab7f40d20bc4c57ed2605cdd88245c9a.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\0fa55507ab7f40d20bc4c57ed2605cdd88245c9a.png'
+          },
+          {
+            find: 'figma:asset/059ef2f82d9a724ad4291ec5fe0e7a6f1bdd7782.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\059ef2f82d9a724ad4291ec5fe0e7a6f1bdd7782.png'
+          },
+          {
+            find: 'embla-carousel-react@8.6.0',
+            replacement: 'embla-carousel-react'
+          },
+          { find: 'cmdk@1.1.1', replacement: 'cmdk' },
+          {
+            find: 'class-variance-authority@0.7.1',
+            replacement: 'class-variance-authority'
+          },
+          {
+            find: '@radix-ui/react-tooltip@1.1.8',
+            replacement: '@radix-ui/react-tooltip'
+          },
+          {
+            find: '@radix-ui/react-toggle@1.1.2',
+            replacement: '@radix-ui/react-toggle'
+          },
+          {
+            find: '@radix-ui/react-toggle-group@1.1.2',
+            replacement: '@radix-ui/react-toggle-group'
+          },
+          {
+            find: '@radix-ui/react-tabs@1.1.3',
+            replacement: '@radix-ui/react-tabs'
+          },
+          {
+            find: '@radix-ui/react-switch@1.1.3',
+            replacement: '@radix-ui/react-switch'
+          },
+          {
+            find: '@radix-ui/react-slot@1.1.2',
+            replacement: '@radix-ui/react-slot'
+          },
+          {
+            find: '@radix-ui/react-slider@1.2.3',
+            replacement: '@radix-ui/react-slider'
+          },
+          {
+            find: '@radix-ui/react-separator@1.1.2',
+            replacement: '@radix-ui/react-separator'
+          },
+          {
+            find: '@radix-ui/react-select@2.1.6',
+            replacement: '@radix-ui/react-select'
+          },
+          {
+            find: '@radix-ui/react-scroll-area@1.2.3',
+            replacement: '@radix-ui/react-scroll-area'
+          },
+          {
+            find: '@radix-ui/react-radio-group@1.2.3',
+            replacement: '@radix-ui/react-radio-group'
+          },
+          {
+            find: '@radix-ui/react-progress@1.1.2',
+            replacement: '@radix-ui/react-progress'
+          },
+          {
+            find: '@radix-ui/react-popover@1.1.6',
+            replacement: '@radix-ui/react-popover'
+          },
+          {
+            find: '@radix-ui/react-navigation-menu@1.2.5',
+            replacement: '@radix-ui/react-navigation-menu'
+          },
+          {
+            find: '@radix-ui/react-menubar@1.1.6',
+            replacement: '@radix-ui/react-menubar'
+          },
+          {
+            find: '@radix-ui/react-label@2.1.2',
+            replacement: '@radix-ui/react-label'
+          },
+          {
+            find: '@radix-ui/react-hover-card@1.1.6',
+            replacement: '@radix-ui/react-hover-card'
+          },
+          {
+            find: '@radix-ui/react-dropdown-menu@2.1.6',
+            replacement: '@radix-ui/react-dropdown-menu'
+          },
+          {
+            find: '@radix-ui/react-dialog@1.1.6',
+            replacement: '@radix-ui/react-dialog'
+          },
+          {
+            find: '@radix-ui/react-context-menu@2.2.6',
+            replacement: '@radix-ui/react-context-menu'
+          },
+          {
+            find: '@radix-ui/react-collapsible@1.1.3',
+            replacement: '@radix-ui/react-collapsible'
+          },
+          {
+            find: '@radix-ui/react-checkbox@1.1.4',
+            replacement: '@radix-ui/react-checkbox'
+          },
+          {
+            find: '@radix-ui/react-avatar@1.1.3',
+            replacement: '@radix-ui/react-avatar'
+          },
+          {
+            find: '@radix-ui/react-aspect-ratio@1.1.2',
+            replacement: '@radix-ui/react-aspect-ratio'
+          },
+          {
+            find: '@radix-ui/react-alert-dialog@1.1.6',
+            replacement: '@radix-ui/react-alert-dialog'
+          },
+          {
+            find: '@radix-ui/react-accordion@1.2.3',
+            replacement: '@radix-ui/react-accordion'
+          },
+          {
+            find: '@',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src'
+          },
+          {
+            find: /^\/?@vite\/env/,
+            replacement: '/@fs/C:/Users/1sriv/Downloads/file-main/file-main/node_modules/vite/dist/client/env.mjs'
+          },
+          {
+            find: /^\/?@vite\/client/,
+            replacement: '/@fs/C:/Users/1sriv/Downloads/file-main/file-main/node_modules/vite/dist/client/client.mjs'
+          }
+        ],
+        mainFields: [ 'browser', 'module', 'jsnext:main', 'jsnext' ],
+        conditions: [ 'module', 'browser', 'development|production' ],
+        builtins: []
+      },
+      keepProcessEnv: false,
+      consumer: 'client',
+      optimizeDeps: {
+        include: [ 'react/jsx-dev-runtime' ],
+        exclude: [],
+        needsInterop: [],
+        extensions: [],
+        disabled: undefined,
+        holdUntilCrawlEnd: true,
+        force: false,
+        noDiscovery: false,
+        esbuildOptions: { preserveSymlinks: false, jsx: 'automatic' }
+      },
+      dev: {
+        warmup: [],
+        sourcemap: { js: true },
+        sourcemapIgnoreList: [Function: isInNodeModules$1],
+        preTransformRequests: true,
+        createEnvironment: [Function: defaultCreateClientDevEnvironment],
+        recoverable: true,
+        moduleRunnerTransform: false
+      },
+      build: {
+        target: 'esnext',
+        polyfillModulePreload: true,
+        modulePreload: { polyfill: true },
+        outDir: 'build',
+        assetsDir: 'assets',
+        assetsInlineLimit: 4096,
+        sourcemap: false,
+        terserOptions: {},
+        rollupOptions: {},
+        commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+        dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+        write: true,
+        emptyOutDir: null,
+        copyPublicDir: true,
+        manifest: false,
+        lib: false,
+        ssrManifest: false,
+        ssrEmitAssets: false,
+        reportCompressedSize: true,
+        chunkSizeWarningLimit: 500,
+        watch: null,
+        cssCodeSplit: true,
+        minify: 'esbuild',
+        ssr: false,
+        emitAssets: true,
+        createEnvironment: [Function: createEnvironment],
+        cssTarget: 'esnext',
+        cssMinify: true
+      }
+    },
+    ssr: {
+      define: undefined,
+      resolve: {
+        externalConditions: [ 'node' ],
+        extensions: [ '.js', '.jsx', '.ts', '.tsx', '.json' ],
+        dedupe: [],
+        noExternal: [],
+        external: [],
+        preserveSymlinks: false,
+        alias: [
+          { find: 'vaul@1.1.2', replacement: 'vaul' },
+          { find: 'sonner@2.0.3', replacement: 'sonner' },
+          { find: 'recharts@2.15.2', replacement: 'recharts' },
+          {
+            find: 'react-resizable-panels@2.1.7',
+            replacement: 'react-resizable-panels'
+          },
+          {
+            find: 'react-hook-form@7.55.0',
+            replacement: 'react-hook-form'
+          },
+          {
+            find: 'react-day-picker@8.10.1',
+            replacement: 'react-day-picker'
+          },
+          { find: 'next-themes@0.4.6', replacement: 'next-themes' },
+          { find: 'lucide-react@0.487.0', replacement: 'lucide-react' },
+          { find: 'input-otp@1.4.2', replacement: 'input-otp' },
+          {
+            find: 'figma:asset/fad44129806a88be5d99e884e96319be206cdba9.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\fad44129806a88be5d99e884e96319be206cdba9.png'
+          },
+          {
+            find: 'figma:asset/ea8edc7a5e80446726722176201d332f9359a7a2.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\ea8edc7a5e80446726722176201d332f9359a7a2.png'
+          },
+          {
+            find: 'figma:asset/c70ff4b507874d64c60a2a2a803b94f4a81262ab.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\c70ff4b507874d64c60a2a2a803b94f4a81262ab.png'
+          },
+          {
+            find: 'figma:asset/c4806e9637d84069edccb37d86ec78c7334aeb44.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\c4806e9637d84069edccb37d86ec78c7334aeb44.png'
+          },
+          {
+            find: 'figma:asset/b88a8ef1e96c6bec8532bc45e1965770c3c90b00.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\b88a8ef1e96c6bec8532bc45e1965770c3c90b00.png'
+          },
+          {
+            find: 'figma:asset/b4f2f423b3c301ca9189b4c18c7bb06b363f7583.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\b4f2f423b3c301ca9189b4c18c7bb06b363f7583.png'
+          },
+          {
+            find: 'figma:asset/ade7c17ca7134b9a9ed8c5fc98a2a5fcb317ebe3.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\ade7c17ca7134b9a9ed8c5fc98a2a5fcb317ebe3.png'
+          },
+          {
+            find: 'figma:asset/a5b6d9e26488894c07b58e2a055a3a130a345cf5.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\a5b6d9e26488894c07b58e2a055a3a130a345cf5.png'
+          },
+          {
+            find: 'figma:asset/99bab43317c91e9339d8206aed7bfe8c1e9d7ff6.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\99bab43317c91e9339d8206aed7bfe8c1e9d7ff6.png'
+          },
+          {
+            find: 'figma:asset/849709757a691f0e0782bc36044166439bcbd6db.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\849709757a691f0e0782bc36044166439bcbd6db.png'
+          },
+          {
+            find: 'figma:asset/7d0528e8a39187bd5c82dc5af4c22d4ed96c2f09.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\7d0528e8a39187bd5c82dc5af4c22d4ed96c2f09.png'
+          },
+          {
+            find: 'figma:asset/75472a56891d782a6aebdf5671d3e38f8d2afea2.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\75472a56891d782a6aebdf5671d3e38f8d2afea2.png'
+          },
+          {
+            find: 'figma:asset/6acfd9d6c8ee7fd0ee085b43918ec67ad605c2de.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\6acfd9d6c8ee7fd0ee085b43918ec67ad605c2de.png'
+          },
+          {
+            find: 'figma:asset/3d26e5f5c5bf70cbc455ccbea5e89ad8f9725cdb.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\3d26e5f5c5bf70cbc455ccbea5e89ad8f9725cdb.png'
+          },
+          {
+            find: 'figma:asset/1ed482f202076846ed215ead8f44f3ba6ab86d94.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\1ed482f202076846ed215ead8f44f3ba6ab86d94.png'
+          },
+          {
+            find: 'figma:asset/17cd23f12fb1885b006cb3fd1bdda399c967f02c.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\17cd23f12fb1885b006cb3fd1bdda399c967f02c.png'
+          },
+          {
+            find: 'figma:asset/15d5ccb4b8b2ff1e32155ef83c9c9535a383bfea.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\15d5ccb4b8b2ff1e32155ef83c9c9535a383bfea.png'
+          },
+          {
+            find: 'figma:asset/0fa55507ab7f40d20bc4c57ed2605cdd88245c9a.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\0fa55507ab7f40d20bc4c57ed2605cdd88245c9a.png'
+          },
+          {
+            find: 'figma:asset/059ef2f82d9a724ad4291ec5fe0e7a6f1bdd7782.png',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src\\assets\\059ef2f82d9a724ad4291ec5fe0e7a6f1bdd7782.png'
+          },
+          {
+            find: 'embla-carousel-react@8.6.0',
+            replacement: 'embla-carousel-react'
+          },
+          { find: 'cmdk@1.1.1', replacement: 'cmdk' },
+          {
+            find: 'class-variance-authority@0.7.1',
+            replacement: 'class-variance-authority'
+          },
+          {
+            find: '@radix-ui/react-tooltip@1.1.8',
+            replacement: '@radix-ui/react-tooltip'
+          },
+          {
+            find: '@radix-ui/react-toggle@1.1.2',
+            replacement: '@radix-ui/react-toggle'
+          },
+          {
+            find: '@radix-ui/react-toggle-group@1.1.2',
+            replacement: '@radix-ui/react-toggle-group'
+          },
+          {
+            find: '@radix-ui/react-tabs@1.1.3',
+            replacement: '@radix-ui/react-tabs'
+          },
+          {
+            find: '@radix-ui/react-switch@1.1.3',
+            replacement: '@radix-ui/react-switch'
+          },
+          {
+            find: '@radix-ui/react-slot@1.1.2',
+            replacement: '@radix-ui/react-slot'
+          },
+          {
+            find: '@radix-ui/react-slider@1.2.3',
+            replacement: '@radix-ui/react-slider'
+          },
+          {
+            find: '@radix-ui/react-separator@1.1.2',
+            replacement: '@radix-ui/react-separator'
+          },
+          {
+            find: '@radix-ui/react-select@2.1.6',
+            replacement: '@radix-ui/react-select'
+          },
+          {
+            find: '@radix-ui/react-scroll-area@1.2.3',
+            replacement: '@radix-ui/react-scroll-area'
+          },
+          {
+            find: '@radix-ui/react-radio-group@1.2.3',
+            replacement: '@radix-ui/react-radio-group'
+          },
+          {
+            find: '@radix-ui/react-progress@1.1.2',
+            replacement: '@radix-ui/react-progress'
+          },
+          {
+            find: '@radix-ui/react-popover@1.1.6',
+            replacement: '@radix-ui/react-popover'
+          },
+          {
+            find: '@radix-ui/react-navigation-menu@1.2.5',
+            replacement: '@radix-ui/react-navigation-menu'
+          },
+          {
+            find: '@radix-ui/react-menubar@1.1.6',
+            replacement: '@radix-ui/react-menubar'
+          },
+          {
+            find: '@radix-ui/react-label@2.1.2',
+            replacement: '@radix-ui/react-label'
+          },
+          {
+            find: '@radix-ui/react-hover-card@1.1.6',
+            replacement: '@radix-ui/react-hover-card'
+          },
+          {
+            find: '@radix-ui/react-dropdown-menu@2.1.6',
+            replacement: '@radix-ui/react-dropdown-menu'
+          },
+          {
+            find: '@radix-ui/react-dialog@1.1.6',
+            replacement: '@radix-ui/react-dialog'
+          },
+          {
+            find: '@radix-ui/react-context-menu@2.2.6',
+            replacement: '@radix-ui/react-context-menu'
+          },
+          {
+            find: '@radix-ui/react-collapsible@1.1.3',
+            replacement: '@radix-ui/react-collapsible'
+          },
+          {
+            find: '@radix-ui/react-checkbox@1.1.4',
+            replacement: '@radix-ui/react-checkbox'
+          },
+          {
+            find: '@radix-ui/react-avatar@1.1.3',
+            replacement: '@radix-ui/react-avatar'
+          },
+          {
+            find: '@radix-ui/react-aspect-ratio@1.1.2',
+            replacement: '@radix-ui/react-aspect-ratio'
+          },
+          {
+            find: '@radix-ui/react-alert-dialog@1.1.6',
+            replacement: '@radix-ui/react-alert-dialog'
+          },
+          {
+            find: '@radix-ui/react-accordion@1.2.3',
+            replacement: '@radix-ui/react-accordion'
+          },
+          {
+            find: '@',
+            replacement: 'C:\\Users\\1sriv\\Downloads\\file-main\\file-main\\src'
+          },
+          {
+            find: /^\/?@vite\/env/,
+            replacement: '/@fs/C:/Users/1sriv/Downloads/file-main/file-main/node_modules/vite/dist/client/env.mjs'
+          },
+          {
+            find: /^\/?@vite\/client/,
+            replacement: '/@fs/C:/Users/1sriv/Downloads/file-main/file-main/node_modules/vite/dist/client/client.mjs'
+          }
+        ],
+        mainFields: [ 'module', 'jsnext:main', 'jsnext' ],
+        conditions: [ 'module', 'node', 'development|production' ],
+        builtins: [
+          '_http_agent',         '_http_client',        '_http_common',
+          '_http_incoming',      '_http_outgoing',      '_http_server',
+          '_stream_duplex',      '_stream_passthrough', '_stream_readable',
+          '_stream_transform',   '_stream_wrap',        '_stream_writable',
+          '_tls_common',         '_tls_wrap',           'assert',
+          'assert/strict',       'async_hooks',         'buffer',
+          'child_process',       'cluster',             'console',
+          'constants',           'crypto',              'dgram',
+          'diagnostics_channel', 'dns',                 'dns/promises',
+          'domain',              'events',              'fs',
+          'fs/promises',         'http',                'http2',
+          'https',               'inspector',           'inspector/promises',
+          'module',              'net',                 'os',
+          'path',                'path/posix',          'path/win32',
+          'perf_hooks',          'process',             'punycode',
+          'querystring',         'readline',            'readline/promises',
+          'repl',                'stream',              'stream/consumers',
+          'stream/promises',     'stream/web',          'string_decoder',
+          'sys',                 'timers',              'timers/promises',
+          'tls',                 'trace_events',        'tty',
+          'url',                 'util',                'util/types',
+          'v8',                  'vm',                  'wasi',
+          'worker_threads',      'zlib',                /^node:/,
+          /^npm:/,               /^bun:/
+        ]
+      },
+      keepProcessEnv: true,
+      consumer: 'server',
+      optimizeDeps: {
+        include: [],
+        exclude: [],
+        needsInterop: [],
+        extensions: [],
+        disabled: undefined,
+        holdUntilCrawlEnd: true,
+        force: false,
+        noDiscovery: true,
+        esbuildOptions: { preserveSymlinks: false }
+      },
+      dev: {
+        warmup: [],
+        sourcemap: { js: true },
+        sourcemapIgnoreList: [Function: isInNodeModules$1],
+        preTransformRequests: false,
+        createEnvironment: [Function: defaultCreateDevEnvironment],
+        recoverable: false,
+        moduleRunnerTransform: true
+      },
+      build: {
+        target: 'esnext',
+        polyfillModulePreload: true,
+        modulePreload: { polyfill: true },
+        outDir: 'build',
+        assetsDir: 'assets',
+        assetsInlineLimit: 4096,
+        sourcemap: false,
+        terserOptions: {},
+        rollupOptions: {},
+        commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+        dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+        write: true,
+        emptyOutDir: null,
+        copyPublicDir: true,
+        manifest: false,
+        lib: false,
+        ssrManifest: false,
+        ssrEmitAssets: false,
+        reportCompressedSize: true,
+        chunkSizeWarningLimit: 500,
+        watch: null,
+        cssCodeSplit: true,
+        minify: false,
+        ssr: true,
+        emitAssets: false,
+        createEnvironment: [Function: createEnvironment],
+        cssTarget: 'esnext',
+        cssMinify: 'esbuild'
+      }
+    }
+  },
+  configFile: 'C:/Users/1sriv/Downloads/file-main/file-main/vite.config.ts',
+  configFileDependencies: [ 'C:/Users/1sriv/Downloads/file-main/file-main/vite.config.ts' ],
+  inlineConfig: {
+    root: undefined,
+    base: undefined,
+    mode: undefined,
+    configFile: undefined,
+    configLoader: undefined,
+    logLevel: undefined,
+    clearScreen: undefined,
+    server: { host: undefined },
+    forceOptimizeDeps: undefined
+  },
+  root: 'C:/Users/1sriv/Downloads/file-main/file-main',
+  base: '/',
+  decodedBase: '/',
+  rawBase: '/',
+  publicDir: 'C:/Users/1sriv/Downloads/file-main/file-main/public',
+  cacheDir: 'C:/Users/1sriv/Downloads/file-main/file-main/node_modules/.vite',
+  command: 'serve',
+  mode: 'development',
+  isWorker: false,
+  mainConfig: null,
+  bundleChain: [],
+  isProduction: false,
+  css: {
+    transformer: 'postcss',
+    preprocessorMaxWorkers: 0,
+    devSourcemap: false
+  },
+  json: { namedExports: true, stringify: 'auto' },
+  builder: undefined,
+  preview: {
+    port: 4173,
+    strictPort: true,
+    host: undefined,
+    allowedHosts: [],
+    https: undefined,
+    open: true,
+    proxy: undefined,
+    cors: {
+      origin: /^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/
+    },
+    headers: {}
+  },
+  envDir: 'C:/Users/1sriv/Downloads/file-main/file-main',
+  env: { BASE_URL: '/', MODE: 'development', DEV: true, PROD: false },
+  assetsInclude: [Function: assetsInclude],
+  logger: {
+    hasWarned: false,
+    info: [Function: info],
+    warn: [Function: warn],
+    warnOnce: [Function: warnOnce],
+    error: [Function: error],
+    clearScreen: [Function: clearScreen],
+    hasErrorLogged: [Function: hasErrorLogged]
+  },
+  packageCache: Map(1) {
+    'fnpd_C:/Users/1sriv/Downloads/file-main/file-main' => {
+      dir: 'C:/Users/1sriv/Downloads/file-main/file-main',
+      data: {
+        name: 'caffelino',
+        version: '0.1.0',
+        private: true,
+        dependencies: {
+          '@radix-ui/react-accordion': '^1.2.3',
+          '@radix-ui/react-alert-dialog': '^1.1.6',
+          '@radix-ui/react-aspect-ratio': '^1.1.2',
+          '@radix-ui/react-avatar': '^1.1.3',
+          '@radix-ui/react-checkbox': '^1.1.4',
+          '@radix-ui/react-collapsible': '^1.1.3',
+          '@radix-ui/react-context-menu': '^2.2.6',
+          '@radix-ui/react-dialog': '^1.1.6',
+          '@radix-ui/react-dropdown-menu': '^2.1.6',
+          '@radix-ui/react-hover-card': '^1.1.6',
+          '@radix-ui/react-label': '^2.1.2',
+          '@radix-ui/react-menubar': '^1.1.6',
+          '@radix-ui/react-navigation-menu': '^1.2.5',
+          '@radix-ui/react-popover': '^1.1.6',
+          '@radix-ui/react-progress': '^1.1.2',
+          '@radix-ui/react-radio-group': '^1.2.3',
+          '@radix-ui/react-scroll-area': '^1.2.3',
+          '@radix-ui/react-select': '^2.1.6',
+          '@radix-ui/react-separator': '^1.1.2',
+          '@radix-ui/react-slider': '^1.2.3',
+          '@radix-ui/react-slot': '^1.1.2',
+          '@radix-ui/react-switch': '^1.1.3',
+          '@radix-ui/react-tabs': '^1.1.3',
+          '@radix-ui/react-toggle': '^1.1.2',
+          '@radix-ui/react-toggle-group': '^1.1.2',
+          '@radix-ui/react-tooltip': '^1.1.8',
+          '@react-oauth/google': '^0.13.4',
+          'class-variance-authority': '^0.7.1',
+          clsx: '*',
+          cmdk: '^1.1.1',
+          'embla-carousel-react': '^8.6.0',
+          'input-otp': '^1.4.2',
+          'jwt-decode': '^4.0.0',
+          leaflet: '^1.9.4',
+          'lucide-react': '^0.487.0',
+          motion: '*',
+          'next-themes': '^0.4.6',
+          react: '^18.3.1',
+          'react-day-picker': '^8.10.1',
+          'react-dom': '^18.3.1',
+          'react-hook-form': '^7.55.0',
+          'react-leaflet': '^5.0.0',
+          'react-resizable-panels': '^2.1.7',
+          recharts: '^2.15.2',
+          sonner: '^2.0.3',
+          'tailwind-merge': '*',
+          vaul: '^1.1.2'
+        },
+        devDependencies: {
+          '@types/node': '^20.10.0',
+          '@vitejs/plugin-react-swc': '^3.10.2',
+          vite: '6.3.5'
+        },
+        scripts: { dev: 'vite', build: 'vite build' }
+      },
+      hasSideEffects: [Function: hasSideEffects],
+      setResolvedCache: [Function: setResolvedCache],
+      getResolvedCache: [Function: getResolvedCache]
+    },
+    set: [Function (anonymous)]
+  },
+  worker: { format: 'iife', plugins: '() => plugins', rollupOptions: {} },
+  appType: 'spa',
+  experimental: { importGlobRestoreExtension: false, hmrPartialAccept: false },
+  future: undefined,
+  ssr: {
+    target: 'node',
+    optimizeDeps: {
+      esbuildOptions: { preserveSymlinks: false },
+      include: [],
+      exclude: [],
+      needsInterop: [],
+      extensions: [],
+      holdUntilCrawlEnd: true,
+      force: false,
+      noDiscovery: true
+    },
+    external: [],
+    noExternal: [],
+    resolve: {
+      conditions: [ 'module', 'node', 'development|production' ],
+      externalConditions: [ 'node' ]
+    }
+  },
+  dev: {
+    warmup: [],
+    sourcemap: { js: true },
+    sourcemapIgnoreList: [Function: isInNodeModules$1],
+    preTransformRequests: false,
+    createEnvironment: [Function: defaultCreateDevEnvironment],
+    recoverable: false,
+    moduleRunnerTransform: false
+  },
+  webSocketToken: 'L7BC0VhG1NlD',
+  getSortedPlugins: [Function: getSortedPlugins],
+  getSortedPluginHooks: [Function: getSortedPluginHooks],
+  createResolver: [Function: createResolver],
+  fsDenyGlob: [Function: arrayMatcher],
+  safeModulePaths: Set(0) {},
+  additionalAllowedHosts: []
+}
+2026-03-07T19:50:31.637Z vite:deps (client) Hash is consistent. Skipping. Use --force to override.
+[31merror when starting dev server:
+Error: Port 5173 is already in use
+    at Server.onError (file:///C:/Users/1sriv/Downloads/file-main/file-main/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:25023:18)
+    at Server.emit (node:events:508:28)
+    at emitErrorNT (node:net:1984:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)[39m

@@ -18,11 +18,13 @@ const {
     getCafeMenu,
     placeOrder,
     getOrders,
-    applyCoupon,
     getActiveMeetups,
     getMyMeetups,
+    getHostedMeetups,
+    endMeetup,
     createRazorpayOrder,
     verifyRazorpayPayment,
+    confirmTableReservation,
 } = require("../controllers/meetup.controller");
 
 // ─── Meetup CRUD ─────────────────────────────────────────────────
@@ -35,6 +37,8 @@ router.get("/code/:code", getMeetupByCode);
 router.get("/user/:userId", getUserMeetups);
 router.get("/active/:userId", getActiveMeetups);
 router.get("/my", getMyMeetups);
+router.get("/hosted/:userId", getHostedMeetups);
+router.post("/end", endMeetup);
 router.get("/:id", getMeetupById);
 
 // ─── Chat ────────────────────────────────────────────────────────
@@ -49,10 +53,10 @@ router.get("/:meetupId/cafe-menu", getCafeMenu);
 
 // ─── ORDERING & PAYMENTS ─────────────────────────────────────────
 router.post("/order", placeOrder);
-router.post("/apply-coupon", applyCoupon);
 router.get("/orders/:meetupId", getOrders);
 router.post("/razorpay-order", createRazorpayOrder);
 router.post("/verify-payment", verifyRazorpayPayment);
+router.post("/confirm-reservation", confirmTableReservation);
 
 module.exports = router;
 

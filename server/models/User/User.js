@@ -25,8 +25,17 @@ const userSchema = new mongoose.Schema(
         },
         authProvider: {
             type: String,
-            enum: ["email", "google"],
+            enum: ["email", "google", "phone", "firebase"],
             default: "email",
+        },
+        username: {
+            type: String,
+            trim: true,
+            sparse: true,
+        },
+        firebaseUid: {
+            type: String,
+            sparse: true,
         },
         googleId: {
             type: String,
@@ -57,6 +66,7 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        avatarId: { type: String },
         meetups: [
             {
                 meetupId: {
@@ -68,7 +78,11 @@ const userSchema = new mongoose.Schema(
                 status: String,
                 joinedAt: { type: Date, default: Date.now },
             }
-        ]
+        ],
+        revenue: {
+            type: Number,
+            default: 0,
+        }
     },
     { timestamps: true }
 );

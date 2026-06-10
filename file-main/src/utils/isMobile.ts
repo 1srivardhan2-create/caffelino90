@@ -1,0 +1,1 @@
+export const isMobileApp = typeof window !== 'undefined' && (!!(window as any).Capacitor || window.location.protocol === 'capacitor:' || /Capacitor|Cordova/i.test(navigator.userAgent) || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && /android|iphone|ipad|ipod/i.test(navigator.userAgent)));

@@ -966,6 +966,16 @@ const getApprovedCafes = async (req, res) => {
                 menuItems: sanitizedMenuItems,
                 Cafe_photos: sanitizedCafePhotos,
                 profilePicture: sanitizedProfilePic,
+                cloudinaryImages: sanitizedCafePhotos,
+                rating: cafe.rating ?? 4.5,
+                verified: cafe.status === true,
+                phone: cafe.Phonenumber,
+                managerName: cafe.managerName,
+                costForOne: cafe.Average_Cost,
+                coordinates: {
+                    lat: cafe.latitude ?? 0,
+                    lng: cafe.longitude ?? 0,
+                },
             };
         });
 
@@ -1164,6 +1174,29 @@ const getPublicMenu = async (req, res) => {
     }
 };
 
+const { attachMenuToCafe } = require("./favorite.controller");
+
+/** GET /api/cafe/public/detail/:cafeId — Full cafe for mobile detail page */
+const getPublicCafeDetail = async (req, res) => {
+    try {
+        const { cafeId } = req.params;
+        if (!cafeId || !mongoose.Types.ObjectId.isValid(cafeId)) {
+            return res.status(400).json({ message: "Valid cafeId is required" });
+        }
+
+        const cafe = await Cafe.findOne({ _id: cafeId, status: true }).lean();
+        if (!cafe) {
+            return res.status(404).json({ message: "Cafe not found" });
+        }
+
+        const enriched = await attachMenuToCafe(cafe);
+        res.json({ success: true, cafe: enriched });
+    } catch (error) {
+        console.error("getPublicCafeDetail:", error);
+        res.status(500).json({ message: "Failed to fetch cafe", error: error.message });
+    }
+};
+
 module.exports = {
     registerCafe,
     Logincafe,
@@ -1189,4 +1222,5 @@ module.exports = {
     updateCafePhotos,
     getMeetupOrders,
     getPublicMenu,
+    getPublicCafeDetail,
 };

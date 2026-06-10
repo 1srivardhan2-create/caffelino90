@@ -1,4 +1,12 @@
 {
+  "name": "file-main",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "android": "npm run android --prefix caffelino-mobile",
+    "start": "npm run start --prefix caffelino-mobile",
+    "install:mobile": "npm install --prefix caffelino-mobile"
+  },
   "dependencies": {
     "cloudinary": "^2.9.0",
     "socket.io": "^4.8.3"

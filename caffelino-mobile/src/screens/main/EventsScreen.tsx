@@ -58,15 +58,17 @@ export function EventsScreen() {
         <Image source={{ uri: item.bannerUrl }} style={styles.banner} />
         <LinearGradient colors={['transparent', 'rgba(0,0,0,0.6)']} style={styles.bannerGradient}>
           <View style={styles.priceTag}>
-            <Text style={styles.priceText}>{item.ticketPrice === 0 ? 'FREE' : `₹${item.ticketPrice}`}</Text>
+            <Text style={styles.priceText}>{item.ticketPrice === 0 ? 'FREE' : 'PAID'}</Text>
           </View>
         </LinearGradient>
         <View style={[styles.cardContent, { backgroundColor: palette.white }]}>
           <View style={styles.cardHeader}>
-            <Text style={[styles.category, { color: palette.goldAccent }]}>{item.category.toUpperCase()}</Text>
-            <Text style={[styles.seats, { color: palette.textSecondary }]}>{item.availableSeats} seats left</Text>
+            <Text style={[styles.category, { color: palette.goldAccent }]}>{item.category?.toUpperCase() || 'EVENT'}</Text>
           </View>
           <Text style={[styles.eventName, { color: palette.espresso }]} numberOfLines={1}>{item.eventName}</Text>
+          <Text style={{ color: palette.textSecondary, fontSize: 13, marginBottom: 8 }}>
+            Hosted By <Text style={{ fontWeight: 'bold' }}>{item.organizationName || item.companyName || 'Caffelino Events'}</Text>
+          </Text>
           
           <View style={styles.detailsRow}>
             <Ionicons name="calendar-outline" size={14} color={palette.textSecondary} />

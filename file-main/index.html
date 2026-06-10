@@ -3,16 +3,20 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#fbf9f6" />
   <title>caffelino</title>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    /* Prevent blank flash on Android Capacitor */
+    html, body { margin: 0; padding: 0; min-height: 100vh; background: #fbf9f6; }
+    #root { min-height: 100vh; }
+  </style>
+  <script defer src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
-  <!-- Tidio Live Chat Widget -->
-  <script src="//code.tidio.co/vglycutile0y6pssqrplibcrnnw6msnx.js" async></script>
 </body>
 
 </html>

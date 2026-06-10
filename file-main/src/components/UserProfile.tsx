@@ -1,4 +1,4 @@
-import { ArrowLeft, Settings, Star, Users, Calendar, Shield, MapPin, Coffee, Heart, Clock, Instagram, Linkedin, Phone, Edit2, Check, X } from 'lucide-react';
+import { ArrowLeft, Settings, Star, Users, Calendar, Shield, MapPin, Coffee, Heart, Clock, Instagram, Linkedin, Phone, Edit2, Check, X, MessageSquare } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
@@ -9,6 +9,8 @@ import { useState, useEffect } from 'react';
 import GenderAvatar from './GenderAvatar';
 import { getAvatarById } from '../utils/avatarData';
 import { toast } from 'sonner';
+import { BASE_URL } from '../utils/api';
+import LovedByUsers from './LovedByUsers';
 
 interface UserProfileProps {
   user: any;
@@ -26,6 +28,12 @@ export default function UserProfile({ user, onNavigate, onLogout, onUpdateUser }
   const [isEditingName, setIsEditingName] = useState(false);
   const [userName, setUserName] = useState(user.name || '');
   const [nameError, setNameError] = useState('');
+
+  // History States
+  const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [meetups, setMeetups] = useState<any[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [showLovedByUsers, setShowLovedByUsers] = useState(false);
   
   // Update phone number state when user changes
   useEffect(() => {
@@ -36,53 +44,95 @@ export default function UserProfile({ user, onNavigate, onLogout, onUpdateUser }
   useEffect(() => {
     setUserName(user.name || '');
   }, [user.name]);
-  
+
+  // Fetch Feedback and Meetup history
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const uId = user.id || user._id;
+      if (!uId) return;
+      setIsLoadingHistory(true);
+      try {
+        const fbRes = await fetch(`${BASE_URL}/api/feedback?userId=${uId}`);
+        if (fbRes.ok) {
+          const fbData = await fbRes.json();
+          setFeedbacks(fbData);
+        }
+
+        const mtRes = await fetch(`${BASE_URL}/api/meetup/user/${uId}`);
+        if (mtRes.ok) {
+          const mtData = await mtRes.json();
+          setMeetups(mtData.meetups || []);
+        }
+      } catch (error) {
+        console.error("Error fetching user history:", error);
+      } finally {
+        setIsLoadingHistory(false);
+      }
+    };
+
+    fetchHistory();
+  }, [user.id, user._id]);
+
   if (!user) {
     return null;
   }
 
+  const userId = user.id || user._id;
   const trustLevel = 70;
-  const totalMeetups = 0; // TODO: fetch real count from API
+  const totalMeetups = meetups.length;
+
+  const saveProfileToBackend = async (updatedFields: any) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/user/profile/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedFields)
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to save profile changes to database.');
+      }
+      const data = await response.json();
+      if (onUpdateUser && data.user) {
+        onUpdateUser({
+          ...user,
+          ...data.user,
+          ...updatedFields
+        });
+      }
+      return true;
+    } catch (err: any) {
+      console.error("Save profile error:", err);
+      toast.error(err.message || "Failed to save details to MongoDB");
+      return false;
+    }
+  };
 
   const validatePhoneNumber = (value: string) => {
-    // Remove +91 prefix for validation
     const numberPart = value.replace('+91', '').trim();
-    
-    // Check if contains non-numeric characters
     if (numberPart && !/^\d*$/.test(numberPart)) {
       setPhoneError('Phone number can only contain digits');
       return false;
     }
-    
-    // Check if length is not 10
     if (numberPart.length > 0 && numberPart.length < 10) {
       setPhoneError('Phone number must be exactly 10 digits');
       return false;
     }
-    
     if (numberPart.length > 10) {
       setPhoneError('Phone number cannot exceed 10 digits');
       return false;
     }
-    
     setPhoneError('');
     return numberPart.length === 10;
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
-    
-    // Always ensure +91 prefix
     if (!value.startsWith('+91')) {
       value = '+91' + value.replace(/^\+91/, '');
     }
-    
-    // Extract only the number part after +91
     const numberPart = value.substring(3);
-    
-    // Only allow digits and limit to 10
     const cleanNumber = numberPart.replace(/\D/g, '').substring(0, 10);
-    
     const finalValue = '+91' + cleanNumber;
     setPhoneNumber(finalValue);
     validatePhoneNumber(finalValue);
@@ -93,20 +143,18 @@ export default function UserProfile({ user, onNavigate, onLogout, onUpdateUser }
     return numberPart.length === 10 && /^\d{10}$/.test(numberPart);
   };
 
-  const handleSavePhone = () => {
+  const handleSavePhone = async () => {
     if (!isPhoneValid()) {
       setPhoneError('Please enter a valid 10-digit phone number');
       return;
     }
     
-    // Update user data
-    if (onUpdateUser) {
-      onUpdateUser({ ...user, mobileNumber: phoneNumber });
+    const success = await saveProfileToBackend({ mobileNumber: phoneNumber });
+    if (success) {
+      setIsEditingPhone(false);
+      setPhoneError('');
+      toast.success('Phone number updated successfully');
     }
-    
-    setIsEditingPhone(false);
-    setPhoneError('');
-    toast.success('Phone number updated successfully');
   };
 
   const handleCancelPhoneEdit = () => {
@@ -116,7 +164,6 @@ export default function UserProfile({ user, onNavigate, onLogout, onUpdateUser }
   };
 
   const handleStartEditing = () => {
-    // Initialize with +91 if no number exists
     if (!user.mobileNumber || user.mobileNumber.trim() === '') {
       setPhoneNumber('+91');
     }
@@ -124,18 +171,14 @@ export default function UserProfile({ user, onNavigate, onLogout, onUpdateUser }
   };
   
   const validateName = (value: string) => {
-    // Check if name is empty
     if (!value.trim()) {
       setNameError('Name cannot be empty');
       return false;
     }
-    
-    // Check if name contains only alphabets and spaces
     if (!/^[a-zA-Z\s]+$/.test(value)) {
       setNameError('Name can only contain alphabets and spaces');
       return false;
     }
-    
     setNameError('');
     return true;
   };
@@ -150,24 +193,18 @@ export default function UserProfile({ user, onNavigate, onLogout, onUpdateUser }
     return !nameError && userName.trim() !== '';
   };
 
-  const handleSaveName = () => {
+  const handleSaveName = async () => {
     if (!isNameValid()) {
       setNameError('Please enter a valid name');
       return;
     }
     
-    // Update user data - update both name and firstName to ensure header updates
-    if (onUpdateUser) {
-      onUpdateUser({ 
-        ...user, 
-        name: userName,
-        firstName: userName // Also update firstName for header display
-      });
+    const success = await saveProfileToBackend({ firstName: userName, name: userName });
+    if (success) {
+      setIsEditingName(false);
+      setNameError('');
+      toast.success('Name updated successfully');
     }
-    
-    setIsEditingName(false);
-    setNameError('');
-    toast.success('Name updated successfully');
   };
 
   const handleCancelNameEdit = () => {
@@ -183,8 +220,8 @@ export default function UserProfile({ user, onNavigate, onLogout, onUpdateUser }
   return (
     <div className="min-h-screen bg-slate-50 pb-20 pt-16 sm:pt-6 overflow-x-hidden">
       <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
-        {/* Back Button */}
-        <div className="mb-6 flex">
+        {/* Back Button and Actions */}
+        <div className="mb-6 flex items-center justify-between">
           <button 
             onClick={() => onNavigate('home')}
             className="flex items-center gap-2 text-sm sm:text-base font-medium text-slate-800 bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors"
@@ -192,7 +229,19 @@ export default function UserProfile({ user, onNavigate, onLogout, onUpdateUser }
             <ArrowLeft className="w-4 h-4" />
             Back
           </button>
+
+          <button 
+            onClick={() => setShowLovedByUsers(true)}
+            className="flex items-center gap-2 text-sm sm:text-base font-medium text-white bg-black px-4 py-2 rounded-xl shadow-md hover:bg-stone-800 transition-colors"
+          >
+            <Heart className="w-4 h-4 text-red-500" fill="currentColor" />
+            Loved By Users
+          </button>
         </div>
+
+        {showLovedByUsers && (
+          <LovedByUsers onClose={() => setShowLovedByUsers(false)} />
+        )}
 
         {/* Profile Header Card */}
         <Card className="p-5 sm:p-8 mb-6 rounded-2xl shadow-sm">
@@ -629,6 +678,77 @@ export default function UserProfile({ user, onNavigate, onLogout, onUpdateUser }
               </p>
             </div>
           </div>
+        </Card>
+
+        {/* 📱 Meetup History Card */}
+        <Card className="p-6 mb-6">
+          <h3 className="mb-4 flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-[#be9d80]" />
+            Meetup History ({meetups.length})
+          </h3>
+          {isLoadingHistory ? (
+            <div className="flex justify-center py-6">
+              <div className="w-6 h-6 border-2 border-neutral-300 border-t-neutral-600 rounded-full animate-spin"></div>
+            </div>
+          ) : meetups.length === 0 ? (
+            <p className="text-sm text-slate-500 py-2">No meetups joined yet. Explore and join one!</p>
+          ) : (
+            <div className="space-y-4">
+              {meetups.map((meetup) => (
+                <div key={meetup._id || meetup.meetupCode} className="p-4 bg-slate-50 rounded-xl border border-slate-200/50 hover:bg-slate-100 transition-all flex justify-between items-center">
+                  <div>
+                    <h4 className="font-semibold text-neutral-800 text-sm sm:text-base">{meetup.title}</h4>
+                    <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+                      <span>📅 {meetup.date || 'TBD'}</span>
+                      <span>•</span>
+                      <span>🕒 {meetup.time || 'TBD'}</span>
+                    </p>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Code: <span className="font-mono bg-white px-1.5 py-0.5 rounded border text-[#8b5943] font-bold">{meetup.meetupCode}</span>
+                    </p>
+                  </div>
+                  <div>
+                    <Badge variant={meetup.status === 'active' ? 'secondary' : 'default'} className="capitalize text-xs">
+                      {meetup.status}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+
+        {/* 📱 Feedback History Card */}
+        <Card className="p-6 mb-6">
+          <h3 className="mb-4 flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-[#be9d80]" />
+            Feedback History ({feedbacks.length})
+          </h3>
+          {isLoadingHistory ? (
+            <div className="flex justify-center py-6">
+              <div className="w-6 h-6 border-2 border-neutral-300 border-t-neutral-600 rounded-full animate-spin"></div>
+            </div>
+          ) : feedbacks.length === 0 ? (
+            <p className="text-sm text-slate-500 py-2">You haven't submitted any feedback yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {feedbacks.map((fb) => (
+                <div key={fb._id} className="p-4 bg-slate-50 rounded-xl border border-slate-200/50 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-0.5">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`w-3.5 h-3.5 ${i < fb.rating ? 'text-amber-500 fill-amber-500' : 'text-slate-300'}`} />
+                      ))}
+                    </div>
+                    <span className="text-[10px] text-slate-400">
+                      {new Date(fb.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-700 leading-relaxed font-medium italic">"{fb.comment}"</p>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
     </div>

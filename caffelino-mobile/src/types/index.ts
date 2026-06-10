@@ -91,7 +91,11 @@ export interface Event {
   totalSeats: number;
   availableSeats: number;
   ticketsSold: number;
-  organizerName: string;
+  organizationName?: string;
+  eventInstagramId?: string;
+  companyName?: string;
+  companyInstagram?: string;
+  organizerName?: string;
   organizerEmail?: string;
   organizerPhone?: string;
   instagramId?: string;
@@ -248,8 +252,12 @@ export type MainTabParamList = {
 export type MainStackParamList = {
   Tabs: { screen?: keyof MainTabParamList } | undefined;
   CafeDetails: { cafeId: string; initialCafe?: Cafe };
+  EventDetails: { eventId: string };
+  EventSuccess: { ticketNumber?: string };
+  AttendanceScanner: undefined;
   Profile: undefined;
   Settings: undefined;
+  MeetupDetails: { meetupId: string };
   MeetupChat: { meetupId: string; meetupCode?: string };
   MyMeetups: undefined;
   MeetupOrder: {
@@ -264,6 +272,5 @@ export type MainStackParamList = {
     meetupTime?: string;
     editOrderId?: string;
   };
-  EventDetails: { eventId: string };
   MyTickets: undefined;
 };

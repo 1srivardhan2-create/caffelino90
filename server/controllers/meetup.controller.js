@@ -636,77 +636,7 @@ const getCafeMenu = async (req, res) => {
     }
 };
 
-// ─── VALID COUPONS (official: LINO9 only) ────────────────────────
-const VALID_COUPONS = {
-    LINO9: { type: "percent", value: 9, minOrder: 0 },
-};
-
-const PREMIUM_CAFE_MIN_ORDER = 500;
-const STANDARD_CAFE_MIN_ORDER = 300;
-
-function getMinimumOrderForCafe(cafeName = "") {
-    const name = String(cafeName).trim().toLowerCase();
-    if (
-        name.includes("chocolate room") ||
-        name.includes("kaapiya")
-    ) {
-        return PREMIUM_CAFE_MIN_ORDER;
-    }
-    if (
-        name.includes("living room") ||
-        name.includes("alkemy")
-    ) {
-        return STANDARD_CAFE_MIN_ORDER;
-    }
-    return STANDARD_CAFE_MIN_ORDER;
-}
-
-function computeCouponDiscount(code, subtotal) {
-    const upperCode = code.trim().toUpperCase();
-    const rule = VALID_COUPONS[upperCode];
-    if (!rule) return null;
-    if (subtotal < (rule.minOrder || 0)) {
-        return { error: `Minimum order ₹${rule.minOrder} required for this coupon` };
-    }
-    let discount =
-        rule.type === "percent"
-            ? parseFloat(((subtotal * rule.value) / 100).toFixed(2))
-            : rule.value;
-    discount = Math.min(discount, subtotal);
-    return { code: upperCode, discount, rule };
-}
-
-// ─── APPLY COUPON ────────────────────────────────────────────────
-const applyCoupon = async (req, res) => {
-    try {
-        const { code, subtotal } = req.body;
-
-        if (!code) {
-            return res.status(400).json({ message: "Coupon code is required" });
-        }
-
-        const result = computeCouponDiscount(code, subtotal || 0);
-        if (!result) {
-            return res.status(400).json({ success: false, message: "Invalid coupon code" });
-        }
-        if (result.error) {
-            return res.status(400).json({ success: false, message: result.error });
-        }
-
-        console.log(`🎫 Coupon ${result.code} validated: ₹${result.discount} off`);
-
-        res.json({
-            success: true,
-            code: result.code,
-            discount: result.discount,
-            discountType: result.rule.type,
-            message: `Coupon applied! ₹${result.discount} off`,
-        });
-    } catch (error) {
-        console.error("Apply Coupon Error:", error);
-        res.status(500).json({ message: "Failed to apply coupon", error: error.message });
-    }
-};
+// Coupon logic has been moved to coupon.controller.js
 
 // ─── TABLE RESERVATION (₹20 — host only) ─────────────────────────
 const confirmTableReservation = async (req, res) => {
@@ -991,20 +921,53 @@ const placeOrder = async (req, res) => {
                 });
             }
 
-            // --- STRICT COUPON VALIDATION ---
-            let isOliveBistro = false;
-            try {
-                const meetupInfo = meetupRow;
-                if (meetupInfo && meetupInfo.selectedCafe && 
-                   (meetupInfo.selectedCafe.name === "Olive Bistro & Bar" || meetupInfo.selectedCafe.cafeName === "Olive Bistro & Bar")) {
-                    isOliveBistro = true;
+            // --- DYNAMIC COUPON VALIDATION ---
+            const strictSubtotal = items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+            let appliedCoupon = 0;
+            
+            if (couponCode) {
+                const CouponModel = require("../models/Coupon");
+                const coupon = await CouponModel.findOne({ code: couponCode.trim().toUpperCase(), isActive: true });
+                if (coupon) {
+                    // Check date validity
+                    const now = new Date();
+                    const isValidDate = (!coupon.endDate || coupon.endDate >= now);
+                    // Check cafe validity
+                    let isCafeEligible = true;
+                    const cafeNameLower = (meetupRow.selectedCafe?.name || meetupRow.selectedCafe?.cafeName || "").trim().toLowerCase();
+                    if (coupon.applicableCafes && coupon.applicableCafes.length > 0 && !coupon.applicableCafes.includes("ALL")) {
+                        isCafeEligible = coupon.applicableCafes.some(ac => 
+                            cafeNameLower.includes(ac.trim().toLowerCase()) || 
+                            ac.trim().toLowerCase().includes(cafeNameLower)
+                        );
+                    }
+                    
+                    let effectiveMinOrder = coupon.minOrder || 0;
+                    if (coupon.minOrderRules && coupon.minOrderRules.length > 0) {
+                        const rule = coupon.minOrderRules.find(r => cafeNameLower.includes((r.cafe || "").trim().toLowerCase()));
+                        if (rule) {
+                            effectiveMinOrder = rule.minOrder;
+                        }
+                    }
+
+                    if (isValidDate && isCafeEligible && strictSubtotal >= effectiveMinOrder) {
+                        let potentialDiscount = coupon.discountType === "percent" 
+                            ? parseFloat(((strictSubtotal * coupon.discountValue) / 100).toFixed(2))
+                            : coupon.discountValue;
+                        appliedCoupon = Math.min(potentialDiscount, strictSubtotal);
+                        
+                        // Analytics update
+                        await CouponModel.updateOne(
+                            { _id: coupon._id },
+                            { 
+                                $inc: { usedCount: 1, totalSavingsGiven: appliedCoupon },
+                                $push: { usersUsed: { email: userName, orderAmount: strictSubtotal - appliedCoupon } }
+                            }
+                        );
+                    }
                 }
-            } catch (e) {
-                console.error("Error fetching meetup for coupon validation:", e);
             }
 
-            const strictSubtotal = items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
-            const appliedCoupon = Math.min(couponDiscount || 0, strictSubtotal);
             const taxableBase = parseFloat((strictSubtotal - appliedCoupon).toFixed(2));
             const strictCgst = parseFloat((taxableBase * 0.025).toFixed(2));
             const strictSgst = parseFloat((taxableBase * 0.025).toFixed(2));
@@ -1016,18 +979,11 @@ const placeOrder = async (req, res) => {
             let calculatedSgst = sgst || strictSgst;
             let calculatedCommission = commission || strictCommission;
             let calculatedTotal = finalAmount || total || strictTotal;
-
-            // 🚨 Override and strictly calculate total if Olive Bistro & Bar
-            if (isOliveBistro) {
-                // If they attempted to send a manipulated total (lower than strictTotal due to coupons)
-                if (calculatedTotal < strictTotal) {
-                     console.warn(`🚨 Blocked coupon/discount attempt for Olive Bistro & Bar! Overriding to full amount.`);
-                     require("fs").appendFileSync("order_debug.log", `[${new Date().toISOString()}] 🚨 Coupon blocked for Olive Bistro & Bar. Overrode total from ${calculatedTotal} to ${strictTotal}.\n`);
-                     calculatedSubtotal = strictSubtotal;
-                     calculatedCgst = strictCgst;
-                     calculatedSgst = strictSgst;
-                     calculatedTotal = strictTotal;
-                }
+            
+            // Increment Revenue
+            if (couponCode && appliedCoupon > 0) {
+                const CouponModel = require("../models/Coupon");
+                await CouponModel.updateOne({ code: couponCode.trim().toUpperCase() }, { $inc: { revenueGenerated: calculatedTotal } });
             }
 
             const formattedMembers = Array.isArray(members) 
@@ -1559,7 +1515,7 @@ module.exports = {
     placeOrder,
     getOrders,
     confirmBill,
-    applyCoupon,
+
     getActiveMeetups,
     getMyMeetups,
     getHostedMeetups,

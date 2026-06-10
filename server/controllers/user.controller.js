@@ -33,9 +33,15 @@ const updateProfile = async (req, res) => {
         if (profileData.city) user.city = profileData.city;
         if (profileData.age) user.age = parseInt(profileData.age);
         if (profileData.mobileNumber) user.mobileNumber = profileData.mobileNumber;
+        if (profileData.avatarId) user.avatarId = profileData.avatarId;
+        if (profileData.username) user.username = profileData.username.trim();
         
-        // Mark profile as complete
-        user.profileCompleted = true;
+        // Mark profile as complete when explicitly requested or all core fields present
+        if (profileData.profileCompleted === true || profileData.markComplete === true) {
+            user.profileCompleted = true;
+        } else if (profileData.firstName && profileData.avatarId) {
+            user.profileCompleted = true;
+        }
 
         // Also update name to full name if firstName is provided
         if (profileData.firstName) {
@@ -50,7 +56,16 @@ const updateProfile = async (req, res) => {
             user: {
                 id: user._id,
                 name: user.name,
+                firstName: user.firstName,
+                lastName: user.lastName,
                 email: user.email,
+                gender: user.gender,
+                city: user.city,
+                age: user.age,
+                mobileNumber: user.mobileNumber,
+                avatarId: user.avatarId,
+                username: user.username,
+                role: user.role,
                 profileCompleted: user.profileCompleted
             }
         });

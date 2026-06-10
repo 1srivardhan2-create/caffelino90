@@ -33,6 +33,7 @@ const chatRoutes = require("./routes/Chat.route");
 const authRoutes = require("./routes/Auth.routes");
 const meetupRoutes = require("./routes/Meetup.routes");
 const eventRoutes = require("./routes/Event.routes");
+const couponRoutes = require("./routes/Coupon.routes");
 
 // ─── Middleware Setup ────────────────────────────────────────────
 app.use(cors());
@@ -57,6 +58,10 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/meetups", meetupRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/coupons", couponRoutes);
+
+const paymentRoutes = require("./routes/payment.routes");
+app.use("/api/payments", paymentRoutes);
 
 const favoriteRoutes = require("./routes/Favorite.routes");
 app.use("/api/favorites", favoriteRoutes);
@@ -209,6 +214,14 @@ io.on("connection", (socket) => {
 const startServer = async () => {
     // 1. Attempt MongoDB connection (non-blocking — retries in background)
     await connectDB();
+    
+    // Start cron jobs
+    try {
+        const setupCronJobs = require("./utils/cronJobs");
+        setupCronJobs();
+    } catch (e) {
+        console.error("Failed to start cron jobs:", e.message);
+    }
 
     // Auto-seed Coupon if NOT exists
     try {

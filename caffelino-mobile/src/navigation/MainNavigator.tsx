@@ -8,6 +8,8 @@ import { EventsScreen } from '../screens/main/EventsScreen';
 import { LovedCafesScreen } from '../screens/main/LovedCafesScreen';
 import { ProfileScreen } from '../screens/main/ProfileScreen';
 import { CafeDetailsScreen } from '../screens/main/CafeDetailsScreen';
+import { EventSuccessScreen } from '../screens/main/EventSuccessScreen';
+import { AttendanceScannerScreen } from '../screens/owner/AttendanceScannerScreen';
 import { SettingsScreen } from '../screens/main/SettingsScreen';
 import { MeetupChatScreen } from '../screens/main/MeetupChatScreen';
 import { MeetupOrderScreen } from '../screens/meetup/MeetupOrderScreen';
@@ -42,13 +44,15 @@ export function MainNavigator() {
         component={CafeDetailsScreen}
         options={{ animation: 'slide_from_bottom' }}
       />
-      <Stack.Screen name="Settings" component={SettingsScreen} />
-      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="EventSuccess" component={EventSuccessScreen} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="AttendanceScanner" component={AttendanceScannerScreen} />
       <Stack.Screen
         name="MyMeetups"
         component={MyMeetupsScreen}
         options={{ animation: 'slide_from_right' }}
       />
+      <Stack.Screen name="Settings" component={SettingsScreen} />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen
         name="MeetupChat"
         component={MeetupChatScreen}

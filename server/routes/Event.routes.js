@@ -17,8 +17,14 @@ router.get("/:id", eventController.getEventById);
 router.get("/my-tickets/:userId", eventController.getUserTickets);
 
 // Registration Endpoints
-router.post("/register/free", eventController.registerFreeEvent);
-router.post("/register/paid/init", eventController.createPaidEventOrder);
-router.post("/register/paid/verify", eventController.verifyAndConfirmPaidRegistration);
+router.post("/:id/register-free", eventController.registerFreeEvent);
+router.post("/:id/register-paid-init", eventController.createPaidEventOrder);
+router.post("/:id/register-paid-verify", eventController.verifyAndConfirmPaidRegistration);
+
+// Scan Ticket Endpoint
+router.post("/scan-ticket", eventController.scanTicket);
+
+// Organizer Registrations Endpoint
+router.get("/organizer-registrations/:ownerId", eventController.getOrganizerRegistrations);
 
 module.exports = router;

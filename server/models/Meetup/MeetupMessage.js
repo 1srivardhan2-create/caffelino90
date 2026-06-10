@@ -16,6 +16,9 @@ const MeetupMessageSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        avatarId: {
+            type: String,
+        },
         message: {
             type: String,
             required: false, // Not required for bill/payment messages

@@ -32,6 +32,7 @@ const MeetupSchema = new mongoose.Schema(
             {
                 userId: { type: String, required: true },
                 name: { type: String, required: true },
+                avatarId: { type: String },
                 joinedAt: { type: Date, default: Date.now },
             },
         ],
@@ -56,8 +57,24 @@ const MeetupSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ["active", "voting", "ordering", "completed"],
+            enum: ["active", "voting", "ordering", "confirmed", "completed"],
             default: "active",
+        },
+        reservationFeePaid: {
+            type: Boolean,
+            default: false,
+        },
+        reservationFeeAmount: {
+            type: Number,
+            default: 0,
+        },
+        tableNumber: {
+            type: String,
+            default: "",
+        },
+        billLocked: {
+            type: Boolean,
+            default: false,
         },
     },
     { timestamps: true }

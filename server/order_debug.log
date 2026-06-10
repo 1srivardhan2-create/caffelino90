@@ -65,3 +65,11 @@
 [2026-03-17T20:24:57.700Z] ✅ Order saved: 492060
 [2026-03-22T09:30:40.920Z] Incoming order: bunny vardhan for cafe: , status: PENDING, orderId: 276636
 [2026-03-22T09:30:40.996Z] ✅ Order saved: 276636
+[2026-06-09T07:50:58.801Z] Incoming order: Bunny for cafe: 69da6e00a8db26b3a98e1036, status: PENDING, orderId: ORD_f5a091_1780991458367
+[2026-06-09T07:50:58.895Z] ✅ Order saved: ORD_f5a091_1780991458367
+[2026-06-09T07:50:58.898Z] 🛠️ shouldPostBill evaluates to: true (postBillToChat: true, finalStatus: PENDING)
+[2026-06-09T07:50:58.900Z] 🛠️ inside postOrderBillMessage... orderId: ORD_f5a091_1780991458367
+[2026-06-09T07:50:58.901Z] 🛠️ Calling MeetupMessage.create...
+[2026-06-09T07:50:58.928Z] ✅ MeetupMessage.create SUCCEEDED!
+[2026-06-09T07:50:58.930Z] 🛠️ About to emit receive_message...
+[2026-06-09T07:50:58.933Z] ✅ receive_message emitted!

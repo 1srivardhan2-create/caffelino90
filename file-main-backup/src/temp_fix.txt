@@ -1,0 +1,22 @@
+                      <Button
+                        className="w-full mt-3 bg-indigo-600 hover:bg-indigo-700"
+                        onClick={() => {
+                          const groupCode = groupData?.groupCode || 'AB47KT';
+                          const shareUrl = 'https://caffelino.in/join/' + groupCode;
+                          const shareTextMsg = 'Join my private meetup "' + (groupData?.title || 'Group Meetup') + '" on Caffélino!\n\n🔗 ' + shareUrl + '\n\nOr use code: ' + groupCode;
+                          
+                          if (navigator.share) {
+                            navigator.share({
+                              title: 'Join ' + (groupData?.title || 'Group Meetup'),
+                              text: shareTextMsg,
+                              url: shareUrl,
+                            }).catch(() => {});
+                          } else {
+                            navigator.clipboard.writeText(shareTextMsg);
+                            toast.success('Invite link copied!');
+                          }
+                        }}
+                      >
+                        <Share2 className="w-4 h-4 mr-2" />
+                        Share Invite Link
+                      </Button>

@@ -75,23 +75,30 @@ const EventSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
-        organizerName: {
-            type: String,
-            required: true,
-        },
-        organizerEmail: {
+        organizationName: {
             type: String,
         },
-        organizerPhone: {
+        eventInstagramId: {
             type: String,
         },
-        instagramId: {
-            type: String, // e.g. "@caffelino"
+        companyName: {
+            type: String,
+        },
+        companyInstagram: {
+            type: String,
         },
         status: {
             type: String,
             enum: ["draft", "published", "cancelled", "completed"],
             default: "published",
+        },
+        organizerId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
+        revenue: {
+            type: Number,
+            default: 0,
         },
     },
     { timestamps: true }

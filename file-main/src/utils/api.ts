@@ -1,7 +1,12 @@
+import { isMobileApp } from './isMobile';
+
 // LOCAL STORAGE IMPLEMENTATION - NO BACKEND
 // All data stored in browser localStorage
 
 const getBaseUrl = () => {
+  if (isMobileApp) {
+    return 'https://caffelino90-9v4a.onrender.com';
+  }
   if (typeof window === 'undefined') return "http://localhost:4000";
   const hostname = window.location.hostname;
   if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.') || hostname.endsWith('.local')) {

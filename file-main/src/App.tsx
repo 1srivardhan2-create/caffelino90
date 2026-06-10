@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSwipeable } from 'react-swipeable';
-import { Bell } from 'lucide-react';
+import { Bell, Home, Users, Coffee, MessageSquare, User as UserIcon } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Toaster } from './components/ui/sonner';
+import { toast } from 'sonner';
 import { AnimatePresence } from 'framer-motion';
 import LandingPage from './components/LandingPage';
 import HomePage from './components/HomePage';
@@ -30,6 +31,7 @@ import HowItWorks from './components/HowItWorks';
 import SafetyGuidelines from './components/SafetyGuidelines';
 import CoffeeLoader from './components/CoffeeLoader';
 import AdminDetails from './components/AdminDetails';
+import WelcomeScreen from './components/WelcomeScreen';
 import MeetupCode from './components/MeetupCode';
 import CafeSelectionCreate from './components/CafeSelectionCreate';
 import CafeVotingCreate from './components/CafeVotingCreate';
@@ -46,6 +48,7 @@ import { getAvatarById } from './utils/avatarData';
 import { getCafeById } from './utils/cafesData';
 import { safeStorage, safeWindow, safeDocument } from './utils/safeStorage';
 import { BASE_URL } from './utils/api';
+import { isMobileApp } from './utils/isMobile';
 const CAFFELINO_LOGO_URL = 'https://i.postimg.cc/g0S6yjSj/caffelino-removebg-preview.png';
 type Page =
   | "landing"
@@ -130,6 +133,70 @@ interface User {
 function AppContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Brewing your experience...");
+  const [appStage, setAppStage] = useState<'welcome' | 'main'>('welcome');
+  
+  // 📱 Dedicated Mobile App Improvements: Offline state & notifications
+  const [isOffline, setIsOffline] = useState(() => typeof navigator !== 'undefined' ? !navigator.onLine : false);
+
+  const triggerNativeNotification = async (title: string, body: string) => {
+    try {
+      if (typeof window !== 'undefined' && (window as any).Capacitor) {
+        const { LocalNotifications } = await import('@capacitor/local-notifications');
+        const hasPermission = await LocalNotifications.checkPermissions();
+        if (hasPermission.display !== 'granted') {
+          await LocalNotifications.requestPermissions();
+        }
+        await LocalNotifications.schedule({
+          notifications: [
+            {
+              title,
+              body,
+              id: Math.floor(Math.random() * 100000),
+              schedule: { at: new Date(Date.now() + 1000) }
+            }
+          ]
+        });
+      } else {
+        toast.info(`${title}: ${body}`);
+      }
+    } catch (e) {
+      console.warn("Local notification plugin unavailable:", e);
+      toast.info(`${title}: ${body}`);
+    }
+  };
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOffline(false);
+      toast.success("Internet connection restored! Syncing data...");
+    };
+    const handleOffline = () => {
+      setIsOffline(true);
+      toast.error("You are currently offline. Check your network.");
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // 📱 Dynamically load Tidio Chat Widget only on standard Web browsers
+  useEffect(() => {
+    if (!isMobileApp && typeof window !== 'undefined') {
+      const script = document.createElement('script');
+      script.src = "https://code.tidio.co/vglycutile0y6pssqrplibcrnnw6msnx.js";
+      script.async = true;
+      document.body.appendChild(script);
+      return () => {
+        try {
+          document.body.removeChild(script);
+        } catch (e) {}
+      };
+    }
+  }, [isMobileApp]);
 
   const setLoading = (loading: boolean, message?: string) => {
     setIsLoading(loading);
@@ -246,7 +313,11 @@ function AppContent() {
   const [currentPage, setCurrentPage] = useState<Page>(getPersistedPage());
   const [pageHistory, setPageHistory] = useState<Page[]>(getPersistedHistory());
   const [user, setUser] = useState<User | null>(getPersistedUser());
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(() => {
+    const savedUser = safeStorage.getItem('caffelino_user');
+    return isMobileApp && !savedUser;
+  });
+  const showBottomNav = isMobileApp && ['home', 'find-groups', 'all-cafes', 'loved-by-users', 'profile', 'notifications', 'settings'].includes(currentPage);
   const [selectedGroup, setSelectedGroup] = useState<any>(getPersistedGroup());
   const [selectedCafe, setSelectedCafe] = useState<any>(getPersistedCafe());
   const [unreadNotifications, setUnreadNotifications] = useState(0);
@@ -287,6 +358,7 @@ function AppContent() {
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
+      const pathPage = getPageFromPath(typeof window !== 'undefined' ? window.location.pathname : '');
       if (event.state && event.state.page) {
         isPopStateNav.current = true;
         // If backing out of chat/billing pages, skip intermediate steps and go home
@@ -348,6 +420,30 @@ function AppContent() {
     trackMouse: false,
     delta: 50,
   });
+
+  useEffect(() => {
+    let activeListener: any = null;
+    if (typeof window !== 'undefined' && (window as any).Capacitor) {
+      import('@capacitor/app').then(({ App }) => {
+        App.addListener('backButton', () => {
+          if (currentPage === 'home') {
+            App.exitApp();
+          } else {
+            handleBack();
+          }
+        }).then(listener => {
+          activeListener = listener;
+        });
+      }).catch(err => {
+        console.error('Capacitor App plugin dynamic import failed:', err);
+      });
+    }
+    return () => {
+      if (activeListener) {
+        activeListener.remove();
+      }
+    };
+  }, [currentPage, pageHistory]);
 
   useEffect(() => {
     const handleOnline = () => { setLoading(false); };
@@ -451,6 +547,7 @@ function AppContent() {
       }
     }
 
+    triggerNativeNotification("Welcome to Caffélino!", "We are excited to brew your meetups today ☕");
     setLoading(false);
   };
 
@@ -472,6 +569,7 @@ function AppContent() {
     if (isPartner) { navigateTo("partner-login-choice"); }
     else { navigateTo("home"); }
 
+    triggerNativeNotification("Caffélino Native", "Logged out successfully. See you soon!");
     setLoading(false);
   };
 
@@ -649,7 +747,7 @@ function AppContent() {
       case "safety-guidelines":
         return <SafetyGuidelines onNavigate={navigateTo} />;
       case "loved-by-users":
-        return <LovedByUsersPage onNavigate={navigateTo} />;
+        return <LovedByUsersPage onNavigate={navigateTo} user={user} />;
       case "admin-details":
         return <AdminDetails user={user} onNavigate={navigateTo} onBack={handleBack} />;
       case "meetup-code":
@@ -684,7 +782,18 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50" {...swipeHandlers}>
+    <div className={`min-h-screen ${showBottomNav ? 'pb-20' : ''} ${currentPage === 'landing' ? '' : 'bg-slate-50'}`} {...swipeHandlers}>
+      
+      {appStage === 'welcome' && isMobileApp && (
+        <WelcomeScreen onStartExploring={() => setAppStage('main')} />
+      )}
+
+      {isOffline && (
+        <div className="fixed top-0 left-0 right-0 z-[9999] bg-gradient-to-r from-red-600 to-red-500 text-white text-center py-3 px-4 font-bold shadow-lg flex items-center justify-center gap-2.5 text-xs sm:text-sm animate-pulse border-b border-red-700">
+          <span className="text-base">⚠️</span>
+          <span>Offline Mode: No Internet Connection. Check your settings.</span>
+        </div>
+      )}
       {showHeader && (
         <header className="fixed top-0 left-0 right-0 h-[72px] md:h-[80px] bg-[#be9d80] border-b border-[#a88968] z-50 shadow-md">
           <div className="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
@@ -748,7 +857,7 @@ function AppContent() {
         </header>
       )}
 
-      <main className={showHeader ? "pt-[72px] md:pt-[80px]" : ""}>
+      <main className={`${showHeader ? "pt-[72px] md:pt-[80px]" : ""} ${showBottomNav ? "pb-[80px]" : ""}`}>
         {renderPage()}
       </main>
 
@@ -759,7 +868,8 @@ function AppContent() {
         currentPage !== "cafe-owner-google-login" &&
         currentPage !== "cafe-owner-dashboard" &&
         currentPage !== "cafe-verification-pending" &&
-        currentPage !== "admin" && (
+        currentPage !== "admin" &&
+        currentPage !== "loved-by-users" && (
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 shadow-lg">
             <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
               <div className="flex-1">
@@ -782,6 +892,53 @@ function AppContent() {
       )}
 
       <Toaster />
+
+      {/* 📱 Premium Glassmorphic Bottom Navigation Bar (Mobile App Only) */}
+      {showBottomNav && (
+        <div 
+          className="fixed bottom-0 left-0 right-0 z-50 bg-[#be9d80]/90 backdrop-blur-xl border-t border-[#a88968]/50 shadow-[0_-8px_32px_rgba(0,0,0,0.15)] flex justify-around items-center py-3.5 pb-safe"
+          style={{
+            background: 'rgba(190, 157, 128, 0.95)',
+            boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.15)'
+          }}
+        >
+          <button 
+            onClick={() => navigateTo('home')}
+            className={`flex flex-col items-center gap-1 transition-all active:scale-95 ${currentPage === 'home' ? 'text-black scale-110 font-bold' : 'text-white/60 hover:text-white'}`}
+          >
+            <Home className="w-6 h-6" />
+            <span className="text-[10px]">Home</span>
+          </button>
+          <button 
+            onClick={() => navigateTo('find-groups')}
+            className={`flex flex-col items-center gap-1 transition-all active:scale-95 ${currentPage === 'find-groups' ? 'text-black scale-110 font-bold' : 'text-white/60 hover:text-white'}`}
+          >
+            <Users className="w-6 h-6" />
+            <span className="text-[10px]">Meetups</span>
+          </button>
+          <button 
+            onClick={() => navigateTo('all-cafes')}
+            className={`flex flex-col items-center gap-1 transition-all active:scale-95 ${currentPage === 'all-cafes' ? 'text-black scale-110 font-bold' : 'text-white/60 hover:text-white'}`}
+          >
+            <Coffee className="w-6 h-6" />
+            <span className="text-[10px]">Cafes</span>
+          </button>
+          <button 
+            onClick={() => navigateTo('loved-by-users')}
+            className={`flex flex-col items-center gap-1 transition-all active:scale-95 ${currentPage === 'loved-by-users' ? 'text-black scale-110 font-bold' : 'text-white/60 hover:text-white'}`}
+          >
+            <MessageSquare className="w-6 h-6" />
+            <span className="text-[10px]">Feedback</span>
+          </button>
+          <button 
+            onClick={() => navigateTo('profile')}
+            className={`flex flex-col items-center gap-1 transition-all active:scale-95 ${currentPage === 'profile' ? 'text-black scale-110 font-bold' : 'text-white/60 hover:text-white'}`}
+          >
+            <UserIcon className="w-6 h-6" />
+            <span className="text-[10px]">Profile</span>
+          </button>
+        </div>
+      )}
 
       <AnimatePresence>
         {isLoading && <CoffeeLoader message={loadingMessage} />}
