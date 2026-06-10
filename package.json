@@ -5,7 +5,8 @@
   "scripts": {
     "android": "npm run android --prefix caffelino-mobile",
     "start": "npm run start --prefix caffelino-mobile",
-    "install:mobile": "npm install --prefix caffelino-mobile"
+    "install:mobile": "npm install --prefix caffelino-mobile",
+    "build": "echo 'Vercel build bypassed'"
   },
   "dependencies": {
     "cloudinary": "^2.9.0",
