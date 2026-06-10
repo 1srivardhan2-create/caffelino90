@@ -138,7 +138,7 @@ exports.registerFreeEvent = async (req, res) => {
         const counter = await Counter.findByIdAndUpdate(
             { _id: 'ticketId' },
             { $inc: { seq: 1 } },
-            { new: true, upsert: true }
+            { returnDocument: 'after', upsert: true }
         );
         const seqFormatted = String(counter.seq).padStart(4, '0');
         const ticketNumber = `CAF-${year}-${seqFormatted}`;
@@ -266,7 +266,7 @@ exports.verifyAndConfirmPaidRegistration = async (req, res) => {
         const counter = await Counter.findByIdAndUpdate(
             { _id: 'ticketId' },
             { $inc: { seq: 1 } },
-            { new: true, upsert: true }
+            { returnDocument: 'after', upsert: true }
         );
         const seqFormatted = String(counter.seq).padStart(4, '0');
         const ticketNumber = `CAF-${year}-${seqFormatted}`;

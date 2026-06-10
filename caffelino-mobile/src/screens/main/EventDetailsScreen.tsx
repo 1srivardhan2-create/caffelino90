@@ -153,8 +153,10 @@ export function EventDetailsScreen() {
         quantity: 1
       });
 
+      console.log('--- API RESPONSE SUCCESS ---', res.data);
+
       if (!res.data.success) {
-        throw new Error('Failed to create order');
+        throw new Error(`Failed to create order: ${res.data.message || 'Unknown'}`);
       }
 
       const { orderId, amount, currency, key } = res.data;
@@ -209,9 +211,15 @@ export function EventDetailsScreen() {
         setRegistering(false);
       });
 
-    } catch (error) {
-      console.error('Initiate Payment Error:', error);
-      alert('Could not initiate payment. Try again.');
+    } catch (error: any) {
+      console.error('==== INITIATE PAYMENT ERROR ====');
+      console.error('Error Message:', error.message);
+      if (error.response) {
+        console.error('Response Status:', error.response.status);
+        console.error('Response Data:', JSON.stringify(error.response.data, null, 2));
+      }
+      console.error('================================');
+      alert('Could not initiate payment. Check Expo terminal for details.');
       setRegistering(false);
     }
   };

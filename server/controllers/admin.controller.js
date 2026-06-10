@@ -8,7 +8,7 @@ const approveCafe = async (req, res) => {
     const cafe = await Cafe.findByIdAndUpdate(
         req.params.id,
         { status: true },
-        { new: true }
+        { returnDocument: 'after' }
     );
 
     if (!cafe) {

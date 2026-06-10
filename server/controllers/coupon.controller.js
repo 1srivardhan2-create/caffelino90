@@ -31,7 +31,7 @@ exports.updateCoupon = async (req, res) => {
         const { id } = req.params;
         const updateData = req.body;
         if (updateData.code) updateData.code = updateData.code.trim().toUpperCase();
-        const updatedCoupon = await Coupon.findByIdAndUpdate(id, updateData, { new: true });
+        const updatedCoupon = await Coupon.findByIdAndUpdate(id, updateData, { returnDocument: 'after' });
         if (!updatedCoupon) return res.status(404).json({ success: false, message: "Coupon not found" });
         res.status(200).json({ success: true, coupon: updatedCoupon });
     } catch (error) {

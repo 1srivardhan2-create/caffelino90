@@ -342,7 +342,7 @@ const addCafesForVoting = async (req, res) => {
                 votes: [], // Reset votes when new cafes are added
                 selectedCafe: null,
             },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!meetup) {

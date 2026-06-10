@@ -505,7 +505,7 @@ const approveCafe = async (req, res) => {
         const cafe = await Cafe.findByIdAndUpdate(
             req.params.id,
             { status: true },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!cafe) {
@@ -560,7 +560,7 @@ const updateOrderStatus = async (req, res) => {
         const order = await Order.findOneAndUpdate(
             { _id: orderId, cafe: req.cafe.id },
             { orderStatus: status },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!order) {
@@ -627,7 +627,7 @@ const collectPayment = async (req, res) => {
                     cashCollectionCount: method === "CASH" ? 1 : 0,
                 },
             },
-            { upsert: true, new: true }
+            { upsert: true, returnDocument: 'after' }
         );
 
         // Create collection record (audit trail)
@@ -858,7 +858,7 @@ const verifyCafe = async (req, res) => {
         const cafe = await Cafe.findByIdAndUpdate(
             req.params.id,
             { status: true },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!cafe) {
@@ -1054,7 +1054,7 @@ const updateCafePhotos = async (req, res) => {
         const updatedCafe = await Cafe.findByIdAndUpdate(
             cafeId,
             { $set: updateData },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!updatedCafe) {

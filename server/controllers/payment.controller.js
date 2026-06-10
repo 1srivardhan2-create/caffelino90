@@ -136,7 +136,7 @@ exports.webhook = async (req, res) => {
                         const counter = await Counter.findByIdAndUpdate(
                             { _id: 'ticketId' },
                             { $inc: { seq: 1 } },
-                            { new: true, upsert: true }
+                            { returnDocument: 'after', upsert: true }
                         );
                         const seqFormatted = String(counter.seq).padStart(4, '0');
                         const ticketNumber = `CAF-${year}-${seqFormatted}`;
@@ -256,7 +256,7 @@ exports.verifyOrder = async (req, res) => {
                     const counter = await Counter.findByIdAndUpdate(
                         { _id: 'ticketId' },
                         { $inc: { seq: 1 } },
-                        { new: true, upsert: true }
+                        { returnDocument: 'after', upsert: true }
                     );
                     const seqFormatted = String(counter.seq).padStart(4, '0');
                     const ticketNumber = `CAF-${year}-${seqFormatted}`;

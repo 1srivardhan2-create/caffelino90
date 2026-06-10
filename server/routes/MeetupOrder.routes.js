@@ -73,7 +73,7 @@ router.post("/", async (req, res) => {
             const order = await MeetupOrder.findOneAndUpdate(
                 { orderId: payload.orderId },
                 { $set: payload },
-                { new: true, upsert: true }
+                { returnDocument: 'after', upsert: true }
             );
             console.log(`📦 Upserted MeetupOrder: ${order.orderId || order._id}`);
             return res.status(200).json({ success: true, order });
@@ -124,7 +124,7 @@ router.patch("/:id/token-paid", async (req, res) => {
         const order = await MeetupOrder.findOneAndUpdate(
             query,
             updateData,
-            { new: true }
+            { returnDocument: 'after' }
         );
         if (!order) return res.status(404).json({ message: "Order not found" });
 
@@ -172,7 +172,7 @@ router.patch("/:id/token-paid", async (req, res) => {
                         meetupTime: order.meetupTime || ""
                     }
                 },
-                { upsert: true, new: true }
+                { upsert: true, returnDocument: 'after' }
             );
             console.log(`📋 CafeOrder saved for order: ${order.orderId || order._id}`);
         } catch (cafeOrderErr) {
@@ -204,7 +204,7 @@ router.patch("/:id/accept", async (req, res) => {
         const order = await MeetupOrder.findOneAndUpdate(
             query,
             { status: "ACCEPTED", orderStatus: "ACCEPTED" },
-            { new: true }
+            { returnDocument: 'after' }
         );
         if (!order) return res.status(404).json({ message: "Order not found" });
 
@@ -231,7 +231,7 @@ router.patch("/:id/cash-collected", async (req, res) => {
         const order = await MeetupOrder.findOneAndUpdate(
             query,
             { status: "COMPLETED", orderStatus: "COMPLETED", paymentStatus: "PAID" },
-            { new: true }
+            { returnDocument: 'after' }
         );
         if (!order) return res.status(404).json({ message: "Order not found" });
 
@@ -289,7 +289,7 @@ router.patch("/:id/cash-collected", async (req, res) => {
                         paymentMethod: "cash",
                     }
                 },
-                { upsert: true, new: true }
+                { upsert: true, returnDocument: 'after' }
             );
             console.log(`📋 CafeOrder saved (cash) for order: ${order.orderId || order._id}`);
         } catch (cafeOrderErr) {

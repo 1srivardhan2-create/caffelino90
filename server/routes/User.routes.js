@@ -209,7 +209,7 @@ router.post("/confirm-coupon-usage", async (req, res) => {
           usersUsed: { email, orderAmount }
         }
       },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!updated) {
