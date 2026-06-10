@@ -124,11 +124,17 @@ exports.webhook = async (req, res) => {
                     }
 
                     // Update revenue and tickets
-                    event.revenue = (event.revenue || 0) + (payment.amount);
-                    event.availableSeats = Math.max(0, event.availableSeats - numTickets);
-                    event.ticketsSold = (event.ticketsSold || 0) + numTickets;
-                    await event.save();
-                    console.log('--- REVENUE UPDATED ---', event.revenue);
+                    await Event.updateOne(
+                        { _id: event._id },
+                        { 
+                            $inc: { 
+                                revenue: payment.amount,
+                                ticketsSold: numTickets,
+                                availableSeats: -numTickets
+                            }
+                        }
+                    );
+                    console.log('--- REVENUE UPDATED ---', (event.revenue || 0) + payment.amount);
 
                     // Update organizer revenue
                     if (event.organizerId) {
@@ -262,11 +268,18 @@ exports.verifyOrder = async (req, res) => {
                     userObj = await User.findOne({ firebaseUid: userId });
                 }
 
-                event.revenue = (event.revenue || 0) + (payment.amount);
-                event.availableSeats = Math.max(0, event.availableSeats - numTickets);
-                event.ticketsSold = (event.ticketsSold || 0) + numTickets;
-                await event.save();
-                console.log('--- REVENUE UPDATED ---', event.revenue);
+                // Update revenue and tickets
+                await Event.updateOne(
+                    { _id: event._id },
+                    { 
+                        $inc: { 
+                            revenue: payment.amount,
+                            ticketsSold: numTickets,
+                            availableSeats: -numTickets
+                        }
+                    }
+                );
+                console.log('--- REVENUE UPDATED ---', (event.revenue || 0) + payment.amount);
 
                 if (event.organizerId) {
                     await User.findByIdAndUpdate(event.organizerId, {
