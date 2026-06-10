@@ -33,7 +33,7 @@ const chatRoutes = require("./routes/Chat.route");
 const authRoutes = require("./routes/Auth.routes");
 const meetupRoutes = require("./routes/Meetup.routes");
 const eventRoutes = require("./routes/Event.routes");
-const couponRoutes = require("./routes/Coupon.routes");
+const couponRoutes = require("./routes/coupon.routes");
 
 // ─── Middleware Setup ────────────────────────────────────────────
 app.use(cors());
