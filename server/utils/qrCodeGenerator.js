@@ -1,5 +1,5 @@
 const QRCode = require("qrcode");
-const { uploadBuffer } = require("./uploadToCloudinary");
+const uploadBuffer = require("./uploadToCloudinary");
 
 const generateAndUploadQRCode = async (ticketNumber) => {
     try {
