@@ -16,6 +16,8 @@ import { MeetupOrderScreen } from '../screens/meetup/MeetupOrderScreen';
 import { MyMeetupsScreen } from '../screens/main/MyMeetupsScreen';
 import { EventDetailsScreen } from '../screens/main/EventDetailsScreen';
 import { MyTicketsScreen } from '../screens/main/MyTicketsScreen';
+import { TermsAndConditionsScreen } from '../screens/main/TermsAndConditionsScreen';
+import { PrivacyPolicyScreen } from '../screens/main/PrivacyPolicyScreen';
 import type { MainStackParamList, MainTabParamList } from '../types';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -71,6 +73,16 @@ export function MainNavigator() {
       <Stack.Screen
         name="MyTickets"
         component={MyTicketsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="TermsAndConditions"
+        component={TermsAndConditionsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="PrivacyPolicy"
+        component={PrivacyPolicyScreen}
         options={{ animation: 'slide_from_right' }}
       />
     </Stack.Navigator>

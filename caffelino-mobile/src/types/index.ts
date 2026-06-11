@@ -273,4 +273,6 @@ export type MainStackParamList = {
     editOrderId?: string;
   };
   MyTickets: undefined;
+  TermsAndConditions: undefined;
+  PrivacyPolicy: undefined;
 };

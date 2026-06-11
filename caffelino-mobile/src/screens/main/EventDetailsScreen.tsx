@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ScrollView, Image, Pressable, ActivityIndicator, Linking, Dimensions, Modal, TextInput, Share, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, { FadeInUp, FadeInDown, ZoomIn } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -37,6 +38,19 @@ export function EventDetailsScreen() {
   const [isRegistered, setIsRegistered] = useState(false);
   const [registeredCount, setRegisteredCount] = useState(0);
   const [relatedEvents, setRelatedEvents] = useState<any[]>([]);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
+  // Load persisted terms acceptance
+  useEffect(() => {
+    AsyncStorage.getItem('caffelino_terms_accepted').then((val) => {
+      if (val === 'true') setTermsAccepted(true);
+    });
+  }, []);
+
+  const handleAcceptTerms = async (val: boolean) => {
+    setTermsAccepted(val);
+    if (val) await AsyncStorage.setItem('caffelino_terms_accepted', 'true');
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -446,6 +460,27 @@ export function EventDetailsScreen() {
 
       {/* FIXED BOTTOM BAR */}
       <Animated.View entering={FadeInDown.delay(700).springify()} style={[styles.bottomBar, shadows.card, { paddingBottom: insets.bottom || spacing.md }]}>
+        {/* Terms checkbox for paid events not yet accepted */}
+        {!isRegistered && !isFree && !disableRegister && !termsAccepted && (
+          <View style={styles.termsRow}>
+            <Pressable
+              onPress={() => handleAcceptTerms(!termsAccepted)}
+              style={[styles.checkbox, { borderColor: palette.coffeeBrown, backgroundColor: termsAccepted ? palette.coffeeBrown : 'transparent' }]}
+            >
+              {termsAccepted && <Ionicons name="checkmark" size={12} color="#FFF" />}
+            </Pressable>
+            <Text style={[styles.termsText, { color: palette.textSecondary }]}>
+              I agree to the{' '}
+              <Text
+                style={{ color: palette.coffeeBrown, fontWeight: '700', textDecorationLine: 'underline' }}
+                onPress={() => navigation.navigate('TermsAndConditions')}
+              >
+                Terms & Conditions
+              </Text>
+            </Text>
+          </View>
+        )}
+
         <View style={styles.bottomBarPriceContainer}>
           <Text style={[styles.bottomBarPrice, { color: palette.espresso }]}>
             {isRegistered ? '✅ Registered' : (isFree ? 'FREE' : `₹${event.ticketPrice}`)}
@@ -466,9 +501,9 @@ export function EventDetailsScreen() {
           <Pressable
             style={[
               styles.actionBtn, 
-              { backgroundColor: disableRegister ? '#BDBDBD' : palette.coffeeBrown }
+              { backgroundColor: (disableRegister || (!isFree && !termsAccepted)) ? '#BDBDBD' : palette.coffeeBrown }
             ]}
-            disabled={disableRegister || registering}
+            disabled={disableRegister || registering || (!isFree && !termsAccepted)}
             onPress={isFree ? handleRegisterClick : initiatePayment}
           >
             {registering ? (
@@ -481,6 +516,7 @@ export function EventDetailsScreen() {
           </Pressable>
         )}
       </Animated.View>
+
 
 
       {/* CONFIRMATION MODAL */}
@@ -689,10 +725,31 @@ const styles = StyleSheet.create({
     position: 'absolute', bottom: 0, left: 0, right: 0,
     backgroundColor: '#FFF',
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    flexWrap: 'wrap',
     paddingHorizontal: spacing.lg, paddingTop: spacing.md,
     borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl,
     borderTopWidth: 1, borderTopColor: '#F0F0F0'
   },
+  termsRow: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  termsText: { fontSize: 13, flex: 1, lineHeight: 18 },
   bottomBarPriceContainer: { flex: 1 },
   bottomBarPrice: { ...typography.h2, fontSize: 24 },
   bottomBarSubtext: { fontSize: 12, marginTop: 2, fontWeight: '500' },

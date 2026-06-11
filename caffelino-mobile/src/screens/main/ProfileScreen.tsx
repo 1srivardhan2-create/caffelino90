@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Alert,
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -176,6 +177,41 @@ export function ProfileScreen({ navigation }: Props) {
           ) : null}
         </Pressable>
       ))}
+
+      {/* Legal Footer */}
+      <View style={[styles.footer, { borderTopColor: palette.border }]}>
+        <Text style={[styles.footerTitle, { color: palette.textMuted }]}>Legal & Support</Text>
+        <View style={styles.footerLinks}>
+          <Pressable
+            onPress={() => navigation.navigate('TermsAndConditions')}
+            style={styles.footerLink}
+          >
+            <Ionicons name="document-text-outline" size={14} color={palette.coffeeBrown} />
+            <Text style={[styles.footerLinkText, { color: palette.coffeeBrown }]}>Terms & Conditions</Text>
+          </Pressable>
+
+          <Text style={[styles.footerDivider, { color: palette.border }]}>|</Text>
+
+          <Pressable
+            onPress={() => navigation.navigate('PrivacyPolicy')}
+            style={styles.footerLink}
+          >
+            <Ionicons name="shield-checkmark-outline" size={14} color={palette.coffeeBrown} />
+            <Text style={[styles.footerLinkText, { color: palette.coffeeBrown }]}>Privacy Policy</Text>
+          </Pressable>
+        </View>
+
+        <Pressable
+          onPress={() => Linking.openURL('mailto:caffelino.9@gmail.com')}
+          style={styles.footerLink}
+        >
+          <Ionicons name="mail-outline" size={14} color={palette.textSecondary} />
+          <Text style={[styles.footerLinkText, { color: palette.textSecondary }]}>Contact Support</Text>
+        </Pressable>
+
+        <Text style={[styles.footerEmail, { color: palette.textMuted }]}>caffelino.9@gmail.com</Text>
+        <Text style={[styles.footerCopy, { color: palette.textMuted }]}>© 2026 Caffelino</Text>
+      </View>
     </ScrollView>
   );
 }
@@ -222,4 +258,20 @@ const styles = StyleSheet.create({
   menuText: { flex: 1 },
   menuLabel: { fontSize: 16, fontWeight: '700' },
   menuSub: { fontSize: 12, marginTop: 2 },
+  footer: {
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xxl,
+    borderTopWidth: 1,
+    alignItems: 'center',
+    gap: 8,
+  },
+  footerTitle: { fontSize: 12, fontWeight: '600', letterSpacing: 0.5, textTransform: 'uppercase' },
+  footerLinks: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'center' },
+  footerLink: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  footerLinkText: { fontSize: 13, fontWeight: '600' },
+  footerDivider: { fontSize: 16 },
+  footerEmail: { fontSize: 12, marginTop: 4 },
+  footerCopy: { fontSize: 11, marginTop: 2 },
 });
