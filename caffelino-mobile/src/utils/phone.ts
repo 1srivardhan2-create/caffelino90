@@ -18,7 +18,7 @@ export function isValidIndianMobile(digits: string): boolean {
 
 /** E.164-style for API: 919876543210 */
 export function toIndianE164(digits: string): string {
-  return `91${parseIndianMobile(digits)}`;
+  return `+91${parseIndianMobile(digits)}`;
 }
 
 /** Display: +91 98765 43210 */

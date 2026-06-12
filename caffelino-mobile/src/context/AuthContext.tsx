@@ -172,6 +172,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const sendPhoneOtp = useCallback(async (localDigits: string) => {
     const e164 = toIndianE164(localDigits);
+    
+    console.log('Original Number:', localDigits);
+    console.log('Firebase Number:', e164);
+
     lastE164Ref.current = e164;
     try {
       const confirmation = await auth().signInWithPhoneNumber(e164);
