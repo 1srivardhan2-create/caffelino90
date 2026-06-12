@@ -73,3 +73,23 @@
 [2026-06-09T07:50:58.928Z] ✅ MeetupMessage.create SUCCEEDED!
 [2026-06-09T07:50:58.930Z] 🛠️ About to emit receive_message...
 [2026-06-09T07:50:58.933Z] ✅ receive_message emitted!
+[2026-06-11T09:05:34.439Z] Incoming order: Bbbbb for cafe: 69c7af789f65fe322c37be7d, status: PENDING, orderId: ORD_7bde00_1781168734884
+[2026-06-11T09:05:34.728Z] ❌ DB/Socket Error: getMinimumOrderForCafe is not defined
+[2026-06-11T09:05:34.731Z] ❌ Outer Error: getMinimumOrderForCafe is not defined
+[2026-06-11T09:05:47.475Z] Incoming order: Bbbbb for cafe: 69c7af789f65fe322c37be7d, status: PENDING, orderId: ORD_7bde00_1781168747961
+[2026-06-11T09:05:47.520Z] ❌ DB/Socket Error: getMinimumOrderForCafe is not defined
+[2026-06-11T09:05:47.523Z] ❌ Outer Error: getMinimumOrderForCafe is not defined
+[2026-06-11T09:33:49.309Z] Incoming order: Bbbbb for cafe: 69c7af789f65fe322c37be7d, status: PENDING, orderId: ORD_7bde40_1781170429792
+[2026-06-11T09:33:49.354Z] ❌ DB/Socket Error: getMinimumOrderForCafe is not defined
+[2026-06-11T09:33:49.356Z] ❌ Outer Error: getMinimumOrderForCafe is not defined
+[2026-06-11T09:34:05.756Z] Incoming order: Bbbbb for cafe: 69c7af789f65fe322c37be7d, status: PENDING, orderId: ORD_7bde40_1781170446082
+[2026-06-11T09:34:05.809Z] ❌ DB/Socket Error: getMinimumOrderForCafe is not defined
+[2026-06-11T09:34:05.810Z] ❌ Outer Error: getMinimumOrderForCafe is not defined
+[2026-06-11T09:53:08.525Z] Incoming order: Bbbbb for cafe: 69c7af789f65fe322c37be7d, status: PENDING, orderId: ORD_7bde40_1781171588888
+[2026-06-11T09:53:08.649Z] ✅ Order saved: ORD_7bde40_1781171588888
+[2026-06-11T09:53:08.651Z] 🛠️ shouldPostBill evaluates to: true (postBillToChat: true, finalStatus: PENDING)
+[2026-06-11T09:53:08.653Z] 🛠️ inside postOrderBillMessage... orderId: ORD_7bde40_1781171588888
+[2026-06-11T09:53:08.653Z] 🛠️ Calling MeetupMessage.create...
+[2026-06-11T09:53:08.679Z] ✅ MeetupMessage.create SUCCEEDED!
+[2026-06-11T09:53:08.680Z] 🛠️ About to emit receive_message...
+[2026-06-11T09:53:08.682Z] ✅ receive_message emitted!

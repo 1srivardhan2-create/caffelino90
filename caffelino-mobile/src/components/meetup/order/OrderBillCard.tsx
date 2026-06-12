@@ -61,8 +61,7 @@ export function OrderBillCard({
   if (!isBill) return null;
 
   const displayId =
-    billData.displayOrderId ||
-    (billData.orderId ? String(billData.orderId).replace(/\D/g, '').slice(-6) : '------');
+    billData.orderId || '------';
   const total = billData.totalPayable ?? billData.finalAmount ?? 0;
   const splitOn = billData.splitEnabled === true;
 

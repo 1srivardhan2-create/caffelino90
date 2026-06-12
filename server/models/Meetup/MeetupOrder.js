@@ -123,6 +123,18 @@ const MeetupOrderSchema = new mongoose.Schema(
         meetupTime: {
             type: String,
             default: ""
+        },
+        razorpayPaymentId: {
+            type: String,
+            default: ""
+        },
+        razorpayOrderId: {
+            type: String,
+            default: ""
+        },
+        transactionId: {
+            type: String,
+            default: ""
         }
     },
     { timestamps: true }

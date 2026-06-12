@@ -594,7 +594,7 @@ export function MeetupOrderScreen({ navigation, route }: Props) {
           <View style={{ width: '100%', backgroundColor: '#FFF', borderRadius: 16, padding: 20, marginBottom: 40, borderWidth: 1, borderColor: 'rgba(111,78,55,0.08)' }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
               <Text style={{ color: palette.textMuted, fontWeight: '500' }}>Order ID</Text>
-              <Text style={{ color: palette.espresso, fontWeight: '700' }}>{orderId ? orderId.replace('ORD_', '') : '—'}</Text>
+              <Text style={{ color: palette.espresso, fontWeight: '700' }}>{orderId || '—'}</Text>
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
               <Text style={{ color: palette.textMuted, fontWeight: '500' }}>Transaction ID</Text>

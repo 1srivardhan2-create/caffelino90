@@ -660,18 +660,16 @@ const confirmTableReservation = async (req, res) => {
             return res.json({
                 success: true,
                 alreadyPaid: true,
-                tableNumber: meetup.tableNumber,
+                tableNumber: "",
                 meetup,
             });
         }
 
-        const tableNumber =
-            meetup.tableNumber ||
-            `T-${Math.floor(Math.random() * 12) + 1}`;
+        const tableNumber = "";
 
         meetup.reservationFeePaid = true;
         meetup.reservationFeeAmount = 20;
-        meetup.tableNumber = tableNumber;
+        meetup.tableNumber = "";
         meetup.status = "confirmed";
         meetup.billLocked = true;
         await meetup.save();
@@ -712,7 +710,7 @@ const confirmTableReservation = async (req, res) => {
                     subtotal: order.subtotal,
                     cgst: order.cgst,
                     sgst: order.sgst,
-                    tableNumber,
+                    tableNumber: "",
                     reservationFeePaid: true,
                     adminName: meetup.organizerName,
                 });
@@ -728,7 +726,7 @@ const confirmTableReservation = async (req, res) => {
             billData: {
                 cardType: "meetup_confirmed",
                 cafeName,
-                tableNumber,
+                tableNumber: "",
                 reservationFee: 20,
             },
         });
@@ -741,7 +739,7 @@ const confirmTableReservation = async (req, res) => {
             type: "bill",
             billData: {
                 cardType: "order_locked",
-                tableNumber,
+                tableNumber: "",
             },
         });
 
@@ -758,19 +756,19 @@ const confirmTableReservation = async (req, res) => {
                     date: meetup.date,
                     time: meetup.time,
                     reservationFeePaid: true,
-                    tableNumber,
+                    tableNumber: "",
                     status: "confirmed",
                 });
             }
         }
 
         console.log(
-            `☕ Table reserved for meetup ${meetup.meetupCode}: ${tableNumber}${demo ? " (demo)" : ""}`,
+            `☕ Order confirmed for meetup ${meetup.meetupCode}${demo ? " (demo)" : ""}`,
         );
 
         res.json({
             success: true,
-            tableNumber,
+            tableNumber: "",
             reservationFeeAmount: 20,
             meetup,
             message: confirmMsg,
@@ -785,9 +783,7 @@ const confirmTableReservation = async (req, res) => {
 };
 
 function formatDisplayOrderId(orderId = "") {
-    const digits = String(orderId).replace(/\D/g, "");
-    if (digits.length >= 6) return digits.slice(-6);
-    return String(orderId).slice(-6).toUpperCase() || "------";
+    return String(orderId) || "------";
 }
 
 async function postOrderBillMessage(meetupId, userId, userName, order, extras = {}) {
@@ -1104,7 +1100,7 @@ const placeOrder = async (req, res) => {
                         splitEnabled: splitEnabled || false,
                         perPersonAmount: perPersonAmount || calculatedTotal,
                         members: members || [],
-                        tableNumber: meetupForOrder?.tableNumber || "",
+                        tableNumber: "",
                         reservationFeePaid: true,
                     });
                 }
@@ -1424,10 +1420,26 @@ const createRazorpayOrder = async (req, res) => {
     }
 };
 
+// Minimum order amounts by café (subtotal before coupon)
+const PREMIUM_CAFES = ['the chocolate room', 'kaapiya cafe', 'kaapiya'];
+const STANDARD_CAFES = ['living room cafe', 'alkemy cafe'];
+
+function getMinimumOrderForCafe(cafeName) {
+    if (!cafeName) return 300;
+    const name = cafeName.trim().toLowerCase();
+    if (PREMIUM_CAFES.some((c) => name.includes(c) || c.includes(name))) {
+        return 500;
+    }
+    if (STANDARD_CAFES.some((c) => name.includes(c) || c.includes(name))) {
+        return 300;
+    }
+    return 300;
+}
+
 // ─── RAZORPAY: VERIFY PAYMENT ────────────────────────────────────
 const verifyRazorpayPayment = async (req, res) => {
     try {
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, meetupId, userId } = req.body;
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, meetupId, userId, orderPayload } = req.body;
 
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
             return res.status(400).json({ success: false, message: "Payment details missing" });
@@ -1442,40 +1454,206 @@ const verifyRazorpayPayment = async (req, res) => {
             return res.status(400).json({ success: false, message: "Payment verification failed" });
         }
 
-        // Emit socket event saying payment token is received if meetup is provided
-        if (meetupId && req.io) {
-            
-            // Mark orders as confirmed in DB
-            const orders = await MeetupOrder.find({ meetupId });
-            for (let o of orders) {
-                o.status = "CONFIRMED";
-                await o.save();
-            }
+        let createdOrder = null;
 
+        // If orderPayload is provided, create the order now
+        if (orderPayload) {
+            const { items, subtotal, cgst, sgst, total, splitEnabled, perPersonAmount, memberCount, members, cafeId, couponCode, couponDiscount, meetupDate, meetupTime, userName } = orderPayload;
+
+            const generatedOrderId = `ORD_${meetupId.substring(meetupId.length - 6)}_${Date.now()}`;
+
+            const formattedMembers = Array.isArray(members) 
+                ? members.map(m => typeof m === 'string' ? { name: m, userId: userId || '' } : m)
+                : [{ name: userName || 'Guest', userId: userId || '' }];
+
+            createdOrder = await MeetupOrder.create({
+                meetupId: new mongoose.Types.ObjectId(meetupId),
+                userId,
+                userName: (userName || "Guest").trim(),
+                items,
+                subtotal,
+                cgst,
+                sgst,
+                total,
+                totalAmount: total,
+                status: "CONFIRMED",
+                orderStatus: "CONFIRMED",
+                orderId: generatedOrderId,
+                splitEnabled: splitEnabled || false,
+                perPersonAmount: perPersonAmount || 0,
+                memberCount: memberCount || 1,
+                members: formattedMembers,
+                cafeId: cafeId || "",
+                paymentStatus: "PAID",
+                tokenPaid: true,
+                tokenAmount: 20,
+                razorpayPaymentId: razorpay_payment_id,
+                razorpayOrderId: razorpay_order_id,
+                transactionId: razorpay_payment_id,
+                meetupDate: meetupDate || "",
+                meetupTime: meetupTime || ""
+            });
+
+            // Update Meetup Model
             const meetup = await Meetup.findById(meetupId);
             if (meetup) {
                 meetup.reservationFeePaid = true;
                 meetup.reservationFeeAmount = 20;
                 meetup.billLocked = true;
-                if (!meetup.tableNumber) {
-                    meetup.tableNumber = `T-${Math.floor(Math.random() * 12) + 1}`;
-                }
+                meetup.tableNumber = ""; // Removed Table Number completely
                 meetup.status = "confirmed";
                 await meetup.save();
-                
-                // Get totals to share with users
-                const grandTotal = orders.reduce((sum, o) => sum + o.total, 0);
-                const memberCount = orders[0]?.memberCount || meetup.members.length || 1;
-                const perPersonSplit = Math.ceil(grandTotal / memberCount);
+            }
 
-                req.io.to(meetupId).emit("bill_confirmed", {
-                    meetupId,
-                    grandTotal,
-                    perPersonSplit,
-                    memberCount,
-                    orders,
-                    isTokenPayment: true
-                });
+            // Lock all existing bill messages in the chat
+            await MeetupMessage.updateMany(
+                { meetupId, type: "bill", "billData.cardType": { $in: ["meetup_bill", "order_placed"] } },
+                { $set: { "billData.locked": true, "billData.billStatus": "locked" } },
+            );
+
+            const cafeName = meetup?.selectedCafe?.cafeName || meetup?.selectedCafe?.name || "Café";
+
+            // Create Confirmation & Lock Messages in Chat
+            const confirmMsg = await MeetupMessage.create({
+                meetupId,
+                userId: String(userId),
+                userName: userName || meetup?.organizerName || "Host",
+                message: "Order confirmed",
+                type: "bill",
+                billData: {
+                    cardType: "meetup_confirmed",
+                    cafeName,
+                    reservationFee: 20,
+                    locked: true,
+                    billStatus: "locked",
+                    orderId: createdOrder.orderId,
+                    items: createdOrder.items,
+                    subtotal: createdOrder.subtotal,
+                    cgst: createdOrder.cgst,
+                    sgst: createdOrder.sgst,
+                    totalPayable: createdOrder.total,
+                    finalAmount: createdOrder.total,
+                    memberCount: createdOrder.memberCount,
+                    splitEnabled: createdOrder.splitEnabled,
+                    perPersonAmount: createdOrder.perPersonAmount,
+                },
+            });
+
+            // Save to CafeOrder collection for Admin Dashboard
+            try {
+                const CafeOrder = require("../models/Cafe/CafeOrder");
+                await CafeOrder.findOneAndUpdate(
+                    { orderId: createdOrder.orderId },
+                    {
+                        $set: {
+                            orderId: createdOrder.orderId,
+                            cafeId: createdOrder.cafeId || "",
+                            cafeName: cafeName,
+                            userId: createdOrder.userId || "",
+                            userName: createdOrder.userName || "",
+                            meetupId: createdOrder.meetupId?.toString() || "",
+                            items: (createdOrder.items || []).map(i => ({
+                                name: i.name,
+                                price: i.price,
+                                quantity: i.quantity || 1,
+                                menuItemId: i.menuItemId || "",
+                            })),
+                            subtotal: createdOrder.subtotal || 0,
+                            cgst: createdOrder.cgst || 0,
+                            sgst: createdOrder.sgst || 0,
+                            total: createdOrder.total || 0,
+                            memberCount: createdOrder.memberCount || 1,
+                            tokenPaid: true,
+                            tokenAmount: 20,
+                            status: "ACCEPTED",
+                            paymentStatus: "PAID",
+                            paymentMethod: "online",
+                            meetupDate: createdOrder.meetupDate || "",
+                            meetupTime: createdOrder.meetupTime || ""
+                        }
+                    },
+                    { upsert: true, returnDocument: 'after' }
+                );
+                console.log(`📋 CafeOrder saved for order: ${createdOrder.orderId}`);
+            } catch (cafeOrderErr) {
+                console.error("Failed to save CafeOrder in verifyPayment:", cafeOrderErr.message);
+            }
+
+            // Socket emits
+            if (req.io) {
+                req.io.to(meetupId).emit("receive_message", confirmMsg);
+
+                const cafeRoom = cafeId || createdOrder.cafeId || "";
+                if (cafeRoom) {
+                    req.io.to(`cafe_${cafeRoom}`).emit("order-created", {
+                        orderNumber: createdOrder.orderId.substring(createdOrder.orderId.length - 6).toUpperCase(),
+                        orderId: createdOrder.orderId,
+                        meetupName: meetup ? `Meetup ${meetup.meetupCode}` : "Meetup Order",
+                        groupName: createdOrder.userName || "Group",
+                        meetupId: meetupId,
+                        cafeId: cafeRoom,
+                        memberCount: createdOrder.memberCount || 1,
+                        items: items.map(i => ({
+                            name: i.name,
+                            quantity: i.quantity || 1,
+                            price: i.price || 0,
+                        })),
+                        totalAmount: total,
+                        subtotal: subtotal,
+                        cgst: cgst,
+                        sgst: sgst,
+                        orderDate: new Date().toLocaleDateString("en-IN"),
+                        orderTime: new Date().toLocaleTimeString("en-IN"),
+                        status: "token_paid",
+                        adminName: createdOrder.userName || "",
+                        adminPhone: "",
+                        createdAt: createdOrder.createdAt || new Date().toISOString(),
+                        splitEnabled: splitEnabled || false,
+                        perPersonAmount: perPersonAmount || total,
+                        members: members || [],
+                        tableNumber: "",
+                        reservationFeePaid: true,
+                    });
+                    req.io.to(`cafe_${cafeRoom}`).emit("refresh-orders");
+                }
+            }
+        } else {
+            // Fallback for confirming existing order without orderPayload
+            if (meetupId && req.io) {
+                const orders = await MeetupOrder.find({ meetupId });
+                for (let o of orders) {
+                    o.status = "CONFIRMED";
+                    o.paymentStatus = "PAID";
+                    o.tokenPaid = true;
+                    o.tokenAmount = 20;
+                    o.razorpayPaymentId = razorpay_payment_id;
+                    o.razorpayOrderId = razorpay_order_id;
+                    o.transactionId = razorpay_payment_id;
+                    await o.save();
+                }
+
+                const meetup = await Meetup.findById(meetupId);
+                if (meetup) {
+                    meetup.reservationFeePaid = true;
+                    meetup.reservationFeeAmount = 20;
+                    meetup.billLocked = true;
+                    meetup.tableNumber = "";
+                    meetup.status = "confirmed";
+                    await meetup.save();
+
+                    const grandTotal = orders.reduce((sum, o) => sum + o.total, 0);
+                    const memberCount = orders[0]?.memberCount || meetup.members.length || 1;
+                    const perPersonSplit = Math.ceil(grandTotal / memberCount);
+
+                    req.io.to(meetupId).emit("bill_confirmed", {
+                        meetupId,
+                        grandTotal,
+                        perPersonSplit,
+                        memberCount,
+                        orders,
+                        isTokenPayment: true
+                    });
+                }
             }
         }
 
@@ -1489,7 +1667,11 @@ const verifyRazorpayPayment = async (req, res) => {
             });
         }
 
-        res.json({ success: true, message: "Payment verified successfully" });
+        res.json({ 
+            success: true, 
+            message: "Payment verified successfully", 
+            order: createdOrder 
+        });
     } catch (error) {
         console.error("Razorpay Verify Error:", error);
         res.status(500).json({ success: false, message: "Payment verification error", error: error.message });
