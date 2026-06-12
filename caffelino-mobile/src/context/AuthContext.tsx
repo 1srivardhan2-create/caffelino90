@@ -5,17 +5,10 @@ import React, {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from 'react';
-import { userApi, ApiError } from '../api';
-import {
-  demoSendOtp,
-  demoResendOtp,
-  demoValidateOtp,
-  demoVerifyExistingUser,
-  demoRegisterUser,
-  buildLocalDemoUser,
-  DEMO_OTP,
-} from '../services/demoAuth.service';
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { userApi, authApi, ApiError } from '../api';
 import {
   getToken,
   getUser,
@@ -62,25 +55,11 @@ interface AuthContextValue extends AuthState {
   logout: () => Promise<void>;
   markLocationGranted: (city?: string) => Promise<void>;
   refreshUser: (user: User) => Promise<void>;
-  demoOtp: string;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function mapApiUser(raw: {
-  id: string;
-  name?: string;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  mobileNumber?: string;
-  avatarId?: string;
-  username?: string;
-  gender?: string;
-  city?: string;
-  role?: string;
-  profileCompleted?: boolean;
-}): User {
+function mapApiUser(raw: any): User {
   return {
     id: raw.id,
     name: raw.name ?? '',
@@ -94,6 +73,8 @@ function mapApiUser(raw: {
     city: raw.city,
     role: raw.role ?? 'user',
     profileCompleted: raw.profileCompleted ?? false,
+    isVerified: raw.isVerified ?? true,
+    firebaseUid: raw.firebaseUid,
   };
 }
 
@@ -124,7 +105,7 @@ async function markOnboardingDone(
 
 function hasCompletedNewOnboarding(user: User | null, localDone: boolean): boolean {
   if (!user || !localDone) return false;
-  return Boolean(user.profileCompleted && user.avatarId?.includes('illust'));
+  return Boolean(user.profileCompleted);
 }
 
 async function applySession(
@@ -164,6 +145,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     hasLocationPermission: false,
   });
 
+  const confirmationRef = useRef<FirebaseAuthTypes.ConfirmationResult | null>(null);
+  const lastE164Ref = useRef<string | null>(null);
+
   const bootstrap = useCallback(async () => {
     const [token, user, onboarding, location] = await Promise.all([
       getToken(),
@@ -187,35 +171,69 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [bootstrap]);
 
   const sendPhoneOtp = useCallback(async (localDigits: string) => {
-    return demoSendOtp(localDigits);
+    const e164 = toIndianE164(localDigits);
+    lastE164Ref.current = e164;
+    try {
+      const confirmation = await auth().signInWithPhoneNumber(e164);
+      confirmationRef.current = confirmation;
+      return { isNewUser: true }; // We don't know until we verify the OTP with the backend
+    } catch (error: any) {
+      console.error('Firebase sendOtp error:', error);
+      throw new Error(error.message || 'Failed to send OTP');
+    }
   }, []);
 
   const resendPhoneOtp = useCallback(async () => {
-    demoResendOtp();
+    if (lastE164Ref.current) {
+      try {
+        const confirmation = await auth().signInWithPhoneNumber(lastE164Ref.current);
+        confirmationRef.current = confirmation;
+      } catch (error: any) {
+        console.error('Firebase resendOtp error:', error);
+        throw new Error(error.message || 'Failed to resend OTP');
+      }
+    }
   }, []);
 
   const verifyPhoneOtp = useCallback(
-    async (localDigits: string, otp: string, _isNewUser: boolean) => {
-      demoValidateOtp(otp);
-      const e164 = toIndianE164(localDigits);
-      const localOnboardingDone = await isOnboardingComplete();
-
+    async (localDigits: string, otpCode: string, _isNewUser: boolean) => {
       try {
-        const { token, user: raw } = await demoVerifyExistingUser(e164);
-        const user = mapApiUser(raw);
-        const profileDone = hasCompletedNewOnboarding(user, localOnboardingDone);
-
-        await applySession(token, user, setState, profileDone);
-
-        return { isNewUser: !profileDone };
-      } catch (error) {
-        if (error instanceof ApiError && (error.status === 404 || error.status === 400)) {
-          // Brand-new number — profile is created at the end of onboarding
-          return { isNewUser: true };
+        if (!confirmationRef.current) {
+          throw new Error('No OTP request found. Please go back and request again.');
         }
 
-        // Server slow/offline — still run onboarding (no auto-login)
-        return { isNewUser: true };
+        // 1. Verify with Firebase
+        await confirmationRef.current.confirm(otpCode);
+        
+        // 2. Get ID Token from Firebase User
+        const currentUser = auth().currentUser;
+        if (!currentUser) throw new Error('Firebase user not found after verification');
+        const idToken = await currentUser.getIdToken(true);
+
+        // 3. Authenticate with backend using the ID Token
+        const response = await authApi.firebasePhoneLogin(idToken);
+        
+        if (!response.success || !response.token || !response.user) {
+          throw new Error('Backend authentication failed');
+        }
+
+        const user = mapApiUser(response.user);
+        const localOnboardingDone = await isOnboardingComplete();
+        const profileDone = hasCompletedNewOnboarding(user, localOnboardingDone);
+
+        // 4. Set Session Locally
+        await applySession(response.token, user, setState, profileDone);
+
+        return { isNewUser: response.isNewUser ?? !profileDone };
+      } catch (error: any) {
+        console.error('Verify OTP Error:', error);
+        if (error.code === 'auth/invalid-verification-code') {
+          throw new Error('Invalid OTP code. Please check and try again.');
+        }
+        if (error.code === 'auth/code-expired') {
+          throw new Error('OTP expired. Please request a new one.');
+        }
+        throw new Error(error.message || 'Verification failed');
       }
     },
     [],
@@ -236,34 +254,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const existingUser = state.user;
       const existingToken = state.token;
 
-      // Returning account updating profile through new onboarding
-      if (existingToken && existingUser?.id) {
-        try {
-          if (!existingUser.id.startsWith('local-')) {
-            const profileRes = await userApi.updateProfile(existingUser.id, {
-              firstName,
-              lastName,
-              username,
-              avatarId,
-              mobileNumber,
-              gender,
-              markComplete: true,
-            });
-            const user = mapApiUser({
-              ...profileRes.user,
-              id: existingUser.id,
-              name: fullName,
-              username,
-              gender,
-              profileCompleted: true,
-            });
-            await markOnboardingDone(existingToken, user, setState);
-            return;
-          }
-        } catch {
-          // Fall through to local save below
-        }
+      if (!existingToken || !existingUser?.id) {
+        throw new Error('Not signed in to update profile');
+      }
 
+      try {
+        const profileRes = await userApi.updateProfile(existingUser.id, {
+          firstName,
+          lastName,
+          username,
+          avatarId,
+          mobileNumber,
+          gender,
+          markComplete: true,
+        });
+
+        const user = mapApiUser({
+          ...profileRes.user,
+          id: existingUser.id,
+          name: fullName,
+          username,
+          gender,
+          profileCompleted: true,
+        });
+
+        await markOnboardingDone(existingToken, user, setState);
+      } catch (e: any) {
+        console.error('Finish Onboarding error:', e);
+        // Fallback for offline development but ideally should not fail
         const user: User = {
           ...existingUser,
           name: fullName,
@@ -276,54 +294,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           profileCompleted: true,
         };
         await markOnboardingDone(existingToken, user, setState);
-        return;
-      }
-
-      try {
-        const { token, user: raw } = await demoRegisterUser(fullName, mobileNumber);
-        const userId = raw.id;
-
-        try {
-          const profileRes = await userApi.updateProfile(userId, {
-            firstName,
-            lastName,
-            username,
-            avatarId,
-            mobileNumber,
-            gender,
-            markComplete: true,
-          });
-
-          const user = mapApiUser({
-            ...profileRes.user,
-            id: userId,
-            name: fullName,
-            username,
-            gender,
-            profileCompleted: true,
-          });
-          await markOnboardingDone(token, user, setState);
-        } catch {
-          const user = mapApiUser({
-            ...raw,
-            id: userId,
-            name: fullName,
-            username,
-            avatarId,
-            gender,
-            profileCompleted: true,
-          });
-          await markOnboardingDone(token, user, setState);
-        }
-      } catch {
-        const local = buildLocalDemoUser(mobileNumber, {
-          name: fullName,
-          username,
-          avatarId,
-          profileCompleted: true,
-        });
-        const user = { ...local.user, gender };
-        await markOnboardingDone(local.token, user, setState);
       }
     },
     [state.user, state.token],
@@ -363,6 +333,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     await clearSession();
+    try {
+      await auth().signOut();
+    } catch(e) {}
     setState({
       user: null,
       token: null,
@@ -420,7 +393,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logout,
       markLocationGranted,
       refreshUser,
-      demoOtp: DEMO_OTP,
     }),
     [
       state,

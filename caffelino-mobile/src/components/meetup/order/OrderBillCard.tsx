@@ -24,13 +24,10 @@ export function OrderBillCard({
     return (
       <View style={styles.wrap}>
         <LinearGradient colors={['#2E7D32', '#1B5E20']} style={styles.card}>
-          <Text style={styles.title}>☕ Table Confirmed</Text>
+          <Text style={styles.title}>☕ Order Confirmed</Text>
           <Text style={styles.subtitle}>🎉 Meetup Confirmed</Text>
           <View style={styles.divider} />
           <Bullet text="Food Order Sent To Cafe" />
-          {billData.tableNumber ? (
-            <Row label="Table" value={`#${billData.tableNumber}`} />
-          ) : null}
         </LinearGradient>
       </View>
     );
@@ -42,7 +39,7 @@ export function OrderBillCard({
         <View style={styles.lockCard}>
           <Text style={styles.lockTitle}>🔒 Order Locked</Text>
           <Text style={styles.lockBody}>
-            Table has been confirmed.{'\n'}
+            Order has been confirmed.{'\n'}
             Food order has been sent to the cafe.{'\n'}
             No edits are allowed.
           </Text>
@@ -103,7 +100,7 @@ export function OrderBillCard({
           <Row label="Host Pays" value={formatRupee(billData.hostPaysAmount ?? total)} bold />
         )}
         <Text style={styles.statusPill}>
-          {locked ? '🔒 Bill Locked' : '⏳ Awaiting Table Confirmation'}
+          {locked ? '🔒 Order Confirmed' : '⏳ Awaiting Confirmation'}
         </Text>
 
         {canEdit && !locked && onEditBill && (
@@ -114,7 +111,7 @@ export function OrderBillCard({
 
         {canConfirm && !locked && onConfirmMeetup && (
           <Pressable onPress={onConfirmMeetup} style={styles.confirmGreen}>
-            <Text style={styles.confirmGreenText}>💳 Confirm Table Token — Pay ₹20</Text>
+            <Text style={styles.confirmGreenText}>💳 Pay ₹20 & Confirm Order</Text>
           </Pressable>
         )}
       </LinearGradient>

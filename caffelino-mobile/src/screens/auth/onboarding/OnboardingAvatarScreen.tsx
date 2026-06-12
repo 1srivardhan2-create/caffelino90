@@ -197,52 +197,73 @@ function AvatarPickerCard({
 }) {
   const { palette } = useTheme();
   const scale = useSharedValue(1);
-  const wave = useSharedValue(0);
-  const bubbleScale = useSharedValue(0);
+  const waveRotate = useSharedValue(0);
+  const waveTranslateX = useSharedValue(0);
+  const bubbleScale = useSharedValue(1);
   const floatBeans = useSharedValue(0);
+  const [speechText, setSpeechText] = useState('🤚💬');
 
   useEffect(() => {
     if (selected) {
+      // Gentle card pop
       scale.value = withSequence(
-        withSpring(1.12, { damping: 12, stiffness: 200 }),
+        withSpring(0.98, { damping: 12, stiffness: 200 }),
         withSpring(1.03, { damping: 12, stiffness: 200 })
       );
-      wave.value = withDelay(
-        200,
-        withSequence(
-          withTiming(-15, { duration: 150 }),
-          withTiming(15, { duration: 150 }),
-          withTiming(-10, { duration: 150 }),
-          withTiming(10, { duration: 150 }),
-          withTiming(0, { duration: 150 })
-        )
+      
+      // gentleWave keyframes: 12deg/3px -> -6deg/-2px -> 8deg/1px -> 0
+      waveRotate.value = withSequence(
+        withTiming(12, { duration: 175, easing: Easing.inOut(Easing.ease) }),
+        withTiming(-6, { duration: 175, easing: Easing.inOut(Easing.ease) }),
+        withTiming(8, { duration: 175, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: 175, easing: Easing.inOut(Easing.ease) })
       );
+      waveTranslateX.value = withSequence(
+        withTiming(3, { duration: 175, easing: Easing.inOut(Easing.ease) }),
+        withTiming(-2, { duration: 175, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1, { duration: 175, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: 175, easing: Easing.inOut(Easing.ease) })
+      );
+
+      // Hi Text & Pop
+      setSpeechText('👋 Hi! 👋');
       bubbleScale.value = withSequence(
-        withDelay(300, withSpring(1, { damping: 12, stiffness: 180 })),
-        withDelay(1500, withTiming(0, { duration: 300 }))
+        withTiming(0.8, { duration: 0 }),
+        withTiming(1.1, { duration: 320, easing: Easing.bezier(0.34, 1.2, 0.64, 1) }),
+        withTiming(1, { duration: 80 })
       );
+
       floatBeans.value = withRepeat(
         withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.sin) }),
         -1,
         true
       );
+
+      const timer = setTimeout(() => {
+        setSpeechText('🤚💬');
+      }, 1000);
+
+      return () => clearTimeout(timer);
     } else {
       scale.value = withSpring(1, { damping: 12, stiffness: 200 });
-      bubbleScale.value = 0;
+      setSpeechText('🤚💬');
+      bubbleScale.value = 1;
     }
-  }, [selected, scale, wave, bubbleScale, floatBeans]);
+  }, [selected, scale, waveRotate, waveTranslateX, bubbleScale, floatBeans]);
 
   const animStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
 
   const avatarStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${wave.value}deg` }],
+    transform: [
+      { rotate: `${waveRotate.value}deg` },
+      { translateX: waveTranslateX.value }
+    ],
   }));
 
   const bubbleStyle = useAnimatedStyle(() => ({
     transform: [{ scale: bubbleScale.value }],
-    opacity: bubbleScale.value,
   }));
 
   const beanStyle1 = useAnimatedStyle(() => ({
@@ -272,9 +293,9 @@ function AvatarPickerCard({
             styles.avatarCard,
             shadows.card,
             {
-              backgroundColor: palette.cream,
-              borderColor: selected ? palette.goldAccent : 'transparent',
-              borderWidth: selected ? 3 : 0,
+               backgroundColor: selected ? '#fff2df' : palette.cream,
+               borderColor: selected ? '#b13e3e' : 'transparent',
+               borderWidth: selected ? 2 : 0,
             },
           ]}
         >
@@ -284,7 +305,7 @@ function AvatarPickerCard({
               <Animated.Text style={[styles.floatingBean, { left: 4, top: 10 }, beanStyle1]}>🫘</Animated.Text>
               <Animated.Text style={[styles.floatingBean, { right: 4, bottom: 10 }, beanStyle2]}>🫘</Animated.Text>
               
-              <View style={[styles.checkBadge, { backgroundColor: palette.goldAccent }]}>
+              <View style={[styles.checkBadge, { backgroundColor: '#4CAF50' }]}>
                 <Ionicons name="checkmark" size={12} color="#FFF" />
               </View>
             </>
@@ -294,8 +315,8 @@ function AvatarPickerCard({
             <IllustratedAvatar avatar={avatar} size={76} />
           </Animated.View>
 
-          <Animated.View style={[styles.speechBubble, { backgroundColor: palette.white, borderColor: palette.border }, bubbleStyle]}>
-            <Text style={[styles.speechText, { color: palette.espresso }]}>Nice to meet you!</Text>
+          <Animated.View style={[styles.speechBubble, { backgroundColor: selected ? '#fff2df' : palette.white, borderColor: selected ? '#b13e3e' : palette.border }, bubbleStyle]}>
+            <Text style={[styles.speechText, { color: selected ? '#b13e3e' : palette.espresso }]}>{speechText}</Text>
           </Animated.View>
         </View>
       </AnimatedPressable>
@@ -350,9 +371,9 @@ const styles = StyleSheet.create({
   speechBubble: {
     position: 'absolute',
     top: -15,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 16,
     borderWidth: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -360,12 +381,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     zIndex: 20,
-    width: 120,
+    minWidth: 50,
     alignItems: 'center',
   },
   speechText: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '800',
     textAlign: 'center',
   },
   continueBtn: {

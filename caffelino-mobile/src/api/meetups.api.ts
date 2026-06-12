@@ -192,4 +192,33 @@ export const meetupsApi = {
       }>;
     }>(`/api/meetups/orders/${meetupId}`);
   },
+
+  createRazorpayOrder(payload: { meetupId: string; userId: string }) {
+    return apiRequest<{
+      success: boolean;
+      orderId: string;
+      amount: number;
+      currency: string;
+    }>('/api/meetups/razorpay-order', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  verifyRazorpayPayment(payload: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+    meetupId: string;
+    userId: string;
+    orderPayload: any;
+  }) {
+    return apiRequest<{
+      success: boolean;
+      order: { orderId: string; status: string };
+    }>('/api/meetups/verify-payment', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
 };

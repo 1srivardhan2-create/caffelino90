@@ -23,8 +23,8 @@ const RESEND_SECONDS = 30;
 export function OtpScreen({ navigation, route }: Props) {
   const { mobileNumber, localDigits } = route.params;
   const { palette } = useTheme();
-  const { verifyPhoneOtp, resendPhoneOtp, demoOtp } = useAuth();
-  const [otp, setOtp] = useState(demoOtp);
+  const { verifyPhoneOtp, resendPhoneOtp } = useAuth();
+  const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [resendSecs, setResendSecs] = useState(RESEND_SECONDS);
@@ -85,12 +85,7 @@ export function OtpScreen({ navigation, route }: Props) {
     ],
   );
 
-  useEffect(() => {
-    if (otp === demoOtp && otp.length === 6) {
-      const t = setTimeout(() => handleVerify(demoOtp), 600);
-      return () => clearTimeout(t);
-    }
-  }, [demoOtp, handleVerify, otp]);
+  // Effect removed since we don't have demo OTP anymore
 
   const zoomStyle = useAnimatedStyle(() => ({
     transform: [{ scale: zoom.value }],
@@ -119,11 +114,7 @@ export function OtpScreen({ navigation, route }: Props) {
         Sent to {formatIndianE164Display(mobileNumber)}
       </Text>
 
-      <View style={[styles.demoHint, { backgroundColor: palette.white, borderColor: palette.border }]}>
-        <Text style={[styles.demoHintText, { color: palette.coffeeBrown }]}>
-          Demo OTP: {demoOtp}
-        </Text>
-      </View>
+
 
       {loading && !success ? (
         <CoffeeLoader message="Verifying…" />
@@ -166,14 +157,7 @@ const styles = StyleSheet.create({
   },
   title: { ...typography.h1, marginBottom: spacing.sm, textAlign: 'center' },
   sub: { ...typography.bodySmall, marginBottom: spacing.md, textAlign: 'center' },
-  demoHint: {
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  demoHintText: { fontSize: 15, fontWeight: '700' },
+
   verifyBtn: { marginTop: spacing.lg, alignSelf: 'stretch' },
   resend: { marginTop: spacing.xl, fontSize: 14, fontWeight: '600' },
   tick: { fontSize: 64, color: '#4CAF50', fontWeight: '700' },

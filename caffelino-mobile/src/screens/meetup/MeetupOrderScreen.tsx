@@ -22,6 +22,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { meetupsApi } from '../../api';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+
 import { radius, shadows, spacing, typography } from '../../theme';
 import type { CafeMenuItem, CartLine, MainStackParamList } from '../../types';
 import {
@@ -59,6 +60,7 @@ type Step = 'menu' | 'checkout';
 export function MeetupOrderScreen({ navigation, route }: Props) {
   const {
     meetupId,
+    meetupCode,
     cafeId,
     cafeName,
     isHost,
@@ -215,8 +217,12 @@ export function MeetupOrderScreen({ navigation, route }: Props) {
     setAppliedCoupon(code);
   };
 
-  const generateBill = async () => {
+  const handlePostBillToChat = async () => {
     if (!user?.id || cart.length === 0) return;
+    if (!user.isVerified) {
+      Alert.alert('Verification Required', 'You must verify your profile with a phone number to place orders.');
+      return;
+    }
     if (!isHost) {
       Alert.alert('Host only', 'Only the meetup host can create or edit the bill.');
       return;
@@ -257,60 +263,48 @@ export function MeetupOrderScreen({ navigation, route }: Props) {
         postBillToChat: true,
         orderId: newOrderId,
       });
-      setOrderId(res.order?.orderId ?? newOrderId);
-      
-      try {
-        await meetupsApi.sendMessage({
-          meetupId,
-          userId: user.id,
-          userName: user.name ?? 'Host',
-          message: 'Bill generated',
-          type: 'bill',
-          billData: {
-            cardType: 'meetup_bill',
-            orderId: res.order?.orderId ?? newOrderId,
-            items: cart,
-            subtotal: bill.subtotal,
-            cgst: bill.cgst,
-            sgst: bill.sgst,
-            totalPayable: bill.finalAmount,
-            finalAmount: bill.finalAmount,
-            memberCount: memberCount,
-            splitEnabled: splitBillEnabled,
-            perPersonAmount: perPerson,
-            locked: false,
-            billStatus: 'awaiting_table_confirmation',
-          }
-        });
-      } catch (msgErr) {
-        console.log('Failed to post bill message explicitly', msgErr);
-      }
+      const savedOrderId = res.order?.orderId ?? newOrderId;
+      setOrderId(savedOrderId);
+
+      // Post bill card to group chat
+      await meetupsApi.sendMessage({
+        meetupId,
+        userId: user.id,
+        userName: user.name ?? 'Host',
+        message: 'Bill generated',
+        type: 'bill',
+        billData: {
+          cardType: 'meetup_bill',
+          orderId: savedOrderId,
+          items: cart,
+          subtotal: bill.subtotal,
+          cgst: bill.cgst,
+          sgst: bill.sgst,
+          totalPayable: bill.finalAmount,
+          finalAmount: bill.finalAmount,
+          memberCount,
+          splitEnabled: splitBillEnabled,
+          perPersonAmount: perPerson,
+          locked: false,
+          billStatus: 'awaiting_payment',
+          billCreatorId: user.id,
+        },
+      });
 
       if (Platform.OS === 'android') {
-        ToastAndroid.show('✅ Bill Saved Successfully', ToastAndroid.SHORT);
-      } else {
-        Alert.alert('Success', '✅ Bill Saved Successfully\nBill posted in meetup chat.');
+        ToastAndroid.show('✅ Bill posted to group chat!', ToastAndroid.SHORT);
       }
       navigation.navigate('MeetupChat', { meetupId });
     } catch (e) {
-      console.error('Exact Backend Error:', e);
+      console.error('Post bill error:', e);
       if (Platform.OS === 'android') {
-        ToastAndroid.show('⚠ Unable to save bill. Please try again.', ToastAndroid.LONG);
+        ToastAndroid.show('⚠ Could not post bill. Try again.', ToastAndroid.LONG);
       } else {
-        Alert.alert('Error', '⚠ Unable to save bill. Please try again.');
+        Alert.alert('Error', '⚠ Could not post bill. Try again.');
       }
     } finally {
       setPlacing(false);
     }
-  };
-
-  const handleDoneBill = () => {
-    if (cart.length === 0) {
-      Alert.alert('Cart empty', 'Add items to generate the bill.');
-      return;
-    }
-    if (!minOrderMet) return;
-    generateBill();
   };
 
   const renderMenuItem = ({ item }: { item: CafeMenuItem }) => {
@@ -490,7 +484,7 @@ export function MeetupOrderScreen({ navigation, route }: Props) {
 
           {!readOnly && isHost && (
             <Pressable
-              onPress={handleDoneBill}
+              onPress={handlePostBillToChat}
               disabled={placing || cart.length === 0 || !minOrderMet}
               style={[styles.placeWrap, !minOrderMet && styles.placeDisabled]}
             >
@@ -505,12 +499,130 @@ export function MeetupOrderScreen({ navigation, route }: Props) {
                 {placing ? (
                   <ActivityIndicator color="#FFF" />
                 ) : (
-                  <Text style={styles.placeBtnText}>✅ Done Bill</Text>
+                  <Text style={styles.placeBtnText}>📋 Post Bill to Chat</Text>
                 )}
               </LinearGradient>
             </Pressable>
           )}
         </ScrollView>
+      </View>
+    );
+  }
+
+  if (step === 'summary') {
+    return (
+      <View style={[styles.flex, { backgroundColor: palette.warmCream, paddingTop: insets.top }]}>
+        <CheckoutHeader
+          title="Order Summary"
+          onBack={() => setStep('checkout')}
+          palette={palette}
+        />
+        <ScrollView contentContainerStyle={styles.checkoutContent}>
+          <Text style={[styles.sectionTitle, { color: palette.espresso }]}>Review Your Items</Text>
+          {cart.map((line) => (
+            <View key={line.menuItemId} style={[styles.cartRow, { backgroundColor: palette.white }]}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.cartName, { color: palette.espresso }]}>{line.name}</Text>
+                <Text style={{ color: palette.textMuted }}>
+                  {formatRupee(line.price)} × {line.quantity}
+                </Text>
+              </View>
+              <Text style={[styles.cartLineTotal, { color: palette.espresso }]}>
+                {formatRupee(line.price * line.quantity)}
+              </Text>
+            </View>
+          ))}
+
+          <View style={[styles.summary, { backgroundColor: '#FFF', marginTop: 16 }]}>
+            <Text style={[styles.sectionTitle, { color: palette.espresso }]}>Bill Breakdown</Text>
+            <SummaryRow label="Subtotal" value={formatRupee(bill.subtotal)} />
+            <SummaryRow label="CGST (2.5%)" value={formatRupee(bill.cgst)} />
+            <SummaryRow label="SGST (2.5%)" value={formatRupee(bill.sgst)} />
+            {bill.couponDiscount > 0 && (
+              <SummaryRow label="Coupon Discount" value={`-${formatRupee(bill.couponDiscount)}`} accent />
+            )}
+            <View style={{ height: 1, backgroundColor: 'rgba(111,78,55,0.12)', marginVertical: 8 }} />
+            <SummaryRow label="Platform Confirmation Fee" value="₹20" bold accent />
+            <View style={{ height: 1, backgroundColor: 'rgba(111,78,55,0.12)', marginVertical: 8 }} />
+            <SummaryRow label="Total Payable (Later at Café)" value={formatRupee(bill.finalAmount)} bold />
+            <SummaryRow label="Amount to Pay Now" value="₹20" bold accent />
+          </View>
+
+          <View style={[styles.warnBox, { backgroundColor: '#E8F5E9', borderColor: '#C8E6C9', marginTop: 16 }]}>
+            <Text style={[styles.warnText, { color: '#2E7D32' }]}>
+              ℹ A platform confirmation fee of ₹20 is charged to confirm and lock this order. This fee is non-refundable. You will pay the remaining food bill at the café.
+            </Text>
+          </View>
+
+          <Pressable
+            onPress={handlePayAndConfirmOrder}
+            disabled={placing}
+            style={[styles.placeWrap, { marginTop: 24 }]}
+          >
+            <LinearGradient
+              colors={[palette.coffeeBrown, palette.darkCoffee]}
+              style={styles.placeBtn}
+            >
+              {placing ? (
+                <ActivityIndicator color="#FFF" />
+              ) : (
+                <Text style={styles.placeBtnText}>Pay ₹20 & Confirm Order</Text>
+              )}
+            </LinearGradient>
+          </Pressable>
+        </ScrollView>
+
+      </View>
+    );
+  }
+
+  if (step === 'success') {
+    return (
+      <View style={[styles.flex, { backgroundColor: palette.warmCream, justifyContent: 'center', alignItems: 'center', padding: 24 }]}>
+        <Animated.View entering={FadeInDown.duration(400)} style={{ alignItems: 'center', width: '100%' }}>
+          <View style={{ width: 96, height: 96, borderRadius: 48, backgroundColor: '#E8F5E9', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+            <Ionicons name="checkmark-circle" size={80} color="#2E7D32" />
+          </View>
+
+          <Text style={{ fontSize: 26, fontWeight: '800', color: palette.espresso, textAlign: 'center', marginBottom: 12 }}>
+            Order Confirmed! 🎉
+          </Text>
+          <Text style={{ fontSize: 15, color: palette.textSecondary, textAlign: 'center', marginBottom: 32, lineHeight: 22 }}>
+            Your order has been verified and successfully sent to the café dashboard.
+          </Text>
+
+          <View style={{ width: '100%', backgroundColor: '#FFF', borderRadius: 16, padding: 20, marginBottom: 40, borderWidth: 1, borderColor: 'rgba(111,78,55,0.08)' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
+              <Text style={{ color: palette.textMuted, fontWeight: '500' }}>Order ID</Text>
+              <Text style={{ color: palette.espresso, fontWeight: '700' }}>{orderId ? orderId.replace('ORD_', '') : '—'}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
+              <Text style={{ color: palette.textMuted, fontWeight: '500' }}>Transaction ID</Text>
+              <Text style={{ color: palette.espresso, fontWeight: '600' }}>{transactionId || '—'}</Text>
+            </View>
+            <View style={{ height: 1, backgroundColor: 'rgba(111,78,55,0.08)', marginVertical: 12 }} />
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+              <Text style={{ color: palette.textMuted, fontWeight: '500' }}>Platform Fee Paid</Text>
+              <Text style={{ color: '#2E7D32', fontWeight: '700' }}>₹20</Text>
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={{ color: palette.textMuted, fontWeight: '500' }}>To Pay at Café</Text>
+              <Text style={{ color: palette.espresso, fontWeight: '800' }}>{formatRupee(bill.finalAmount)}</Text>
+            </View>
+          </View>
+
+          <Pressable
+            onPress={() => navigation.navigate('MeetupChat', { meetupId })}
+            style={{ width: '100%', borderRadius: 28, overflow: 'hidden' }}
+          >
+            <LinearGradient
+              colors={[palette.coffeeBrown, palette.darkCoffee]}
+              style={{ paddingVertical: 16, alignItems: 'center' }}
+            >
+              <Text style={{ color: '#FFF', fontWeight: '800', fontSize: 16 }}>Go to Meetup Chat</Text>
+            </LinearGradient>
+          </Pressable>
+        </Animated.View>
       </View>
     );
   }

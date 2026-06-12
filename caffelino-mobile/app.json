@@ -21,6 +21,7 @@
     },
     "android": {
       "package": "com.caffelino.mobile",
+      "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "adjustResize",
       "adaptiveIcon": {
         "backgroundColor": "#3E2723",
@@ -40,7 +41,9 @@
           "locationWhenInUsePermission": "Allow Caffélino to find cafés near you."
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth"
     ],
     "web": {
       "favicon": "./assets/favicon.png"

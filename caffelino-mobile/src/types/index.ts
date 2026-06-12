@@ -11,6 +11,8 @@ export interface User {
   profileCompleted: boolean;
   username?: string;
   city?: string;
+  isVerified?: boolean;
+  firebaseUid?: string;
 }
 
 export interface AuthResponse {
@@ -262,6 +264,7 @@ export type MainStackParamList = {
   MyMeetups: undefined;
   MeetupOrder: {
     meetupId: string;
+    meetupCode?: string;
     cafeId: string;
     cafeName: string;
     isHost: boolean;

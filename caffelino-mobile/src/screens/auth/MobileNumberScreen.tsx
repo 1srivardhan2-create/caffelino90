@@ -14,7 +14,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { DEMO_PHONE_HINT } from '../../services/demoAuth.service';
+
 import {
   formatIndianMobile,
   isValidIndianMobile,
@@ -30,10 +30,11 @@ const COUNTRY_CODE = '+91';
 
 export function MobileNumberScreen({ navigation }: Props) {
   const { palette } = useTheme();
-  const { demoOtp } = useAuth();
+  const { sendPhoneOtp } = useAuth();
   const inputRef = useRef<TextInput>(null);
-  const [digits, setDigits] = useState(DEMO_PHONE_HINT);
+  const [digits, setDigits] = useState('');
   const [focused, setFocused] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const displayValue = formatIndianMobile(digits);
 
@@ -41,7 +42,7 @@ export function MobileNumberScreen({ navigation }: Props) {
     setDigits(parseIndianMobile(text));
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!isValidIndianMobile(digits)) {
       Alert.alert(
         'Invalid number',
@@ -50,12 +51,20 @@ export function MobileNumberScreen({ navigation }: Props) {
       return;
     }
 
-    navigation.navigate('Otp', {
-      mobileNumber: toIndianE164(digits),
-      localDigits: digits,
-      countryCode: COUNTRY_CODE,
-      isNewUser: true,
-    });
+    setLoading(true);
+    try {
+      await sendPhoneOtp(digits);
+      navigation.navigate('Otp', {
+        mobileNumber: toIndianE164(digits),
+        localDigits: digits,
+        countryCode: COUNTRY_CODE,
+        isNewUser: true, // Will be resolved during verification
+      });
+    } catch (e: any) {
+      Alert.alert('Error', e.message || 'Failed to send OTP');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -70,13 +79,9 @@ export function MobileNumberScreen({ navigation }: Props) {
             Enter Your Mobile Number
           </Text>
           <Text style={[styles.hint, { color: palette.textMuted }]}>
-            Demo mode — use OTP {demoOtp} on the next screen
+            We'll send you an OTP to verify your number
           </Text>
         </Animated.View>
-
-        <View style={[styles.demoBadge, { backgroundColor: palette.goldAccent }]}>
-          <Text style={styles.demoText}>☕ Demo: {DEMO_PHONE_HINT} → OTP {demoOtp}</Text>
-        </View>
 
         <Pressable
           onPress={() => inputRef.current?.focus()}
@@ -112,7 +117,7 @@ export function MobileNumberScreen({ navigation }: Props) {
           />
         </Pressable>
 
-        <Button label="Continue →" onPress={handleContinue} />
+        <Button label="Continue →" onPress={handleContinue} loading={loading} disabled={loading} />
       </View>
     </KeyboardAvoidingView>
   );
@@ -124,12 +129,6 @@ const styles = StyleSheet.create({
   header: { marginBottom: spacing.lg },
   title: { ...typography.h1, marginBottom: spacing.sm },
   hint: { ...typography.bodySmall },
-  demoBadge: {
-    padding: spacing.sm,
-    borderRadius: radius.md,
-    marginBottom: spacing.lg,
-  },
-  demoText: { color: '#2B1B17', fontSize: 13, fontWeight: '600', textAlign: 'center' },
   phoneRow: {
     flexDirection: 'row',
     alignItems: 'center',

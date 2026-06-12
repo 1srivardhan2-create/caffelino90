@@ -149,12 +149,14 @@ export function EventDetailsScreen() {
 
   const handleRegisterClick = () => {
     if (!user) return setErrorMsg('Please login to register for events');
+    if (!user.isVerified) return setErrorMsg('Please verify your phone number to register for events.');
     if (!user.mobileNumber && !mobileInput) return setShowMobileModal(true);
     setShowConfirmModal(true);
   };
 
   const initiatePayment = async () => {
     if (!user) return alert('Please login to purchase tickets');
+    if (!user.isVerified) return alert('Please verify your phone number to purchase tickets.');
     if (!user.mobileNumber && !mobileInput) return setShowMobileModal(true);
     
     setRegistering(true);

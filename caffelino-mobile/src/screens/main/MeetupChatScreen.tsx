@@ -38,8 +38,7 @@ import { useMeetupChat, useMeetupRoom, type ChatMessage } from '../../hooks/useM
 import { meetupsApi } from '../../api';
 import { IllustratedAvatar } from '../../components/onboarding/IllustratedAvatar';
 import { getAvatarById } from '../../constants/avatars';
-import { paymentService } from '../../services/paymentService';
-import { RazorpaySimulator } from '../../components/payment/RazorpaySimulator';
+import RazorpayCheckout from 'react-native-razorpay';
 import { radius, shadows, spacing, typography } from '../../theme';
 import type { ColorPalette } from '../../theme/colors';
 import type { MainStackParamList, MeetupMember } from '../../types';
@@ -95,7 +94,6 @@ export function MeetupChatScreen({ navigation, route }: Props) {
   const [codeCopied, setCodeCopied] = useState(false);
   const [joinToast, setJoinToast] = useState<string | null>(null);
   const [showReservationModal, setShowReservationModal] = useState(false);
-  const [showRazorpay, setShowRazorpay] = useState(false);
   const [payingReservation, setPayingReservation] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -258,6 +256,7 @@ export function MeetupChatScreen({ navigation, route }: Props) {
     }
     navigation.navigate('MeetupOrder', {
       meetupId,
+      meetupCode: meetupCode !== '——' ? meetupCode : undefined,
       cafeId,
       cafeName,
       isHost: Boolean(isHost),
@@ -278,6 +277,7 @@ export function MeetupChatScreen({ navigation, route }: Props) {
     }
     navigation.navigate('MeetupOrder', {
       meetupId,
+      meetupCode: meetupCode !== '——' ? meetupCode : undefined,
       cafeId,
       cafeName,
       isHost: true,
@@ -290,53 +290,91 @@ export function MeetupChatScreen({ navigation, route }: Props) {
     });
   };
 
-  const payReservation = () => {
+  const payReservation = async () => {
     setShowReservationModal(false);
-    setTimeout(() => {
-      setShowRazorpay(true);
-    }, 500);
-  };
-
-  const handleRazorpaySuccess = async () => {
-    setShowRazorpay(false);
     if (!user?.id) return;
     setPayingReservation(true);
     try {
-      await meetupsApi.confirmTableReservation({
+      // Step 1: Create Razorpay order on backend
+      const createRes = await meetupsApi.createRazorpayOrder({
         meetupId,
         userId: user.id,
-        userName: user.name ?? 'Host',
-        demo: true,
       });
 
-      if (latestBill && meetup) {
-        await paymentService.sendOrderToCafeDashboard(
-          meetup,
-          latestBill.items || [],
-          latestBill.total,
-          user.name || 'Host',
-          cafeName,
-          latestBill.splitEnabled || false,
-          latestBill.coupon
-        );
+      if (!createRes.success || !createRes.orderId) {
+        Alert.alert('Payment Error', 'Failed to initialize payment. Try again.');
+        setPayingReservation(false);
+        return;
       }
 
-      await meetupsApi.sendMessage({
-        meetupId,
-        userId: 'system',
-        userName: 'System',
-        message: '☕ Meetup Confirmed\n✅ Payment Received\n✅ Table Reserved\n✅ Order Sent To Cafe\n🔒 Bill Locked\n₹20 Confirmation Fee Paid',
-        type: 'system',
-      });
+      setPayingReservation(false);
 
-      await reload();
-      Alert.alert(
-        '☕ Meetup Confirmed',
-        'Payment successful! Table reserved. Order sent to café. Bill is now locked.',
-      );
-    } catch (e) {
-      Alert.alert('Payment processing failed', e instanceof Error ? e.message : 'Try again');
-    } finally {
+      // Step 2: Open real Razorpay native checkout
+      const options = {
+        description: 'Platform Confirmation Fee',
+        image: 'https://i.imgur.com/3g7nmJC.png',
+        currency: createRes.currency || 'INR',
+        key: 'rzp_live_STzO1DnRlqY3vN',
+        amount: String(createRes.amount),
+        order_id: createRes.orderId,
+        name: 'Caffelino',
+        prefill: {
+          email: user.email || 'user@caffelino.in',
+          contact: user.mobileNumber ? `+${user.mobileNumber}` : '',
+          name: user.name || 'User',
+        },
+        theme: { color: '#6F4E37' },
+      };
+
+      RazorpayCheckout.open(options)
+        .then(async (data: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) => {
+          setPayingReservation(true);
+          try {
+            const verifyRes = await meetupsApi.verifyRazorpayPayment({
+              razorpay_order_id: data.razorpay_order_id,
+              razorpay_payment_id: data.razorpay_payment_id,
+              razorpay_signature: data.razorpay_signature,
+              meetupId,
+              userId: user.id,
+              orderPayload: latestBill ? {
+                items: latestBill.items,
+                subtotal: latestBill.subtotal,
+                cgst: latestBill.cgst,
+                sgst: latestBill.sgst,
+                total: latestBill.totalPayable ?? latestBill.finalAmount,
+                splitEnabled: latestBill.splitEnabled,
+                perPersonAmount: latestBill.perPersonAmount,
+                memberCount: latestBill.memberCount,
+                members: meetup?.members || [],
+                cafeId: cafeId,
+                cafeName: cafeName,
+                meetupDate: meetup?.date,
+                meetupTime: meetup?.time,
+                userName: user.name ?? 'Host',
+              } : undefined,
+            });
+
+            if (verifyRes.success) {
+              await reload();
+              Alert.alert('☕ Meetup Confirmed', 'Payment successful! Table reserved. Order sent to café.');
+            } else {
+              Alert.alert('Verification Failed', 'Payment received but could not be verified.');
+            }
+          } catch (e) {
+            console.error('Verify payment error:', e);
+            Alert.alert('Verification Error', 'Failed to verify payment.');
+          } finally {
+            setPayingReservation(false);
+          }
+        })
+        .catch((error: { code: number; description: string }) => {
+          if (error.code !== 0) {
+            Alert.alert('Payment Failed', 'Payment was not completed. Order not confirmed.');
+          }
+        });
+    } catch (err) {
+      console.error('Failed to start Razorpay payment', err);
+      Alert.alert('Payment Error', 'Could not start payment. Try again.');
       setPayingReservation(false);
     }
   };
@@ -667,12 +705,6 @@ export function MeetupChatScreen({ navigation, route }: Props) {
           </View>
         </Modal>
 
-        <RazorpaySimulator
-          visible={showRazorpay}
-          amount={20}
-          onSuccess={handleRazorpaySuccess}
-          onCancel={() => setShowRazorpay(false)}
-        />
 
         <Modal visible={Boolean(selectedMsgForMenu)} transparent animationType="fade">
           <Pressable style={styles.modalBg} onPress={() => setSelectedMsgForMenu(null)}>

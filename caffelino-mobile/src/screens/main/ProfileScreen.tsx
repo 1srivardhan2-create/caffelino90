@@ -32,7 +32,7 @@ type MenuItem = {
 export function ProfileScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { palette } = useTheme();
-  const { user, logout, refreshUser } = useAuth();
+  const { user, logout } = useAuth();
   const avatar = getAvatarById(user?.avatarId);
 
   const handleLogout = () => {
@@ -79,17 +79,6 @@ export function ProfileScreen({ navigation }: Props) {
       onPress: () => navigation.navigate('Settings'),
     },
     {
-      icon: 'briefcase-outline',
-      label: user?.role === 'cafe_owner' ? 'Switch to User View' : 'Switch to Cafe Owner View',
-      subtitle: 'Developer Testing Toggle',
-      onPress: async () => {
-        if (user) {
-          const newRole = user.role === 'cafe_owner' ? 'user' : 'cafe_owner';
-          await refreshUser({ ...user, role: newRole });
-        }
-      },
-    },
-    {
       icon: 'log-out-outline',
       label: 'Logout',
       onPress: handleLogout,
@@ -110,7 +99,12 @@ export function ProfileScreen({ navigation }: Props) {
         <View style={styles.avatarWrap}>
           <IllustratedAvatar avatar={avatar} size={88} />
         </View>
-        <Text style={styles.name}>{user?.name}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Text style={styles.name}>{user?.name}</Text>
+          {user?.isVerified && (
+            <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
+          )}
+        </View>
         {user?.mobileNumber ? (
           <Text style={styles.phone}>+{user.mobileNumber}</Text>
         ) : null}
