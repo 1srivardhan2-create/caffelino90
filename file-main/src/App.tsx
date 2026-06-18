@@ -294,11 +294,15 @@ function AppContent() {
 
   const getPageFromPath = (path: string): Page | null => {
     if (path === '/loved-by-users') return 'loved-by-users';
+    if (path === '/privacy-policy') return 'privacy-policy';
+    if (path === '/terms') return 'terms';
     return null;
   };
 
   const getUrlFromPage = (page: Page): string => {
     if (page === 'loved-by-users') return '/loved-by-users';
+    if (page === 'privacy-policy') return '/privacy-policy';
+    if (page === 'terms') return '/terms';
     return '/';
   };
 
