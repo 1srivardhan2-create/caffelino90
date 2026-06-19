@@ -41,6 +41,8 @@ import JoinMeetup from './components/JoinMeetup';
 import JoinVoting from './components/JoinVoting';
 import CafeDetailsPage from './components/CafeDetailsPage';
 import AllCafesPage from './components/AllCafesPage';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsAndConditions from './components/TermsAndConditions';
 import { initializeApp } from './utils/initializeApp';
 import { initializeNotifications, getUnreadCount } from './utils/notificationManager';
 import { clearAllGroupData } from './utils/groupStateManager';
@@ -84,10 +86,11 @@ type Page =
   | "meetup-chat-billing"
   | "meetup-chat-billing-completed"
   | "payment-online"
-  | "join-meetup"
   | "join-voting"
   | "cafe-details"
   | "all-cafes"
+  | "privacy-policy"
+  | "terms"
   | "cafe-owner-google-login";
 
 interface User {
@@ -779,6 +782,10 @@ function AppContent() {
         return <CafeDetailsPage cafe={selectedCafe} user={user} onNavigate={navigateTo} onBack={handleBack} />;
       case "all-cafes":
         return <AllCafesPage onNavigate={navigateTo} onBack={handleBack} />;
+      case "privacy-policy":
+        return <PrivacyPolicy onBack={() => navigateTo("landing")} />;
+      case "terms":
+        return <TermsAndConditions onBack={() => navigateTo("landing")} />;
       default:
         if (currentPage !== 'landing' && currentPage !== 'home') {
           setTimeout(() => navigateTo('home'), 0);
