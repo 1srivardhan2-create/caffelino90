@@ -78,6 +78,22 @@ export default function Footer({ user, onShowAuth, onNavigate }: FooterProps) {
                     Safety Guidelines
                   </button>
                 </li>
+                <li>
+                  <button 
+                    onClick={() => onNavigate?.('privacy-policy')}
+                    className="text-slate-300 text-[14px] hover:text-white transition-colors text-left"
+                  >
+                    Privacy Policy
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => onNavigate?.('terms')}
+                    className="text-slate-300 text-[14px] hover:text-white transition-colors text-left"
+                  >
+                    Terms & Conditions
+                  </button>
+                </li>
               </ul>
             </div>
           </div>
