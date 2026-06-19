@@ -262,7 +262,7 @@ function AppContent() {
       const publicPages = [
         'landing', 'login', 'partner-login-choice', 'about-us', 
         'how-it-works', 'safety-guidelines', 'partner-registration', 
-        'cafe-owner-google-login'
+        'cafe-owner-google-login', 'privacy-policy', 'terms'
       ];
       if (publicPages.includes(savedCurrentPage)) {
         return savedCurrentPage;
@@ -293,9 +293,11 @@ function AppContent() {
   };
 
   const getPageFromPath = (path: string): Page | null => {
-    if (path === '/loved-by-users') return 'loved-by-users';
-    if (path === '/privacy-policy') return 'privacy-policy';
-    if (path === '/terms') return 'terms';
+    // Remove trailing slash for robust matching
+    const cleanPath = path.endsWith('/') && path.length > 1 ? path.slice(0, -1) : path;
+    if (cleanPath === '/loved-by-users') return 'loved-by-users';
+    if (cleanPath === '/privacy-policy') return 'privacy-policy';
+    if (cleanPath === '/terms') return 'terms';
     return null;
   };
 
