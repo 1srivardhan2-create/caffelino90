@@ -5,9 +5,10 @@ import { ArrowLeft } from "lucide-react";
 interface LandingPageProps {
   onSelectMode: (mode: 'go' | 'partner') => void;
   onBack?: () => void;
+  onNavigate?: (page: string) => void;
 }
 
-export default function LandingPage({ onSelectMode, onBack }: LandingPageProps) {
+export default function LandingPage({ onSelectMode, onBack, onNavigate }: LandingPageProps) {
   return (
     <div className="glass-button-root relative shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] size-full min-h-screen" data-name="LandingPage" style={{ backgroundImage: "linear-gradient(147.955deg, rgb(100, 65, 48) 2%, rgb(217, 191, 157) 52.404%, rgb(139, 89, 67) 100%), linear-gradient(90deg, rgb(248, 250, 252) 0%, rgb(248, 250, 252) 100%)" }}>
       {/* Dotted Grid Background Pattern */}
@@ -68,9 +69,25 @@ export default function LandingPage({ onSelectMode, onBack }: LandingPageProps) 
           </div>
 
           {/* Bottom Text */}
-          <p className="font-['Arial:Regular',_sans-serif] text-[14px] text-center text-neutral-950 leading-[20px]">
+          <p className="font-['Arial:Regular',_sans-serif] text-[14px] text-center text-neutral-950 leading-[20px] mb-8">
             Plan meetups and split bills effortlessly
           </p>
+
+          {/* Footer Links */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 mt-4 text-neutral-800 text-sm font-medium z-10">
+            <button 
+              onClick={() => onNavigate && onNavigate('privacy-policy')}
+              className="hover:text-black hover:underline transition-all"
+            >
+              Privacy Policy
+            </button>
+            <button 
+              onClick={() => onNavigate && onNavigate('terms')}
+              className="hover:text-black hover:underline transition-all"
+            >
+              Terms & Conditions
+            </button>
+          </div>
         </div>
       </div>
     </div>

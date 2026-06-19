@@ -712,7 +712,7 @@ function AppContent() {
   const renderPage = () => {
     switch (currentPage) {
       case "landing":
-        return <LandingPage onSelectMode={handleModeSelection} />;
+        return <LandingPage onSelectMode={handleModeSelection} onNavigate={navigateTo} />;
       case "home":
         return <HomePage user={user} onNavigate={navigateTo} onShowAuth={() => setShowAuthModal(true)} userJustLoggedIn={userJustLoggedIn} />;
       case "complete-profile":
