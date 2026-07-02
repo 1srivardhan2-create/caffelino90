@@ -101,6 +101,10 @@ app.get("/health", (req, res) => {
     });
 });
 
+app.get("/", (req, res) => {
+    res.send("Caffelino API is running");
+});
+
 // ─── Socket.io Events ────────────────────────────────────────────
 io.on("connection", (socket) => {
     console.log(`⚡ Socket connected: ${socket.id}`);
