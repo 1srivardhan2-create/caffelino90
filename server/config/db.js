@@ -16,7 +16,13 @@ const connectDB = async () => {
 
     // Auto-fix missing scheme if user pasted connection string incorrectly in Render
     if (!MONGO_URI.startsWith("mongodb://") && !MONGO_URI.startsWith("mongodb+srv://")) {
-        MONGO_URI = "mongodb+srv://" + MONGO_URI.replace(/^\/+/, "");
+        const cleanUri = MONGO_URI.replace(/^\/+/, "");
+        // If the connection string specifies multiple replica nodes (comma-separated), it MUST use mongodb://
+        if (cleanUri.includes(",")) {
+            MONGO_URI = "mongodb://" + cleanUri;
+        } else {
+            MONGO_URI = "mongodb+srv://" + cleanUri;
+        }
     }
 
     // Log a masked URI for debugging
