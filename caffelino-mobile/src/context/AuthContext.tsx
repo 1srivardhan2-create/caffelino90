@@ -7,7 +7,6 @@ import React, {
   useState,
   useRef,
 } from 'react';
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { userApi, authApi, ApiError } from '../api';
 import {
   getToken,
@@ -145,8 +144,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     hasLocationPermission: false,
   });
 
-  const confirmationRef = useRef<FirebaseAuthTypes.ConfirmationResult | null>(null);
   const lastE164Ref = useRef<string | null>(null);
+  const logIdRef = useRef<string | null>(null);
 
   const bootstrap = useCallback(async () => {
     const [token, user, onboarding, location] = await Promise.all([
@@ -171,18 +170,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [bootstrap]);
 
   const sendPhoneOtp = useCallback(async (localDigits: string) => {
+    // AuthKey works best with raw numbers. The backend handles any +91 logic if needed.
     const e164 = toIndianE164(localDigits);
-    
-    console.log('Original Number:', localDigits);
-    console.log('Firebase Number:', e164);
+    console.log('Requesting OTP for:', localDigits);
 
-    lastE164Ref.current = e164;
+    lastE164Ref.current = localDigits; // Store the original for resend
     try {
-      const confirmation = await auth().signInWithPhoneNumber(e164);
-      confirmationRef.current = confirmation;
-      return { isNewUser: true }; // We don't know until we verify the OTP with the backend
+      const response = await authApi.sendOtp(localDigits);
+      if (response.success && response.logId) {
+        logIdRef.current = response.logId;
+        return { isNewUser: true }; // Backend will determine actual status during verification
+      }
+      throw new Error(response.message || 'Failed to send OTP');
     } catch (error: any) {
-      console.error('Firebase sendOtp error:', error);
+      console.error('sendOtp error:', error);
       throw new Error(error.message || 'Failed to send OTP');
     }
   }, []);
@@ -190,10 +191,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const resendPhoneOtp = useCallback(async () => {
     if (lastE164Ref.current) {
       try {
-        const confirmation = await auth().signInWithPhoneNumber(lastE164Ref.current);
-        confirmationRef.current = confirmation;
+        const response = await authApi.sendOtp(lastE164Ref.current);
+        if (response.success && response.logId) {
+           logIdRef.current = response.logId;
+        } else {
+           throw new Error(response.message || 'Failed to resend OTP');
+        }
       } catch (error: any) {
-        console.error('Firebase resendOtp error:', error);
+        console.error('resendOtp error:', error);
         throw new Error(error.message || 'Failed to resend OTP');
       }
     }
@@ -202,41 +207,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const verifyPhoneOtp = useCallback(
     async (localDigits: string, otpCode: string, _isNewUser: boolean) => {
       try {
-        if (!confirmationRef.current) {
-          throw new Error('No OTP request found. Please go back and request again.');
+        if (!logIdRef.current) {
+          throw new Error('No active OTP session. Please go back and request a new code.');
         }
 
-        // 1. Verify with Firebase
-        await confirmationRef.current.confirm(otpCode);
-        
-        // 2. Get ID Token from Firebase User
-        const currentUser = auth().currentUser;
-        if (!currentUser) throw new Error('Firebase user not found after verification');
-        const idToken = await currentUser.getIdToken(true);
-
-        // 3. Authenticate with backend using the ID Token
-        const response = await authApi.firebasePhoneLogin(idToken);
+        const response = await authApi.verifyOtp(localDigits, otpCode, logIdRef.current);
         
         if (!response.success || !response.token || !response.user) {
-          throw new Error('Backend authentication failed');
+          throw new Error(response.message || 'Verification failed. Please check the OTP.');
         }
 
         const user = mapApiUser(response.user);
         const localOnboardingDone = await isOnboardingComplete();
         const profileDone = hasCompletedNewOnboarding(user, localOnboardingDone);
 
-        // 4. Set Session Locally
+        // Set Session Locally
         await applySession(response.token, user, setState, profileDone);
 
         return { isNewUser: response.isNewUser ?? !profileDone };
       } catch (error: any) {
         console.error('Verify OTP Error:', error);
-        if (error.code === 'auth/invalid-verification-code') {
-          throw new Error('Invalid OTP code. Please check and try again.');
-        }
-        if (error.code === 'auth/code-expired') {
-          throw new Error('OTP expired. Please request a new one.');
-        }
         throw new Error(error.message || 'Verification failed');
       }
     },
@@ -337,9 +327,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     await clearSession();
-    try {
-      await auth().signOut();
-    } catch(e) {}
     setState({
       user: null,
       token: null,

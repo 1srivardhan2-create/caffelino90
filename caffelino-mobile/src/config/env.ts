@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 
-/** Render backend — works from real phones on Expo Go */
-const PRODUCTION_API = 'http://192.168.0.105:4000';
+/** Render backend — live production URL */
+const PRODUCTION_API = 'https://caffelino90.onrender.com';
 
 const extra = Constants.expoConfig?.extra as { apiBaseUrl?: string } | undefined;
 

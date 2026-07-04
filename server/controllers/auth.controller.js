@@ -2,7 +2,6 @@ const { OAuth2Client } = require("google-auth-library");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User/User");
 const Cafe = require("../models/Cafe/Cafe_login");
-const { getFirebaseAdmin } = require("../config/firebase");
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -273,12 +272,63 @@ const mobileSignup = async (req, res) => {
     }
 };
 
-const mobileLogin = async (req, res) => {
+const sendOtp = async (req, res) => {
     try {
         const { mobileNumber } = req.body;
 
         if (!mobileNumber) {
             return res.status(400).json({ message: "Mobile Number is required" });
+        }
+
+        const cleanPhone = mobileNumber.trim();
+        const digitsOnly = String(cleanPhone).replace(/\D/g, "");
+        // The mobile number sent to AuthKey should ideally be without the country code, 
+        // as country_code is passed separately in the URL.
+        // E.g., if digitsOnly is 12 digits starting with 91, extract the last 10.
+        const mobileForAuthKey = digitsOnly.length >= 10 ? digitsOnly.slice(-10) : digitsOnly;
+
+        const authKeyUrl = `https://console.authkey.io/restapi/request.php?authkey=${process.env.AUTHKEY_API_KEY}&mobile=${mobileForAuthKey}&country_code=91&sid=${process.env.AUTHKEY_SID}`;
+
+        const response = await fetch(authKeyUrl);
+        const data = await response.json();
+
+        if (data.Message === "Submitted Successfully" || data.LogId) {
+            console.log(`📱 AuthKey OTP sent for ${mobileForAuthKey}, LogId: ${data.LogId}`);
+            res.status(200).json({
+                success: true,
+                message: "OTP sent successfully",
+                logId: data.LogId
+            });
+        } else {
+            console.error("AuthKey Send Error:", data);
+            res.status(400).json({ message: "Failed to send OTP", error: data });
+        }
+    } catch (error) {
+        console.error("Send OTP Error:", error.message);
+        res.status(500).json({ message: "Failed to send OTP", error: error.message });
+    }
+};
+
+const verifyOtp = async (req, res) => {
+    try {
+        const { mobileNumber, otp, logId } = req.body;
+
+        if (!mobileNumber || !otp || !logId) {
+            return res.status(400).json({ message: "Mobile Number, OTP, and LogId are required" });
+        }
+
+        const authKeyUrl = `https://console.authkey.io/api/2fa_verify.php?authkey=${process.env.AUTHKEY_API_KEY}&channel=SMS&otp=${otp}&logid=${logId}`;
+        
+        const response = await fetch(authKeyUrl);
+        const data = await response.json();
+
+        if (data.Message !== "Successful" && data.Status !== "Success" && data.Message !== "Valid OTP") {
+            // Adjust based on exact AuthKey valid response structure. 
+            // "Successful" or "Valid OTP" are common success messages.
+            if (!data.Message?.toLowerCase().includes("success") && !data.Message?.toLowerCase().includes("valid")) {
+                console.error("AuthKey Verify Error:", data);
+                return res.status(400).json({ message: "Invalid OTP code. Please try again." });
+            }
         }
 
         const cleanPhone = mobileNumber.trim();
@@ -292,61 +342,27 @@ const mobileLogin = async (req, res) => {
             ] 
         });
 
-        if (!user) {
-            return res.status(404).json({ message: "No account found with this mobile number. Please register first." });
-        }
-
-        // Generate a simple 6-digit OTP (e.g. 123456 or a random code)
-        const generatedOtp = "123456"; // standard demo OTP
-        user.otp = generatedOtp;
-        user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins expiry
-        await user.save();
-
-        console.log(`📱 OTP generated for ${cleanPhone}: ${generatedOtp}`);
-
-        res.status(200).json({
-            success: true,
-            message: "OTP sent successfully",
-            otp: generatedOtp, // return OTP so the app can auto-fill or print it for developers!
-        });
-    } catch (error) {
-        console.error("Mobile Login Error:", error.message);
-        res.status(500).json({ message: "Login failed", error: error.message });
-    }
-};
-
-const mobileVerifyOtp = async (req, res) => {
-    try {
-        const { mobileNumber, otp } = req.body;
-
-        if (!mobileNumber || !otp) {
-            return res.status(400).json({ message: "Mobile Number and OTP are required" });
-        }
-
-        const cleanPhone = mobileNumber.trim();
-        const dummyEmail = `${cleanPhone}@caffelino.app`;
-
-        // Check user
-        let user = await User.findOne({ 
-            $or: [
-                { mobileNumber: cleanPhone },
-                { email: dummyEmail }
-            ] 
-        });
+        let isNewUser = false;
 
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            isNewUser = true;
+            const casualAvatars = ["male-casual-1", "male-casual-2", "female-casual-1", "female-casual-2"];
+            const randomAvatar = casualAvatars[Math.floor(Math.random() * casualAvatars.length)];
+            user = await User.create({
+                name: "Coffee Lover",
+                email: dummyEmail,
+                mobileNumber: cleanPhone,
+                authProvider: "authkey",
+                isVerified: true,
+                profileCompleted: false,
+                avatarId: randomAvatar,
+                gender: randomAvatar.startsWith("male") ? "male" : "female",
+            });
+        } else {
+            user.isVerified = true;
+            await user.save();
+            isNewUser = !user.profileCompleted;
         }
-
-        // Verify OTP (accept 123456 or saved OTP)
-        if (otp !== "123456" && user.otp !== otp) {
-            return res.status(400).json({ message: "Invalid OTP code. Please try again." });
-        }
-
-        // Clear OTP on successful verify
-        user.otp = undefined;
-        user.otpExpiresAt = undefined;
-        await user.save();
 
         // Generate JWT token
         const token = jwt.sign(
@@ -363,23 +379,13 @@ const mobileVerifyOtp = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: "OTP verification successful",
+            message: isNewUser ? "Phone verified. Complete your profile." : "Login successful",
             token,
-            user: {
-                id: user._id,
-                name: user.name,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                mobileNumber: user.mobileNumber,
-                avatarId: user.avatarId,
-                gender: user.gender,
-                role: "user",
-                profileCompleted: user.profileCompleted || false,
-            }
+            isNewUser,
+            user: buildAuthUserResponse(user)
         });
     } catch (error) {
-        console.error("Mobile Verify OTP Error:", error.message);
+        console.error("Verify OTP Error:", error.message);
         res.status(500).json({ message: "Verification failed", error: error.message });
     }
 };
@@ -410,99 +416,10 @@ function buildAuthUserResponse(user) {
     };
 }
 
-// POST /api/auth/firebase-phone — Verify Firebase ID token after phone OTP
-const firebasePhoneLogin = async (req, res) => {
-    try {
-        const { idToken } = req.body;
-        if (!idToken) {
-            return res.status(400).json({ message: "Firebase ID token is required" });
-        }
-
-        const admin = getFirebaseAdmin();
-        if (!admin) {
-            return res.status(503).json({
-                message: "Firebase is not configured on the server. Set FIREBASE_SERVICE_ACCOUNT_JSON.",
-            });
-        }
-
-        const decoded = await admin.auth().verifyIdToken(idToken);
-        const firebaseUid = decoded.uid;
-        const phoneRaw = decoded.phone_number;
-        if (!phoneRaw) {
-            return res.status(400).json({ message: "Phone number not found in Firebase token" });
-        }
-
-        const mobileDigits = normalizeMobileDigits(phoneRaw);
-        const localTen = mobileDigits.length >= 10 ? mobileDigits.slice(-10) : mobileDigits;
-        const dummyEmail = `${mobileDigits}@caffelino.app`;
-
-        let user = await User.findOne({
-            $or: [
-                { firebaseUid },
-                { mobileNumber: mobileDigits },
-                { mobileNumber: localTen },
-                { email: dummyEmail },
-            ],
-        });
-
-        let isNewUser = false;
-
-        if (!user) {
-            isNewUser = true;
-            const casualAvatars = ["male-casual-1", "male-casual-2", "female-casual-1", "female-casual-2"];
-            const randomAvatar = casualAvatars[Math.floor(Math.random() * casualAvatars.length)];
-            user = await User.create({
-                name: "Coffee Lover",
-                email: dummyEmail,
-                mobileNumber: mobileDigits,
-                firebaseUid,
-                authProvider: "firebase",
-                isVerified: true,
-                profileCompleted: false,
-                avatarId: randomAvatar,
-                gender: randomAvatar.startsWith("male") ? "male" : "female",
-            });
-        } else {
-            if (!user.firebaseUid) {
-                user.firebaseUid = firebaseUid;
-            }
-            if (!user.mobileNumber) user.mobileNumber = mobileDigits;
-            user.isVerified = true;
-            user.authProvider = user.authProvider || "firebase";
-            await user.save();
-            isNewUser = !user.profileCompleted;
-        }
-
-        const token = jwt.sign(
-            {
-                userId: user._id,
-                email: user.email,
-                name: user.name,
-                role: "user",
-                profileCompleted: user.profileCompleted || false,
-            },
-            process.env.JWT_SECRET || "secret",
-            { expiresIn: "7d" }
-        );
-
-        res.status(200).json({
-            success: true,
-            message: isNewUser ? "Phone verified. Complete your profile." : "Login successful",
-            token,
-            isNewUser: !user.profileCompleted,
-            user: buildAuthUserResponse(user),
-        });
-    } catch (error) {
-        console.error("Firebase Phone Login Error:", error.message);
-        res.status(401).json({ message: "Invalid or expired Firebase token", error: error.message });
-    }
-};
-
 module.exports = {
     googleLogin,
     checkRole,
     mobileSignup,
-    mobileLogin,
-    mobileVerifyOtp,
-    firebasePhoneLogin,
+    sendOtp,
+    verifyOtp,
 };

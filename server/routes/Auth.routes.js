@@ -4,9 +4,8 @@ const {
     googleLogin,
     checkRole,
     mobileSignup,
-    mobileLogin,
-    mobileVerifyOtp,
-    firebasePhoneLogin,
+    sendOtp,
+    verifyOtp,
 } = require("../controllers/auth.controller");
 
 // POST /api/auth/google-login
@@ -20,10 +19,7 @@ router.post("/check-role", checkRole);
 
 // Mobile Native Auth Endpoints
 router.post("/mobile-signup", mobileSignup);
-router.post("/mobile-login", mobileLogin);
-router.post("/mobile-verify-otp", mobileVerifyOtp);
-
-// Firebase Phone Auth (mobile app — verify ID token, issue JWT)
-router.post("/firebase-phone", firebasePhoneLogin);
+router.post("/send-otp", sendOtp);
+router.post("/verify-otp", verifyOtp);
 
 module.exports = router;

@@ -3,17 +3,17 @@ import type { AuthResponse } from '../types';
 
 export const authApi = {
   sendOtp(mobileNumber: string, timeout = 10000) {
-    return apiRequest<AuthResponse>('/api/auth/mobile-login', {
+    return apiRequest<AuthResponse & { logId?: string }>('/api/auth/send-otp', {
       method: 'POST',
       body: JSON.stringify({ mobileNumber }),
       timeout,
     });
   },
 
-  verifyOtp(mobileNumber: string, otp: string, timeout = 12000) {
-    return apiRequest<AuthResponse>('/api/auth/mobile-verify-otp', {
+  verifyOtp(mobileNumber: string, otp: string, logId: string, timeout = 12000) {
+    return apiRequest<AuthResponse & { isNewUser?: boolean }>('/api/auth/verify-otp', {
       method: 'POST',
-      body: JSON.stringify({ mobileNumber, otp }),
+      body: JSON.stringify({ mobileNumber, otp, logId }),
       timeout,
     });
   },
@@ -23,13 +23,6 @@ export const authApi = {
       method: 'POST',
       body: JSON.stringify({ fullName, mobileNumber }),
       timeout,
-    });
-  },
-
-  firebasePhoneLogin(idToken: string) {
-    return apiRequest<AuthResponse & { isNewUser?: boolean }>('/api/auth/firebase-phone', {
-      method: 'POST',
-      body: JSON.stringify({ idToken }),
     });
   },
 };

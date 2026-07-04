@@ -7,11 +7,16 @@ let isConnected = false;
  * Does NOT crash the server — keeps retrying in the background.
  */
 const connectDB = async () => {
-    const MONGO_URI = process.env.MONGO_URI;
+    let MONGO_URI = process.env.MONGO_URI;
 
     if (!MONGO_URI) {
         console.error("❌ MONGO_URI is not defined in .env — cannot connect to database.");
         return;
+    }
+
+    // Auto-fix missing scheme if user pasted connection string incorrectly in Render
+    if (!MONGO_URI.startsWith("mongodb://") && !MONGO_URI.startsWith("mongodb+srv://")) {
+        MONGO_URI = "mongodb+srv://" + MONGO_URI.replace(/^\/+/, "");
     }
 
     // Log a masked URI for debugging
